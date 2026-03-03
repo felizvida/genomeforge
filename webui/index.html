@@ -1,0 +1,2114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Genome Forge UI</title>
+  <style>
+    :root {
+      --paper: #fffaf3;
+      --bg0: #e0f2fe;
+      --bg1: #fde68a;
+      --ink: #111827;
+      --muted: #5b6476;
+      --line: #d8cfc0;
+      --card: #ffffff;
+      --brand: #0f766e;
+      --hot: #be123c;
+      --tab: #f3eadb;
+      --ok: #14532d;
+      --warn: #9a3412;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Sora", "Avenir Next", "Helvetica Neue", sans-serif;
+      background:
+        radial-gradient(800px 500px at 14% 0%, var(--bg0), transparent 60%),
+        radial-gradient(700px 460px at 90% 10%, var(--bg1), transparent 58%),
+        var(--paper);
+      min-height: 100vh;
+    }
+    .frame {
+      width: min(1380px, 96vw);
+      margin: 14px auto 24px;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      padding: 14px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 6px 0 12px;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tab {
+      border: 1px solid var(--line);
+      background: var(--tab);
+      padding: 8px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: "IBM Plex Mono", Menlo, monospace;
+      font-size: 12px;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, var(--brand), #0369a1);
+      color: white;
+      border-color: transparent;
+      font-weight: 700;
+    }
+    .tabpane { display: none; }
+    .tabpane.active { display: block; }
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 8px 0 5px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 14px;
+      font-family: "IBM Plex Mono", Menlo, monospace;
+      background: #fff;
+    }
+    input[type="checkbox"] { width: auto; margin-right: 6px; }
+    textarea { min-height: 170px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    button {
+      background: linear-gradient(140deg, var(--brand), #0c4a6e);
+      color: white;
+      border: none;
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .1s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button.hot { background: linear-gradient(140deg, var(--hot), #f97316); }
+    .output {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #0d1b2a;
+      color: #ddf7ff;
+      font-size: 12px;
+      min-height: 180px;
+      overflow: auto;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    #map {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      min-height: 460px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+    }
+    .viz-controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .viz-controls button {
+      padding: 7px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+    .interactive-viz svg [data-feature-index],
+    .interactive-viz svg [data-cut-enzyme],
+    .interactive-viz svg [data-codon-start] {
+      cursor: pointer;
+      transition: opacity .12s ease, filter .12s ease;
+    }
+    .interactive-viz svg [data-feature-index]:hover,
+    .interactive-viz svg [data-cut-enzyme]:hover,
+    .interactive-viz svg [data-codon-start]:hover {
+      opacity: 0.86;
+      filter: brightness(1.06);
+    }
+    .interactive-viz svg .selected-feature {
+      stroke: #f43f5e !important;
+      stroke-width: 4 !important;
+      opacity: 1 !important;
+    }
+    #inspector {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      min-height: 92px;
+      background: #fff;
+      padding: 10px;
+      margin-top: 8px;
+      font-family: "IBM Plex Mono", Menlo, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+    #historyGraph {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      min-height: 140px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+      margin-top: 8px;
+    }
+    #seqTrack {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      min-height: 220px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+      margin-top: 8px;
+    }
+    #trackMiniMap {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      min-height: 110px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      margin-top: 8px;
+      padding: 6px;
+    }
+    #trackMiniMap svg {
+      width: 100%;
+      height: 100px;
+      display: block;
+    }
+    #msaHeatmap {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      min-height: 220px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+      margin-top: 8px;
+    }
+    #starViz {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      min-height: 220px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+      margin-top: 8px;
+      padding: 8px;
+    }
+    #ligationGraph {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      min-height: 240px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+      margin-top: 8px;
+      padding: 8px;
+    }
+    .star-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
+      width: 100%;
+    }
+    .star-chip {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      background: #fffdfa;
+      font-family: "IBM Plex Mono", Menlo, monospace;
+      font-size: 12px;
+    }
+    .star-chip b {
+      display: block;
+      font-size: 18px;
+      color: #0f172a;
+    }
+    .star-grid {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "IBM Plex Mono", Menlo, monospace;
+      font-size: 12px;
+    }
+    .star-grid th, .star-grid td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .bar {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0ea5e9, #22c55e);
+      min-width: 1px;
+    }
+    .lig-edge {
+      stroke: #64748b;
+      stroke-width: 2;
+      opacity: .8;
+      stroke-dasharray: 7 5;
+      animation: edgeFlow 1.6s linear infinite;
+    }
+    @keyframes edgeFlow {
+      from { stroke-dashoffset: 0; }
+      to { stroke-dashoffset: -24; }
+    }
+    .lig-node {
+      cursor: pointer;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .lig-node:hover {
+      filter: brightness(1.07);
+      transform: translateY(-1px);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      background: #fffdfa;
+      text-align: center;
+    }
+    .stat b { display: block; font-size: 18px; }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    @media (max-width: 1020px) {
+      .frame { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <section class="card">
+      <h1>Genome Forge</h1>
+      <div class="subtitle">SnapGene-like local workbench: edit, map, digest, primers, PCR, ORFs, motifs, codon optimization.</div>
+
+      <label>Name</label>
+      <input id="name" value="pDemo" />
+      <div class="row">
+        <div>
+          <label>Topology</label>
+          <select id="topology"><option value="circular">circular</option><option value="linear">linear</option></select>
+        </div>
+        <div>
+          <label>Frame</label>
+          <select id="frame"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+        </div>
+      </div>
+      <label>Sequence / FASTA / GenBank</label>
+      <textarea id="content">>pDemo
+GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
+      <div class="row">
+        <button onclick="runInfo()">Refresh Info</button>
+        <button class="hot" onclick="applyEditToBuffer()">Apply Edit To Buffer</button>
+      </div>
+      <div class="row">
+        <button onclick="undoSequence()">Undo</button>
+        <button onclick="redoSequence()">Redo</button>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="tab-map">Map</button>
+        <button class="tab" data-tab="tab-analysis">Analysis</button>
+        <button class="tab" data-tab="tab-primers">Primers/PCR</button>
+        <button class="tab" data-tab="tab-search">ORF/Motif</button>
+        <button class="tab" data-tab="tab-edit">Edit</button>
+        <button class="tab" data-tab="tab-advanced">Advanced</button>
+      </div>
+
+      <div id="tab-map" class="tabpane active">
+        <label>Enzymes (comma-separated)</label>
+        <input id="enzymes" value="EcoRI,BamHI,HindIII" />
+        <label>Enzyme Set Name</label>
+        <input id="enzymeSetName" value="core_set" />
+        <div class="row">
+          <button onclick="runDigest()">Digest</button>
+          <button onclick="runMap()">Render Map</button>
+        </div>
+        <div class="row">
+          <button onclick="runEnzymeSetSave()">Set Save</button>
+          <button onclick="runEnzymeSetLoad()">Set Load</button>
+        </div>
+        <div class="row">
+          <button onclick="runEnzymeSetList()">Set List</button>
+          <button onclick="runEnzymeSetDelete()">Set Delete</button>
+        </div>
+        <button onclick="runPredefinedEnzymeSets()">Predefined Enzyme Sets</button>
+        <button onclick="runEnzymeScan()">Scan All Built-in Enzymes</button>
+      </div>
+
+      <div id="tab-analysis" class="tabpane">
+        <div class="row">
+          <button onclick="runTranslate(false)">Translate</button>
+          <button onclick="runTranslate(true)">Translate To Stop</button>
+        </div>
+        <div class="row">
+          <select id="host"><option value="ecoli">ecoli</option><option value="yeast">yeast</option></select>
+          <button class="hot" onclick="runCodonOptimize()">Codon Optimize</button>
+        </div>
+      </div>
+
+      <div id="tab-primers" class="tabpane">
+        <div class="row3">
+          <input id="targetStart" type="number" value="12" />
+          <input id="targetEnd" type="number" value="60" />
+          <input id="window" type="number" value="80" />
+        </div>
+        <div class="row">
+          <button onclick="runPrimerDesign()">Design Primers</button>
+          <button onclick="runPcr()">Virtual PCR</button>
+        </div>
+        <label>Forward Primer</label>
+        <input id="forward" value="ATGGCCATTGTAATGGGCCG" />
+        <label>Reverse Primer</label>
+        <input id="reverse" value="TCTAGAAGCTTCTATCGGGC" />
+        <div class="row">
+          <input id="naMm" type="number" value="50" />
+          <input id="primerNm" type="number" value="250" />
+        </div>
+        <button onclick="runPrimerDiagnostics()">Primer Diagnostics</button>
+        <label>PCR Gel Lanes (JSON primer pairs)</label>
+        <textarea id="pcrLanePairs">[
+  {"forward":"ATGGCCATTGTAATGGGCCG","reverse":"TCTAGAAGCTTCTATCGGGC"}
+]</textarea>
+        <button onclick="runPcrGelLanes()">Simulate PCR Gel Lanes</button>
+      </div>
+
+      <div id="tab-search" class="tabpane">
+        <label>Motif (DNA)</label>
+        <input id="motif" value="GAATTC" />
+        <div class="row">
+          <button onclick="runMotif()">Find Motif</button>
+          <button onclick="runOrfs()">Find ORFs</button>
+        </div>
+        <label>Unified Search Query</label>
+        <input id="entityQuery" value="gene" />
+        <label>Primer List (comma-separated)</label>
+        <input id="searchPrimers" value="ATGGCCATTGTAATGGGCCG,TCTAGAAGCTTCTATCGGGC" />
+        <button onclick="runSearchEntities()">Search Enzymes/Features/Primers</button>
+        <label>Min ORF AA length</label>
+        <input id="minAa" type="number" value="20" />
+      </div>
+
+      <div id="tab-edit" class="tabpane">
+        <div class="row">
+          <select id="editOp">
+            <option value="insert">insert</option>
+            <option value="delete">delete</option>
+            <option value="replace">replace</option>
+          </select>
+          <input id="editStart" type="number" value="1" />
+        </div>
+        <div class="row">
+          <input id="editEnd" type="number" value="1" />
+          <input id="editValue" placeholder="ATGC..." />
+        </div>
+        <div class="row">
+          <button onclick="previewEdit()">Preview Edit</button>
+          <button class="hot" onclick="applyEditToBuffer()">Apply Edit</button>
+        </div>
+      </div>
+
+      <div id="tab-advanced" class="tabpane">
+        <label>Protein (AA) For Reverse Translation</label>
+        <input id="protein" value="MSTNPKPQRKTK" />
+        <div class="row">
+          <button onclick="runReverseTranslate()">Reverse Translate</button>
+          <button onclick="runMutagenesis()">Mutagenesis Replace</button>
+        </div>
+        <div class="row">
+          <input id="proteinEditAaIndex" type="number" value="1" />
+          <input id="proteinEditResidue" value="A" />
+        </div>
+        <button onclick="runProteinEdit()">Protein-Level Edit (codon swap)</button>
+        <label>Alignment Seq A</label>
+        <input id="seqA" value="GAATTCCGGATCCATGGCC" />
+        <label>Alignment Seq B</label>
+        <input id="seqB" value="GAATTCCGGATCCATGACC" />
+        <div class="row">
+          <select id="pairwiseMode">
+            <option value="dna">Pairwise DNA</option>
+            <option value="protein">Pairwise Protein</option>
+          </select>
+          <button onclick="runPairwiseAlign()">Pairwise Align</button>
+        </div>
+        <div class="row">
+          <button onclick="runAutoAnnotate()">Auto Annotate</button>
+        </div>
+        <label>Multi Align Sequences (one per line)</label>
+        <textarea id="multiAlignSeqs">GAATTCCGGATCCATGGCC
+GAATACCGGATCCATGGCC
+GAATTCCGGTTCCATGGCC</textarea>
+        <div class="row">
+          <select id="msaMethod">
+            <option value="progressive">MSA progressive</option>
+            <option value="mafft">MSA mafft (if installed)</option>
+            <option value="muscle">MSA muscle (if installed)</option>
+            <option value="clustalw2">MSA clustalw2 (if installed)</option>
+            <option value="tcoffee">MSA T-Coffee (if installed)</option>
+          </select>
+          <button onclick="runMSA()">Run MSA</button>
+        </div>
+        <button onclick="runMSAHeatmap()">MSA Identity Heatmap</button>
+        <button onclick="runAlignmentConsensus()">Alignment Consensus</button>
+        <button onclick="runPhyloTree()">Build Phylo Tree (UPGMA)</button>
+        <button onclick="runMultiAlign()">Multi Align (Reference)</button>
+        <label>Oligo Annealing</label>
+        <div class="row">
+          <input id="oligoF" value="ATGCGTACCGGTTTAA" />
+          <input id="oligoR" value="TTAAACCGGTACGCAT" />
+        </div>
+        <div class="row">
+          <input id="minOverlap" type="number" value="8" />
+          <button onclick="runAnnealOligos()">Anneal Oligos</button>
+        </div>
+        <label>Gel Band Sizes (comma-separated)</label>
+        <div class="row">
+          <input id="gelSizes" value="10000,5000,2000,1000,500,200" />
+          <select id="gelMarkerSet">
+            <option value="1kb_plus">1kb plus ladder</option>
+            <option value="100bp">100bp ladder</option>
+            <option value="ultra_low">Ultra-low ladder</option>
+            <option value="high_range">High-range ladder</option>
+          </select>
+        </div>
+        <div class="row">
+          <button onclick="runGelSim()">Gel Sim</button>
+          <button onclick="runGelMarkerSets()">List Marker Sets</button>
+        </div>
+        <label>Translated Features / Slippage</label>
+        <div class="row">
+          <label><input id="includeSlippage" type="checkbox" /> include ribosomal slippage model</label>
+          <input id="slipPos" type="number" value="0" />
+        </div>
+        <div class="row">
+          <select id="slipType">
+            <option value="-1">-1 frameshift</option>
+            <option value="+1">+1 frameshift</option>
+          </select>
+          <button onclick="runTranslatedFeatures()">Translated Feature Report</button>
+        </div>
+        <div class="row">
+          <input id="editFeatureIndex" type="number" value="0" />
+          <input id="editAaIndex" type="number" value="1" />
+        </div>
+        <div class="row">
+          <input id="editResidue" value="A" />
+          <button onclick="runTranslatedFeatureEdit()">Edit Translated Feature</button>
+        </div>
+        <label>cDNA to Genome Map</label>
+        <textarea id="cdnaSeq">ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG</textarea>
+        <textarea id="genomeSeq">TTTATGGCCATTGTAATGGGCCGCTGAAAAGTAACCCCGATAGGGGTTT</textarea>
+        <div class="row">
+          <input id="cdnaMinExon" type="number" value="12" />
+          <input id="cdnaMaxIntron" type="number" value="5000" />
+        </div>
+        <button onclick="runCdnaMap()">Map cDNA to Genome</button>
+        <label>Batch Digest (JSON records array)</label>
+        <textarea id="batchRecords">[
+  {"name":"pA","topology":"circular","content":"GAATTCCGGATCCATGGCC"},
+  {"name":"pB","topology":"linear","content":"AAGCTTGAATTCTCTAGA"}
+]</textarea>
+        <button onclick="runBatchDigest()">Run Batch Digest</button>
+        <label>Methylated Motifs (comma-separated)</label>
+        <input id="methylMotifs" value="GAATTC" />
+        <div class="row">
+          <button onclick="runDigestAdvanced()">Digest (Methylation Aware)</button>
+          <button onclick="runStarActivityScan()">Star Activity Scan</button>
+          <button onclick="runEnzymeInfo()">Enzyme Metadata</button>
+        </div>
+        <div class="row">
+          <input id="starActivityLevel" type="number" min="0" max="1" step="0.05" value="0.5" />
+          <label><input id="includeStarCuts" type="checkbox" checked /> include star cuts in fragment simulation</label>
+        </div>
+        <label>Gibson Fragments (JSON array of DNA strings)</label>
+        <textarea id="gibsonFrags">[
+  "AAACCCGGGTTTATGCATGC",
+  "ATGCATGCGGGAAATTTCCC",
+  "TTTCCCGGGAAATTT"
+]</textarea>
+        <div class="row">
+          <input id="gibsonOverlap" type="number" value="8" />
+          <button onclick="runGibsonAssemble()">Gibson Assemble</button>
+        </div>
+        <label>Golden Gate Parts (JSON array)</label>
+        <textarea id="goldenParts">[
+  {"sequence":"ATGAAA","left_overhang":"AATG","right_overhang":"GGCC"},
+  {"sequence":"CCCTTT","left_overhang":"GGCC","right_overhang":"TTAA"}
+]</textarea>
+        <button onclick="runGoldenGateAssemble()">Golden Gate Assemble</button>
+        <label>Feature Editor</label>
+        <div class="row">
+          <input id="featKey" value="misc_feature" />
+          <input id="featLoc" value="1..10" />
+        </div>
+        <div class="row">
+          <input id="featLabel" value="example_feature" />
+          <input id="featIndex" type="number" value="0" />
+        </div>
+        <div class="row">
+          <button onclick="runFeatureAdd()">Feature Add</button>
+          <button onclick="runFeatureDelete()">Feature Delete</button>
+        </div>
+        <button onclick="runFeatureList()">Feature List</button>
+        <label>Annotation DB Name</label>
+        <input id="annotDbName" value="default_signatures" />
+        <label>Annotation DB Signatures (JSON array)</label>
+        <textarea id="annotDbSigs">[
+  {"label":"AmpR fragment","type":"gene","motif":"ATGAGTATTCAACATTTCC"},
+  {"label":"T7 promoter","type":"promoter","motif":"TAATACGACTCACTATAGGG"}
+]</textarea>
+        <div class="row">
+          <button onclick="runAnnotDbSave()">Annot DB Save</button>
+          <button onclick="runAnnotDbList()">Annot DB List</button>
+        </div>
+        <div class="row">
+          <button onclick="runAnnotDbLoad()">Annot DB Load</button>
+          <button onclick="runAnnotDbApply()">Annot DB Apply</button>
+        </div>
+        <label>Project Name</label>
+        <input id="projectName" value="demo_project" />
+        <div class="row">
+          <button onclick="runProjectSave()">Save Project</button>
+          <button onclick="runProjectLoad()">Load Project</button>
+        </div>
+        <div class="row">
+          <button onclick="runProjectList()">List Projects</button>
+          <button onclick="runProjectDelete()">Delete Project</button>
+        </div>
+        <label>Collections & Sharing</label>
+        <input id="collectionName" value="demo_collection" />
+        <input id="collectionProjects" value="demo_project" />
+        <div class="row">
+          <button onclick="runCollectionSave()">Save Collection</button>
+          <button onclick="runCollectionLoad()">Load Collection</button>
+        </div>
+        <div class="row">
+          <button onclick="runCollectionList()">List Collections</button>
+          <button onclick="runCollectionDelete()">Delete Collection</button>
+        </div>
+        <div class="row">
+          <button onclick="runCollectionAddProject()">Add Project To Collection</button>
+          <button onclick="runShareCreate()">Create Share Bundle</button>
+        </div>
+        <input id="shareId" value="" placeholder="share id for load" />
+        <button onclick="runShareLoad()">Load Share Bundle</button>
+        <button onclick="runProjectHistoryGraph()">Project History Graph</button>
+        <label>Contig Assembly Reads (one per line)</label>
+        <textarea id="contigReads">AAACCCGGGTTTATGCATGC
+ATGCATGCGGGAAATTTCCC
+TTTCCCGGGAAATTT</textarea>
+        <div class="row">
+          <input id="contigOverlap" type="number" value="8" />
+          <button onclick="runContigAssemble()">Contig Assemble</button>
+        </div>
+        <label>Gateway / TOPO / TA-GC Cloning</label>
+        <textarea id="entryClone">ACAAGTTTGTACAAAAAAGCAGGCTATGAAACCCGGGACCACTTTGTACAAGAAAGCTGGGT</textarea>
+        <textarea id="destVector">GGGCCCAAATTTCCCGGG</textarea>
+        <div class="row">
+          <button onclick="runGatewayCloning()">Gateway Clone</button>
+          <button onclick="runTopoCloning()">TOPO Clone</button>
+        </div>
+        <div class="row">
+          <select id="cloneMode">
+            <option value="TA">TA</option>
+            <option value="GC">GC</option>
+            <option value="BLUNT">BLUNT</option>
+          </select>
+          <button onclick="runTAGCCloning()">TA/GC Clone</button>
+        </div>
+        <label>Compatibility Check Mode</label>
+        <select id="compatMode">
+          <option value="restriction">restriction</option>
+          <option value="golden_gate">golden_gate</option>
+          <option value="gibson">gibson</option>
+          <option value="in-fusion">in-fusion</option>
+        </select>
+        <div class="row">
+          <input id="compatLeftOverhang" value="GGCC" />
+          <input id="compatRightOverhang" value="GGCC" />
+        </div>
+        <div class="row">
+          <input id="compatMinOverlap" type="number" value="8" />
+          <button onclick="runCloningCompatibility()">Check Compatibility</button>
+        </div>
+        <label>Ligation Simulator (enzyme ends)</label>
+        <div class="row">
+          <input id="ligVecLeft" value="EcoRI" />
+          <input id="ligVecRight" value="BamHI" />
+        </div>
+        <div class="row">
+          <input id="ligInsLeft" value="BamHI" />
+          <input id="ligInsRight" value="EcoRI" />
+        </div>
+        <div class="row">
+          <label><input id="ligDeriveSeq" type="checkbox" /> derive ends from sequence</label>
+          <label><input id="ligByproducts" type="checkbox" checked /> include byproducts</label>
+        </div>
+        <div class="row">
+          <input id="ligTempC" type="number" value="16" />
+          <input id="ligaseUnits" type="number" value="1" />
+        </div>
+        <div class="row">
+          <input id="ligVecInsRatio" type="number" value="1.0" />
+          <input id="ligDnaNg" type="number" value="100" />
+        </div>
+        <div class="row">
+          <label><input id="ligPhosphatase" type="checkbox" /> phosphatase-treated vector</label>
+          <input id="ligStarActivity" type="number" value="0.0" />
+        </div>
+        <button onclick="runLigationSim()">Simulate Ligation Products</button>
+        <label>In-Fusion / Overlap PCR</label>
+        <textarea id="inFusionFrags">[
+  "AAACCCGGGTTTATGCATGC",
+  "ATGCATGCGGGAAATTTCCC"
+]</textarea>
+        <div class="row">
+          <input id="inFusionOverlap" type="number" value="8" />
+          <button onclick="runInFusion()">In-Fusion Assemble</button>
+        </div>
+        <div class="row">
+          <input id="oeA" value="AAACCCGGGTTTATGCATGC" />
+          <input id="oeB" value="ATGCATGCGGGAAATTTCCC" />
+        </div>
+        <div class="row">
+          <input id="oeOverlap" type="number" value="8" />
+          <button onclick="runOverlapPCR()">Overlap PCR</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="stats">
+        <div class="stat"><small>Name</small><b id="sName">-</b></div>
+        <div class="stat"><small>Length</small><b id="sLen">-</b></div>
+        <div class="stat"><small>GC%</small><b id="sGc">-</b></div>
+        <div class="stat"><small>Topology</small><b id="sTopo">-</b></div>
+      </div>
+      <label>Results</label>
+      <div class="output" id="out">Ready.</div>
+      <label>Map Preview</label>
+      <div id="map" class="interactive-viz">Click "Render Map".</div>
+      <div class="viz-controls">
+        <button onclick="zoomPanel('map', 1.2)">Map Zoom In</button>
+        <button onclick="zoomPanel('map', 0.84)">Map Zoom Out</button>
+        <button onclick="resetPanelView('map')">Map Reset</button>
+        <button onclick="runMap()">Re-render Map</button>
+      </div>
+      <div class="row">
+        <input id="trackStart" type="number" value="1" />
+        <input id="trackEnd" type="number" value="120" />
+      </div>
+      <div class="row">
+        <select id="trackFrame"><option value="1">frame 1</option><option value="2">frame 2</option><option value="3">frame 3</option></select>
+        <button onclick="runSequenceTrack()">Render Sequence Track</button>
+      </div>
+      <label>Sequence Track</label>
+      <div id="seqTrack" class="interactive-viz">Click "Render Sequence Track".</div>
+      <div class="viz-controls">
+        <button onclick="zoomPanel('seqTrack', 1.2)">Track Zoom In</button>
+        <button onclick="zoomPanel('seqTrack', 0.84)">Track Zoom Out</button>
+        <button onclick="resetPanelView('seqTrack')">Track Reset</button>
+        <button onclick="runSequenceTrack()">Re-render Track</button>
+      </div>
+      <label>Track Minimap</label>
+      <div id="trackMiniMap">Track minimap appears after sequence info loads.</div>
+      <div class="viz-controls">
+        <button onclick="shiftTrackWindow(-0.6)">Prev Window</button>
+        <button onclick="shiftTrackWindow(0.6)">Next Window</button>
+        <button onclick="setFullTrackWindow()">Full Span</button>
+        <button onclick="runSequenceTrack()">Apply Window</button>
+      </div>
+      <label>MSA Heatmap</label>
+      <div id="msaHeatmap">Run MSA, then click "MSA Identity Heatmap".</div>
+      <label>History Graph</label>
+      <div id="historyGraph">Load a project and click "Project History Graph".</div>
+      <label>Star Activity Risk View</label>
+      <div id="starViz">Run "Star Activity Scan" to visualize off-target cleavage risk.</div>
+      <label>Ligation Pathway Graph</label>
+      <div id="ligationGraph">Run "Simulate Ligation Products" to render pathway graph.</div>
+      <div class="viz-controls">
+        <select id="ligGraphFilter">
+          <option value="all">Ligation view: all products</option>
+          <option value="desired">Ligation view: desired insert only</option>
+          <option value="byproducts">Ligation view: byproducts only</option>
+        </select>
+        <button onclick="refreshLigationGraph()">Apply Graph Filter</button>
+        <button onclick="focusTopLigationProduct()">Focus Top Product</button>
+        <button onclick="runLigationSim()">Recompute Ligation</button>
+      </div>
+      <label>Selection Inspector</label>
+      <div id="inspector">Click a feature/cut/codon in map or track to inspect details.</div>
+    </section>
+  </div>
+
+  <script>
+    const historyState = {
+      stack: [],
+      index: -1,
+    };
+    let featureState = [];
+    let lastMSAAlignment = [];
+    let lastLigationResult = null;
+    const minimapState = { dragging: false, dragOffsetBp: 0, mode: '', spanBp: 0 };
+    const panelState = {};
+    let selectedFeatureIndex = null;
+
+    function payload(extra = {}) {
+      return {
+        name: document.getElementById('name').value,
+        topology: document.getElementById('topology').value,
+        content: document.getElementById('content').value,
+        features: featureState,
+        ...extra,
+      };
+    }
+
+    async function callApi(path, body) {
+      const r = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+
+    function show(data) {
+      document.getElementById('out').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    }
+
+    function panelSvg(panelId) {
+      return document.querySelector(`#${panelId} svg`);
+    }
+
+    function ensurePanelState(panelId) {
+      if (!panelState[panelId]) panelState[panelId] = { viewBox: null, startViewBox: null };
+      return panelState[panelId];
+    }
+
+    function attachPanZoom(panelId) {
+      const svg = panelSvg(panelId);
+      if (!svg) return;
+      const state = ensurePanelState(panelId);
+      if (!svg.hasAttribute('viewBox')) {
+        const w = Number(svg.getAttribute('width')) || svg.clientWidth || 1000;
+        const h = Number(svg.getAttribute('height')) || svg.clientHeight || 600;
+        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      }
+      if (!state.viewBox) state.viewBox = svg.getAttribute('viewBox');
+      state.startViewBox = state.viewBox;
+      svg.setAttribute('viewBox', state.viewBox);
+      let dragging = false;
+      let sx = 0;
+      let sy = 0;
+      svg.onwheel = (e) => {
+        e.preventDefault();
+        zoomPanel(panelId, e.deltaY < 0 ? 1.1 : 0.9);
+      };
+      svg.onmousedown = (e) => {
+        dragging = true;
+        sx = e.clientX;
+        sy = e.clientY;
+      };
+      svg.onmouseup = () => { dragging = false; };
+      svg.onmouseleave = () => { dragging = false; };
+      svg.onmousemove = (e) => {
+        if (!dragging) return;
+        const vb = (panelState[panelId]?.viewBox || svg.getAttribute('viewBox')).split(/\s+/).map(Number);
+        const scaleX = vb[2] / Math.max(svg.clientWidth, 1);
+        const scaleY = vb[3] / Math.max(svg.clientHeight, 1);
+        const dx = (e.clientX - sx) * scaleX;
+        const dy = (e.clientY - sy) * scaleY;
+        vb[0] -= dx;
+        vb[1] -= dy;
+        panelState[panelId].viewBox = vb.join(' ');
+        svg.setAttribute('viewBox', panelState[panelId].viewBox);
+        sx = e.clientX;
+        sy = e.clientY;
+      };
+    }
+
+    function zoomPanel(panelId, factor) {
+      const svg = panelSvg(panelId);
+      if (!svg) return;
+      const st = ensurePanelState(panelId);
+      const vb = (st.viewBox || svg.getAttribute('viewBox')).split(/\s+/).map(Number);
+      const cx = vb[0] + vb[2] / 2;
+      const cy = vb[1] + vb[3] / 2;
+      vb[2] /= factor;
+      vb[3] /= factor;
+      vb[0] = cx - vb[2] / 2;
+      vb[1] = cy - vb[3] / 2;
+      st.viewBox = vb.join(' ');
+      svg.setAttribute('viewBox', st.viewBox);
+    }
+
+    function resetPanelView(panelId) {
+      const svg = panelSvg(panelId);
+      const st = panelState[panelId];
+      if (!svg || !st || !st.startViewBox) return;
+      st.viewBox = st.startViewBox;
+      svg.setAttribute('viewBox', st.viewBox);
+    }
+
+    function setInspectorText(text) {
+      document.getElementById('inspector').textContent = text;
+    }
+
+    function selectFeature(idx) {
+      selectedFeatureIndex = Number(idx);
+      document.querySelectorAll('#map [data-feature-index], #seqTrack [data-feature-index]').forEach((el) => {
+        if (Number(el.getAttribute('data-feature-index')) === selectedFeatureIndex) {
+          el.classList.add('selected-feature');
+        } else {
+          el.classList.remove('selected-feature');
+        }
+      });
+      const f = featureState[selectedFeatureIndex];
+      if (!f) {
+        setInspectorText(`Feature ${selectedFeatureIndex}: not loaded in current feature state.`);
+        return;
+      }
+      const label = (f.qualifiers && (f.qualifiers.label || f.qualifiers.gene || f.qualifiers.product)) || f.key || 'feature';
+      setInspectorText(
+        `Feature #${selectedFeatureIndex}\n` +
+        `Label: ${label}\n` +
+        `Type: ${f.key || 'misc_feature'}\n` +
+        `Location: ${f.location || '-'}`
+      );
+    }
+
+    function bindPanelSelection(panelId) {
+      const host = document.getElementById(panelId);
+      host.onclick = (e) => {
+        const t = e.target.closest('[data-feature-index], [data-cut-enzyme], [data-codon-start]');
+        if (!t) return;
+        if (t.hasAttribute('data-feature-index')) {
+          selectFeature(t.getAttribute('data-feature-index'));
+          return;
+        }
+        if (t.hasAttribute('data-cut-enzyme')) {
+          const enz = t.getAttribute('data-cut-enzyme');
+          const pos = t.getAttribute('data-cut-position');
+          setInspectorText(`Restriction cut\nEnzyme: ${enz}\nPosition: ${pos}`);
+          return;
+        }
+        if (t.hasAttribute('data-codon-start')) {
+          setInspectorText(
+            `Translation cell\nCodon: ${t.getAttribute('data-codon-start')}..${t.getAttribute('data-codon-end')}\n` +
+            `Residue: ${t.getAttribute('data-residue')}`
+          );
+        }
+      };
+    }
+
+    function enhancePanel(panelId) {
+      attachPanZoom(panelId);
+      bindPanelSelection(panelId);
+      if (selectedFeatureIndex !== null) selectFeature(selectedFeatureIndex);
+    }
+
+    function getContentValue() {
+      return document.getElementById('content').value;
+    }
+
+    function plainSeq(text) {
+      return String(text || '').toUpperCase().replace(/[^ACGTN]/g, '');
+    }
+
+    function setContentValue(v) {
+      document.getElementById('content').value = v;
+    }
+
+    function pushHistory(v) {
+      const value = String(v ?? '');
+      if (historyState.index >= 0 && historyState.stack[historyState.index] === value) return;
+      historyState.stack = historyState.stack.slice(0, historyState.index + 1);
+      historyState.stack.push(value);
+      historyState.index = historyState.stack.length - 1;
+      if (historyState.stack.length > 200) {
+        historyState.stack.shift();
+        historyState.index -= 1;
+      }
+      try {
+        localStorage.setItem('genomeforge_history_stack', JSON.stringify(historyState.stack));
+        localStorage.setItem('genomeforge_history_index', String(historyState.index));
+      } catch (_) {}
+    }
+
+    function undoSequence() {
+      if (historyState.index <= 0) return;
+      historyState.index -= 1;
+      setContentValue(historyState.stack[historyState.index]);
+      runInfo();
+    }
+
+    function redoSequence() {
+      if (historyState.index >= historyState.stack.length - 1) return;
+      historyState.index += 1;
+      setContentValue(historyState.stack[historyState.index]);
+      runInfo();
+    }
+
+    function setStats(info) {
+      if (!info) return;
+      document.getElementById('sName').textContent = info.name || '-';
+      document.getElementById('sLen').textContent = info.length ?? '-';
+      document.getElementById('sGc').textContent = (info.gc ?? '-') + '';
+      document.getElementById('sTopo').textContent = info.topology || '-';
+      renderTrackMiniMap();
+    }
+
+    function currentSeqLength() {
+      return Number(document.getElementById('sLen').textContent) || 0;
+    }
+
+    function clampWindow(start, end, len) {
+      if (len <= 0) return [1, Math.max(1, end)];
+      let s = Math.max(1, Math.min(start, len));
+      let e = Math.max(s, Math.min(end, len));
+      if (e === s) e = Math.min(len, s + 1);
+      return [s, e];
+    }
+
+    function trackWindow() {
+      const len = currentSeqLength();
+      const start = Number(document.getElementById('trackStart').value) || 1;
+      const end = Number(document.getElementById('trackEnd').value) || Math.min(len || 120, 120);
+      return clampWindow(start, end, len || Math.max(120, end));
+    }
+
+    function setTrackWindow(start, end) {
+      const len = currentSeqLength();
+      const [s, e] = clampWindow(start, end, len || Math.max(end, 120));
+      document.getElementById('trackStart').value = s;
+      document.getElementById('trackEnd').value = e;
+      renderTrackMiniMap();
+    }
+
+    function shiftTrackWindow(fraction) {
+      const len = currentSeqLength();
+      if (len <= 0) return;
+      const [s, e] = trackWindow();
+      const w = Math.max(2, e - s);
+      const delta = Math.round(w * fraction);
+      setTrackWindow(s + delta, e + delta);
+    }
+
+    function setFullTrackWindow() {
+      const len = currentSeqLength();
+      if (len <= 0) return;
+      setTrackWindow(1, len);
+    }
+
+    function parseFeatureBounds(location) {
+      const nums = String(location || '').match(/\d+/g) || [];
+      if (nums.length < 2) return null;
+      let a = Number(nums[0]);
+      let b = Number(nums[nums.length - 1]);
+      if (!a || !b) return null;
+      if (a > b) [a, b] = [b, a];
+      return [a, b];
+    }
+
+    function renderTrackMiniMap() {
+      const host = document.getElementById('trackMiniMap');
+      const len = currentSeqLength();
+      if (len <= 0) {
+        host.textContent = 'Track minimap appears after sequence info loads.';
+        return;
+      }
+      const [s, e] = trackWindow();
+      const w = 980;
+      const h = 92;
+      const x0 = 24;
+      const trackW = w - x0 * 2;
+      const y = 44;
+      const windowX = x0 + ((s - 1) / len) * trackW;
+      const windowW = Math.max(4, ((e - s + 1) / len) * trackW);
+
+      const featureRects = (featureState || []).map((f, idx) => {
+        const b = parseFeatureBounds(f.location);
+        if (!b) return '';
+        const a = b[0];
+        const z = b[1];
+        const fx = x0 + ((a - 1) / len) * trackW;
+        const fw = Math.max(1, ((z - a + 1) / len) * trackW);
+        const color = idx === selectedFeatureIndex ? '#f43f5e' : '#0ea5e9';
+        return `<rect x="${fx.toFixed(2)}" y="${(y-10).toFixed(2)}" width="${fw.toFixed(2)}" height="6" rx="3" fill="${color}" opacity="0.9"></rect>`;
+      }).join('');
+
+      host.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+          <rect x="0" y="0" width="${w}" height="${h}" fill="#f8fafc"></rect>
+          <rect x="${x0}" y="${y}" width="${trackW}" height="8" rx="4" fill="#e2e8f0"></rect>
+          ${featureRects}
+          <rect id="miniBrush" x="${windowX.toFixed(2)}" y="${(y-8).toFixed(2)}" width="${windowW.toFixed(2)}" height="24" rx="6" fill="rgba(15,118,110,0.2)" stroke="#0f766e" stroke-width="2"></rect>
+          <rect id="miniHandleLeft" x="${(windowX - 2).toFixed(2)}" y="${(y-10).toFixed(2)}" width="5" height="28" rx="2" fill="#0f766e"></rect>
+          <rect id="miniHandleRight" x="${(windowX + windowW - 3).toFixed(2)}" y="${(y-10).toFixed(2)}" width="5" height="28" rx="2" fill="#0f766e"></rect>
+          <text x="${x0}" y="20" font-size="11" font-family="Menlo, monospace" fill="#334155">1</text>
+          <text x="${w-x0}" y="20" text-anchor="end" font-size="11" font-family="Menlo, monospace" fill="#334155">${len}</text>
+          <text x="${w/2}" y="20" text-anchor="middle" font-size="11" font-family="Menlo, monospace" fill="#0f172a">Window ${s}..${e} (${e - s + 1} bp)</text>
+        </svg>
+      `;
+
+      const svg = host.querySelector('svg');
+      const brush = host.querySelector('#miniBrush');
+      const leftHandle = host.querySelector('#miniHandleLeft');
+      const rightHandle = host.querySelector('#miniHandleRight');
+      if (!svg || !brush || !leftHandle || !rightHandle) return;
+      const toBp = (clientX) => {
+        const rect = svg.getBoundingClientRect();
+        const px = ((clientX - rect.left) / Math.max(rect.width, 1)) * w;
+        const frac = Math.max(0, Math.min(1, (px - x0) / trackW));
+        return 1 + Math.round(frac * (len - 1));
+      };
+
+      brush.onmousedown = (ev) => {
+        ev.preventDefault();
+        minimapState.dragging = true;
+        minimapState.mode = 'drag';
+        const brushX = Number(brush.getAttribute('x'));
+        const bpAtPointer = toBp(ev.clientX);
+        const bpAtBrushLeft = 1 + Math.round(((brushX - x0) / trackW) * (len - 1));
+        minimapState.dragOffsetBp = bpAtPointer - bpAtBrushLeft;
+        minimapState.spanBp = Math.max(2, e - s + 1);
+      };
+
+      leftHandle.onmousedown = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        minimapState.dragging = true;
+        minimapState.mode = 'resize_left';
+      };
+
+      rightHandle.onmousedown = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        minimapState.dragging = true;
+        minimapState.mode = 'resize_right';
+      };
+
+      svg.onmousedown = (ev) => {
+        if (ev.target === brush || ev.target === leftHandle || ev.target === rightHandle) return;
+        const bp = toBp(ev.clientX);
+        const span = Math.max(2, e - s + 1);
+        setTrackWindow(bp - Math.floor(span / 2), bp + Math.ceil(span / 2));
+      };
+
+      window.onmousemove = (ev) => {
+        if (!minimapState.dragging) return;
+        const [curS, curE] = trackWindow();
+        if (minimapState.mode === 'drag') {
+          const span = Math.max(2, minimapState.spanBp || (curE - curS + 1));
+          const leftBp = toBp(ev.clientX) - minimapState.dragOffsetBp;
+          setTrackWindow(leftBp, leftBp + span - 1);
+        } else if (minimapState.mode === 'resize_left') {
+          const bp = toBp(ev.clientX);
+          setTrackWindow(bp, curE);
+        } else if (minimapState.mode === 'resize_right') {
+          const bp = toBp(ev.clientX);
+          setTrackWindow(curS, bp);
+        }
+      };
+      window.onmouseup = () => {
+        if (!minimapState.dragging) return;
+        minimapState.dragging = false;
+        minimapState.mode = '';
+      };
+    }
+
+    async function runInfo() {
+      try {
+        const info = await callApi('/api/info', payload());
+        setStats(info);
+        show(info);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTranslate(toStop) {
+      try {
+        const frame = Number(document.getElementById('frame').value);
+        show(await callApi('/api/translate', payload({ frame, to_stop: !!toStop })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runDigest() {
+      try {
+        show(await callApi('/api/digest', payload({
+          enzymes: document.getElementById('enzymes').value,
+          enzyme_set: document.getElementById('enzymeSetName').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runMap() {
+      try {
+        const r = await callApi('/api/map', payload({ enzymes: document.getElementById('enzymes').value }));
+        document.getElementById('map').innerHTML = r.svg;
+        enhancePanel('map');
+        show('Map rendered.');
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runSequenceTrack() {
+      try {
+        const r = await callApi('/api/sequence-tracks', payload({
+          start: Number(document.getElementById('trackStart').value),
+          end: Number(document.getElementById('trackEnd').value),
+          frame: Number(document.getElementById('trackFrame').value),
+        }));
+        document.getElementById('seqTrack').innerHTML = r.svg;
+        enhancePanel('seqTrack');
+        show({ track_window: `${r.start_1based}..${r.end_1based}`, frame: r.frame });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runPrimerDesign() {
+      try {
+        const r = await callApi('/api/primers', payload({
+          target_start: Number(document.getElementById('targetStart').value),
+          target_end: Number(document.getElementById('targetEnd').value),
+          window: Number(document.getElementById('window').value),
+        }));
+        document.getElementById('forward').value = r.forward.sequence;
+        document.getElementById('reverse').value = r.reverse.sequence;
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runPcr() {
+      try {
+        show(await callApi('/api/pcr', payload({
+          forward: document.getElementById('forward').value,
+          reverse: document.getElementById('reverse').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runPrimerDiagnostics() {
+      try {
+        show(await callApi('/api/primer-diagnostics', {
+          forward: document.getElementById('forward').value,
+          reverse: document.getElementById('reverse').value,
+          na_mM: Number(document.getElementById('naMm').value),
+          primer_nM: Number(document.getElementById('primerNm').value),
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runPcrGelLanes() {
+      try {
+        const primer_pairs = JSON.parse(document.getElementById('pcrLanePairs').value);
+        show(await callApi('/api/pcr-gel-lanes', payload({
+          primer_pairs,
+          marker_set: document.getElementById('gelMarkerSet').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCodonOptimize() {
+      try {
+        const frame = Number(document.getElementById('frame').value);
+        show(await callApi('/api/codon-optimize', payload({ host: document.getElementById('host').value, frame })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runMotif() {
+      try {
+        show(await callApi('/api/motif', payload({ motif: document.getElementById('motif').value })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runOrfs() {
+      try {
+        show(await callApi('/api/orfs', payload({ min_aa: Number(document.getElementById('minAa').value) })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runSearchEntities() {
+      try {
+        show(await callApi('/api/search-entities', payload({
+          query: document.getElementById('entityQuery').value,
+          primers: document.getElementById('searchPrimers').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runEnzymeScan() {
+      try {
+        show(await callApi('/api/enzyme-scan', payload({
+          enzyme_set: document.getElementById('enzymeSetName').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runEnzymeInfo() {
+      try {
+        show(await callApi('/api/enzyme-info', {
+          enzymes: document.getElementById('enzymes').value,
+          enzyme_set: document.getElementById('enzymeSetName').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runDigestAdvanced() {
+      try {
+        show(await callApi('/api/digest-advanced', payload({
+          enzymes: document.getElementById('enzymes').value,
+          enzyme_set: document.getElementById('enzymeSetName').value,
+          methylated_motifs: document.getElementById('methylMotifs').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    function renderStarViz(scan) {
+      const host = document.getElementById('starViz');
+      const hits = Array.isArray(scan.star_hits) ? scan.star_hits : [];
+      const byEnzyme = {};
+      for (const h of hits) byEnzyme[h.enzyme] = (byEnzyme[h.enzyme] || 0) + 1;
+      const rank = Object.entries(byEnzyme).sort((a, b) => b[1] - a[1]);
+      const maxCount = rank.length ? rank[0][1] : 1;
+
+      const summary = `
+        <div class="star-summary">
+          <div class="star-chip"><small>Star Hits</small><b>${scan.star_hit_count || 0}</b></div>
+          <div class="star-chip"><small>Level</small><b>${Number(scan.star_activity_level || 0).toFixed(2)}</b></div>
+          <div class="star-chip"><small>Max Mismatch</small><b>${scan.max_mismatch ?? 0}</b></div>
+          <div class="star-chip"><small>Enzymes Flagged</small><b>${rank.length}</b></div>
+        </div>
+      `;
+      const rows = rank.length
+        ? rank.map(([enzyme, count]) => {
+            const width = Math.max(2, Math.round((count / maxCount) * 100));
+            return `<tr><td>${enzyme}</td><td>${count}</td><td><div class="bar" style="width:${width}%"></div></td></tr>`;
+          }).join('')
+        : '<tr><td colspan="3">No off-target cuts detected for current level.</td></tr>';
+      const table = `
+        <table class="star-grid">
+          <thead><tr><th>Enzyme</th><th>Off-target sites</th><th>Relative burden</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+      host.innerHTML = summary + table;
+      const topHits = hits.slice(0, 12).map((h) => (
+        `<tr data-star-cut="${h.cut_position_1based}" title="Jump to ${h.cut_position_1based}">` +
+        `<td>${h.enzyme}</td><td>${h.cut_position_1based}</td><td>${h.mismatches}</td><td>${h.matched}</td></tr>`
+      )).join('');
+      if (topHits) {
+        host.innerHTML += `
+          <table class="star-grid" style="margin-top:10px">
+            <thead><tr><th>Enzyme</th><th>Cut pos</th><th>Mismatches</th><th>Matched site</th></tr></thead>
+            <tbody>${topHits}</tbody>
+          </table>
+        `;
+      }
+      host.querySelectorAll('tr[data-star-cut]').forEach((row) => {
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', async () => {
+          const p = Number(row.getAttribute('data-star-cut'));
+          const len = Math.max(60, Number(document.getElementById('trackEnd').value) - Number(document.getElementById('trackStart').value));
+          const seqLen = Number(document.getElementById('sLen').textContent) || 0;
+          const start = Math.max(1, p - Math.floor(len / 2));
+          const end = seqLen > 0 ? Math.min(seqLen, start + len) : (start + len);
+          document.getElementById('trackStart').value = start;
+          document.getElementById('trackEnd').value = end;
+          setInspectorText(`Star cut selected\nPosition: ${p}\nTrack window centered and re-rendered.`);
+          await runSequenceTrack();
+        });
+      });
+    }
+
+    async function runStarActivityScan() {
+      try {
+        const r = await callApi('/api/star-activity-scan', payload({
+          enzymes: document.getElementById('enzymes').value,
+          enzyme_set: document.getElementById('enzymeSetName').value,
+          star_activity_level: Number(document.getElementById('starActivityLevel').value),
+          include_star_cuts: document.getElementById('includeStarCuts').checked,
+        }));
+        renderStarViz(r);
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runEnzymeSetSave() {
+      try {
+        show(await callApi('/api/enzyme-set-save', {
+          set_name: document.getElementById('enzymeSetName').value,
+          enzymes: document.getElementById('enzymes').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runEnzymeSetLoad() {
+      try {
+        const r = await callApi('/api/enzyme-set-load', {
+          set_name: document.getElementById('enzymeSetName').value,
+        });
+        document.getElementById('enzymes').value = (r.enzymes || []).join(',');
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runEnzymeSetList() {
+      try {
+        show(await callApi('/api/enzyme-set-list', {}));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runPredefinedEnzymeSets() {
+      try {
+        show(await callApi('/api/enzyme-set-predefined', {}));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runEnzymeSetDelete() {
+      try {
+        show(await callApi('/api/enzyme-set-delete', {
+          set_name: document.getElementById('enzymeSetName').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runReverseTranslate() {
+      try {
+        show(await callApi('/api/reverse-translate', {
+          protein: document.getElementById('protein').value,
+          host: document.getElementById('host').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProteinEdit() {
+      try {
+        const r = await callApi('/api/protein-edit', payload({
+          aa_index_1based: Number(document.getElementById('proteinEditAaIndex').value),
+          new_residue: document.getElementById('proteinEditResidue').value,
+          frame: Number(document.getElementById('frame').value),
+          host: document.getElementById('host').value,
+        }));
+        document.getElementById('content').value = `>${r.name}\n${r.sequence}`;
+        pushHistory(getContentValue());
+        runInfo();
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runPairwiseAlign() {
+      try {
+        show(await callApi('/api/pairwise-align', {
+          seq_a: document.getElementById('seqA').value,
+          seq_b: document.getElementById('seqB').value,
+          mode: document.getElementById('pairwiseMode').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runMultiAlign() {
+      try {
+        const sequences = document.getElementById('multiAlignSeqs').value.split('\n').map(s => s.trim()).filter(Boolean);
+        show(await callApi('/api/multi-align', { sequences }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runMSA() {
+      try {
+        const sequences = document.getElementById('multiAlignSeqs').value.split('\n').map(s => s.trim()).filter(Boolean);
+        const method = document.getElementById('msaMethod').value;
+        const r = await callApi('/api/msa', { sequences, method });
+        lastMSAAlignment = r.alignment || [];
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runAlignmentConsensus() {
+      try {
+        let alignment = lastMSAAlignment;
+        if (!alignment || !alignment.length) {
+          const sequences = document.getElementById('multiAlignSeqs').value.split('\n').map(s => s.trim()).filter(Boolean);
+          const r = await callApi('/api/msa', { sequences, method: document.getElementById('msaMethod').value });
+          alignment = r.alignment || [];
+          lastMSAAlignment = alignment;
+        }
+        show(await callApi('/api/alignment-consensus', { alignment }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runMSAHeatmap() {
+      try {
+        let alignment = lastMSAAlignment;
+        if (!alignment || !alignment.length) {
+          const sequences = document.getElementById('multiAlignSeqs').value.split('\n').map(s => s.trim()).filter(Boolean);
+          const r = await callApi('/api/msa', { sequences, method: document.getElementById('msaMethod').value });
+          alignment = r.alignment || [];
+          lastMSAAlignment = alignment;
+        }
+        const r = await callApi('/api/alignment-heatmap-svg', { alignment });
+        document.getElementById('msaHeatmap').innerHTML = r.svg || '';
+        show({ row_count: r.row_count, heatmap_rendered: true });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runPhyloTree() {
+      try {
+        const sequences = document.getElementById('multiAlignSeqs').value.split('\n').map(s => s.trim()).filter(Boolean);
+        show(await callApi('/api/phylo-tree', { sequences }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runAutoAnnotate() {
+      try {
+        const r = await callApi('/api/annotate-auto', payload());
+        featureState = (r.annotations || []).map(a => ({
+          key: a.type || 'misc_feature',
+          location: `${a.start_1based}..${a.end_1based}`,
+          qualifiers: { label: a.label || a.motif || 'auto' },
+        }));
+        show({ ...r, features_loaded: featureState.length });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runAnnotDbSave() {
+      try {
+        const signatures = JSON.parse(document.getElementById('annotDbSigs').value);
+        show(await callApi('/api/annot-db-save', {
+          db_name: document.getElementById('annotDbName').value,
+          signatures,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runAnnotDbList() {
+      try {
+        show(await callApi('/api/annot-db-list', {}));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runAnnotDbLoad() {
+      try {
+        const r = await callApi('/api/annot-db-load', {
+          db_name: document.getElementById('annotDbName').value,
+        });
+        document.getElementById('annotDbSigs').value = JSON.stringify(r.signatures || [], null, 2);
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runAnnotDbApply() {
+      try {
+        const r = await callApi('/api/annot-db-apply', payload({
+          db_name: document.getElementById('annotDbName').value,
+        }));
+        featureState = (r.annotations || []).map(a => ({
+          key: a.type || 'misc_feature',
+          location: `${a.start_1based}..${a.end_1based}`,
+          qualifiers: { label: a.label || a.motif || 'db_annot' },
+        }));
+        show({ ...r, features_loaded: featureState.length });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runAnnealOligos() {
+      try {
+        show(await callApi('/api/anneal-oligos', {
+          forward: document.getElementById('oligoF').value,
+          reverse: document.getElementById('oligoR').value,
+          min_overlap: Number(document.getElementById('minOverlap').value),
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runMutagenesis() {
+      try {
+        show(await callApi('/api/mutagenesis', payload({
+          start: Number(document.getElementById('editStart').value),
+          end: Number(document.getElementById('editEnd').value),
+          mutant: document.getElementById('editValue').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runGelSim() {
+      try {
+        show(await callApi('/api/gel-sim', {
+          sizes: document.getElementById('gelSizes').value,
+          marker_set: document.getElementById('gelMarkerSet').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runGelMarkerSets() {
+      try {
+        show(await callApi('/api/gel-marker-sets', {}));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTranslatedFeatures() {
+      try {
+        show(await callApi('/api/translated-features', payload({
+          include_slippage: document.getElementById('includeSlippage').checked,
+          slip_pos_1based: Number(document.getElementById('slipPos').value),
+          slip_type: document.getElementById('slipType').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTranslatedFeatureEdit() {
+      try {
+        const r = await callApi('/api/translated-feature-edit', payload({
+          feature_index: Number(document.getElementById('editFeatureIndex').value),
+          aa_index_1based: Number(document.getElementById('editAaIndex').value),
+          new_residue: document.getElementById('editResidue').value,
+          host: document.getElementById('host').value,
+        }));
+        document.getElementById('content').value = `>${r.name}\n${r.sequence}`;
+        pushHistory(getContentValue());
+        runInfo();
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCdnaMap() {
+      try {
+        show(await callApi('/api/cdna-map', {
+          cdna_sequence: document.getElementById('cdnaSeq').value,
+          genome_sequence: document.getElementById('genomeSeq').value,
+          min_exon_bp: Number(document.getElementById('cdnaMinExon').value),
+          max_intron_bp: Number(document.getElementById('cdnaMaxIntron').value),
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runBatchDigest() {
+      try {
+        const records = JSON.parse(document.getElementById('batchRecords').value);
+        show(await callApi('/api/batch-digest', {
+          records,
+          enzymes: document.getElementById('enzymes').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runGibsonAssemble() {
+      try {
+        const fragments = JSON.parse(document.getElementById('gibsonFrags').value);
+        show(await callApi('/api/gibson-assemble', {
+          fragments,
+          min_overlap: Number(document.getElementById('gibsonOverlap').value),
+          circular: false,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runGoldenGateAssemble() {
+      try {
+        const parts = JSON.parse(document.getElementById('goldenParts').value);
+        show(await callApi('/api/golden-gate', {
+          parts,
+          circular: true,
+          enforce_complement: true,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectSave() {
+      try {
+        const history = historyState.stack.slice(0, historyState.index + 1);
+        show(await callApi('/api/project-save', payload({
+          project_name: document.getElementById('projectName').value,
+          history,
+          features: featureState,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectLoad() {
+      try {
+        const r = await callApi('/api/project-load', {
+          project_name: document.getElementById('projectName').value,
+        });
+        document.getElementById('name').value = r.name || r.project_name || 'LoadedProject';
+        document.getElementById('content').value = r.content || '';
+        if (r.topology) document.getElementById('topology').value = r.topology;
+        featureState = Array.isArray(r.features) ? r.features : [];
+        historyState.stack = Array.isArray(r.history) && r.history.length ? r.history : [document.getElementById('content').value];
+        historyState.index = historyState.stack.length - 1;
+        runInfo();
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectList() {
+      try {
+        show(await callApi('/api/project-list', {}));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectDelete() {
+      try {
+        show(await callApi('/api/project-delete', {
+          project_name: document.getElementById('projectName').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCollectionSave() {
+      try {
+        show(await callApi('/api/collection-save', {
+          collection_name: document.getElementById('collectionName').value,
+          projects: document.getElementById('collectionProjects').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCollectionLoad() {
+      try {
+        const r = await callApi('/api/collection-load', {
+          collection_name: document.getElementById('collectionName').value,
+        });
+        document.getElementById('collectionProjects').value = (r.projects || []).join(',');
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCollectionList() {
+      try {
+        show(await callApi('/api/collection-list', {}));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCollectionDelete() {
+      try {
+        show(await callApi('/api/collection-delete', {
+          collection_name: document.getElementById('collectionName').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCollectionAddProject() {
+      try {
+        show(await callApi('/api/collection-add-project', {
+          collection_name: document.getElementById('collectionName').value,
+          project_name: document.getElementById('projectName').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runShareCreate() {
+      try {
+        const r = await callApi('/api/share-create', {
+          projects: document.getElementById('collectionProjects').value,
+          collection_name: document.getElementById('collectionName').value,
+          include_content: true,
+        });
+        document.getElementById('shareId').value = r.share_id || '';
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runShareLoad() {
+      try {
+        show(await callApi('/api/share-load', {
+          share_id: document.getElementById('shareId').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectHistoryGraph() {
+      try {
+        const r = await callApi('/api/project-history-svg', {
+          project_name: document.getElementById('projectName').value,
+        });
+        document.getElementById('historyGraph').innerHTML = r.svg || '';
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runContigAssemble() {
+      try {
+        const reads = document.getElementById('contigReads').value.split('\n').map(s => s.trim()).filter(Boolean);
+        show(await callApi('/api/contig-assemble', {
+          reads,
+          min_overlap: Number(document.getElementById('contigOverlap').value),
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runGatewayCloning() {
+      try {
+        show(await callApi('/api/gateway-cloning', {
+          entry_clone: document.getElementById('entryClone').value,
+          destination_vector: document.getElementById('destVector').value,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTopoCloning() {
+      try {
+        show(await callApi('/api/topo-cloning', {
+          vector: document.getElementById('destVector').value,
+          insert: document.getElementById('entryClone').value,
+          mode: document.getElementById('cloneMode').value === 'BLUNT' ? 'BLUNT' : 'TA',
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTAGCCloning() {
+      try {
+        const mode = document.getElementById('cloneMode').value === 'GC' ? 'GC' : 'TA';
+        show(await callApi('/api/ta-gc-cloning', {
+          vector: document.getElementById('destVector').value,
+          insert: document.getElementById('entryClone').value,
+          mode,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCloningCompatibility() {
+      try {
+        show(await callApi('/api/cloning-compatibility', {
+          mode: document.getElementById('compatMode').value,
+          vector: document.getElementById('destVector').value,
+          insert: document.getElementById('entryClone').value,
+          enzymes: document.getElementById('enzymes').value,
+          left_overhang: document.getElementById('compatLeftOverhang').value,
+          right_overhang: document.getElementById('compatRightOverhang').value,
+          min_overlap: Number(document.getElementById('compatMinOverlap').value),
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    function filteredLigationProducts(result) {
+      const allProducts = Array.isArray(result.products) ? result.products : [];
+      const mode = document.getElementById('ligGraphFilter')?.value || 'all';
+      if (mode === 'desired') {
+        return allProducts
+          .map((p, idx) => ({ ...p, _orig_idx: idx }))
+          .filter((p) => p.class === 'desired_insert');
+      }
+      if (mode === 'byproducts') {
+        return allProducts
+          .map((p, idx) => ({ ...p, _orig_idx: idx }))
+          .filter((p) => p.class !== 'desired_insert');
+      }
+      return allProducts.map((p, idx) => ({ ...p, _orig_idx: idx }));
+    }
+
+    function renderLigationGraph(result) {
+      const host = document.getElementById('ligationGraph');
+      const products = filteredLigationProducts(result);
+      if (!products.length) {
+        host.textContent = 'No ligation products match the current graph filter.';
+        return;
+      }
+      const w = 980;
+      const h = Math.max(260, 140 + products.length * 92);
+      const srcX = 120;
+      const dstX = 700;
+      const vectorY = 70;
+      const insertY = 150;
+      const yForProduct = (idx) => 70 + idx * 92;
+      const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+
+      const sourceNodes = [
+        { id: 'vector', x: srcX, y: vectorY, label: 'Vector', color: '#0369a1' },
+        { id: 'insert', x: srcX, y: insertY, label: 'Insert', color: '#16a34a' },
+      ];
+      const prodNodes = products.map((p, idx) => ({
+        id: `p${idx}`,
+        x: dstX,
+        y: yForProduct(idx),
+        p,
+        label: `${p.class} (${p.orientation})`,
+      }));
+
+      const edges = [];
+      for (const n of prodNodes) {
+        const prob = Number(n.p.predicted_probability || 0);
+        edges.push({ from: 'vector', to: n.id, width: 1 + prob * 9, prob });
+        edges.push({ from: 'insert', to: n.id, width: 1 + prob * 9, prob });
+      }
+
+      const nodeById = {};
+      for (const n of sourceNodes) nodeById[n.id] = n;
+      for (const n of prodNodes) nodeById[n.id] = n;
+
+      const edgeSvg = edges.map((e) => {
+        const a = nodeById[e.from];
+        const b = nodeById[e.to];
+        const midX = (a.x + b.x) / 2;
+        const d = `M ${a.x+54} ${a.y} C ${midX} ${a.y}, ${midX} ${b.y}, ${b.x-94} ${b.y}`;
+        return `<path d="${d}" class="lig-edge" stroke-width="${e.width.toFixed(2)}"></path>`;
+      }).join('');
+
+      const sourceSvg = sourceNodes.map((n) => (
+        `<g class="lig-node" data-lig-node="${n.id}">` +
+          `<rect x="${n.x-56}" y="${n.y-26}" width="112" height="40" rx="12" fill="${n.color}" opacity="0.93"></rect>` +
+          `<text x="${n.x}" y="${n.y}" text-anchor="middle" font-size="13" font-family="Menlo, monospace" fill="white">${n.label}</text>` +
+        `</g>`
+      )).join('');
+
+      const prodSvg = prodNodes.map((n, idx) => {
+        const p = n.p;
+        const prob = clamp(Number(p.predicted_probability || 0), 0, 1);
+        const barW = Math.round(prob * 160);
+        const fill = p.class === 'desired_insert' ? '#0f766e' : '#b45309';
+        return (
+          `<g class="lig-node" data-lig-product="${idx}">` +
+            `<rect x="${n.x-90}" y="${n.y-32}" width="210" height="64" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"></rect>` +
+            `<text x="${n.x-76}" y="${n.y-10}" font-size="11" font-family="Menlo, monospace" fill="#0f172a">${p.class}</text>` +
+            `<text x="${n.x-76}" y="${n.y+6}" font-size="10" font-family="Menlo, monospace" fill="#334155">${p.orientation}</text>` +
+            `<text x="${n.x+112}" y="${n.y-10}" text-anchor="end" font-size="10" font-family="Menlo, monospace" fill="#334155">${p.length} bp</text>` +
+            `<rect x="${n.x-76}" y="${n.y+12}" width="160" height="8" rx="4" fill="#e2e8f0"></rect>` +
+            `<rect x="${n.x-76}" y="${n.y+12}" width="${barW}" height="8" rx="4" fill="${fill}"></rect>` +
+            `<text x="${n.x+112}" y="${n.y+20}" text-anchor="end" font-size="10" font-family="Menlo, monospace" fill="${fill}">${(prob*100).toFixed(1)}%</text>` +
+          `</g>`
+        );
+      }).join('');
+
+      host.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">
+          <defs>
+            <linearGradient id="ligBg" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#f8fafc"></stop>
+              <stop offset="100%" stop-color="#fef9c3"></stop>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="${w}" height="${h}" fill="url(#ligBg)"></rect>
+          ${edgeSvg}
+          ${sourceSvg}
+          ${prodSvg}
+          <text x="18" y="20" font-size="12" font-family="Menlo, monospace" fill="#334155">Ligation pathway graph (click nodes for details)</text>
+        </svg>
+      `;
+
+      host.querySelectorAll('[data-lig-node]').forEach((el) => {
+        el.addEventListener('click', () => {
+          const id = el.getAttribute('data-lig-node');
+          if (id === 'vector') {
+            setInspectorText(`Ligation source: Vector\nLength: ${plainSeq(document.getElementById('destVector').value).length} bp`);
+          } else if (id === 'insert') {
+            setInspectorText(`Ligation source: Insert\nLength: ${plainSeq(document.getElementById('entryClone').value).length} bp`);
+          }
+        });
+      });
+      host.querySelectorAll('[data-lig-product]').forEach((el) => {
+        el.addEventListener('click', () => {
+          const idx = Number(el.getAttribute('data-lig-product'));
+          const p = products[idx];
+          if (!p) return;
+          const junction = Array.isArray(p.junction_integrity) ? p.junction_integrity.slice(0, 2).map((j) => `${j.label}: scar=${j.scar_8bp}`).join('\n') : 'n/a';
+          setInspectorText(
+            `Ligation product #${(Number(p._orig_idx) + 1)}\n` +
+            `Class: ${p.class}\n` +
+            `Orientation: ${p.orientation}\n` +
+            `Length: ${p.length} bp\n` +
+            `Predicted probability: ${(Number(p.predicted_probability || 0) * 100).toFixed(2)}%\n` +
+            `Condition score: ${p.condition_adjusted_score || '-'}\n` +
+            `Junctions:\n${junction}`
+          );
+        });
+      });
+    }
+
+    function refreshLigationGraph() {
+      if (!lastLigationResult) {
+        setInspectorText('Run ligation simulation first to populate graph data.');
+        return;
+      }
+      renderLigationGraph(lastLigationResult);
+      show({ ligation_graph_filter: document.getElementById('ligGraphFilter').value });
+    }
+
+    function focusTopLigationProduct() {
+      if (!lastLigationResult || !Array.isArray(lastLigationResult.products) || !lastLigationResult.products.length) {
+        setInspectorText('No ligation products available. Run simulation first.');
+        return;
+      }
+      const top = lastLigationResult.products[0];
+      setInspectorText(
+        `Top ligation product\n` +
+        `Class: ${top.class}\n` +
+        `Orientation: ${top.orientation}\n` +
+        `Probability: ${(Number(top.predicted_probability || 0) * 100).toFixed(2)}%\n` +
+        `Length: ${top.length} bp`
+      );
+    }
+
+    async function runLigationSim() {
+      try {
+        const r = await callApi('/api/ligation-sim', {
+          vector_sequence: document.getElementById('destVector').value,
+          insert_sequence: document.getElementById('entryClone').value,
+          vector_left_enzyme: document.getElementById('ligVecLeft').value,
+          vector_right_enzyme: document.getElementById('ligVecRight').value,
+          insert_left_enzyme: document.getElementById('ligInsLeft').value,
+          insert_right_enzyme: document.getElementById('ligInsRight').value,
+          derive_from_sequence: document.getElementById('ligDeriveSeq').checked,
+          include_byproducts: document.getElementById('ligByproducts').checked,
+          temp_c: Number(document.getElementById('ligTempC').value),
+          ligase_units: Number(document.getElementById('ligaseUnits').value),
+          vector_insert_ratio: Number(document.getElementById('ligVecInsRatio').value),
+          dna_ng: Number(document.getElementById('ligDnaNg').value),
+          phosphatase_treated_vector: document.getElementById('ligPhosphatase').checked,
+          star_activity_level: Number(document.getElementById('ligStarActivity').value),
+        });
+        lastLigationResult = r;
+        renderLigationGraph(r);
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runInFusion() {
+      try {
+        const fragments = JSON.parse(document.getElementById('inFusionFrags').value);
+        show(await callApi('/api/in-fusion', {
+          fragments,
+          min_overlap: Number(document.getElementById('inFusionOverlap').value),
+          circular: false,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runOverlapPCR() {
+      try {
+        show(await callApi('/api/overlap-extension-pcr', {
+          fragment_a: document.getElementById('oeA').value,
+          fragment_b: document.getElementById('oeB').value,
+          min_overlap: Number(document.getElementById('oeOverlap').value),
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runFeatureList() {
+      try {
+        const r = await callApi('/api/features-list', payload());
+        featureState = r.features || [];
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runFeatureAdd() {
+      try {
+        const key = document.getElementById('featKey').value;
+        const location = document.getElementById('featLoc').value;
+        const label = document.getElementById('featLabel').value;
+        const r = await callApi('/api/features-add', payload({
+          key,
+          location,
+          qualifiers: { label },
+        }));
+        featureState = r.features || [];
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runFeatureDelete() {
+      try {
+        const index = Number(document.getElementById('featIndex').value);
+        const r = await callApi('/api/features-delete', payload({ index }));
+        featureState = r.features || [];
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    function editBody() {
+      return payload({
+        op: document.getElementById('editOp').value,
+        start: Number(document.getElementById('editStart').value),
+        end: Number(document.getElementById('editEnd').value),
+        value: document.getElementById('editValue').value,
+      });
+    }
+
+    async function previewEdit() {
+      try {
+        const r = await callApi('/api/sequence-edit', editBody());
+        show({ preview_length: r.length, preview_gc: r.gc, preview_sequence_head: r.sequence.slice(0, 120) });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function applyEditToBuffer() {
+      try {
+        const r = await callApi('/api/sequence-edit', editBody());
+        document.getElementById('content').value = `>${r.name}\n${r.sequence}`;
+        pushHistory(getContentValue());
+        setStats(r);
+        show({ applied: true, length: r.length, gc: r.gc });
+      } catch (e) { show(String(e)); }
+    }
+
+    document.getElementById('tabs').addEventListener('click', (e) => {
+      const btn = e.target.closest('.tab');
+      if (!btn) return;
+      for (const t of document.querySelectorAll('.tab')) t.classList.remove('active');
+      for (const p of document.querySelectorAll('.tabpane')) p.classList.remove('active');
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+
+    document.getElementById('content').addEventListener('change', () => pushHistory(getContentValue()));
+    document.getElementById('trackStart').addEventListener('input', () => renderTrackMiniMap());
+    document.getElementById('trackEnd').addEventListener('input', () => renderTrackMiniMap());
+    document.getElementById('ligGraphFilter').addEventListener('change', () => refreshLigationGraph());
+    try {
+      const stack = JSON.parse(localStorage.getItem('genomeforge_history_stack') || '[]');
+      const idx = Number(localStorage.getItem('genomeforge_history_index') || -1);
+      if (Array.isArray(stack) && stack.length && idx >= 0 && idx < stack.length) {
+        historyState.stack = stack.map((x) => String(x));
+        historyState.index = idx;
+        document.getElementById('content').value = historyState.stack[idx];
+      } else {
+        pushHistory(getContentValue());
+      }
+    } catch (_) {
+      pushHistory(getContentValue());
+    }
+    runInfo();
+  </script>
+</body>
+</html>
