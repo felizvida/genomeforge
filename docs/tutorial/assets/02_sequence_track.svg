@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="260" viewBox="0 0 1200 260">
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="40" y="24" font-size="14" font-family="Menlo, monospace" fill="#0f172a">pTraining  1..64</text>
+<line x1="40" y1="90" x2="1160" y2="90" stroke="#0f172a" stroke-width="2"/>
+<rect x="253.33" y="68" width="835.56" height="14" rx="3" fill="#2563eb" opacity="0.9" data-feature-index="0" data-feature-start="13" data-feature-end="60" class="feature-segment"/>
+<polygon points="1080.89,68.00 1088.89,75.00 1080.89,82.00" fill="#0f172a" opacity="0.75" data-feature-index="0" class="feature-arrow"/>
+<text x="253.33" y="62" font-size="10" font-family="Menlo, monospace" fill="#111827" data-feature-index="0" class="feature-label">cds1 phase=0</text>
+<rect x="111.11" y="68" width="355.56" height="14" rx="3" fill="#dc2626" opacity="0.9" data-feature-index="1" data-feature-start="5" data-feature-end="25" class="feature-segment"/>
+<polygon points="458.67,68.00 466.67,75.00 458.67,82.00" fill="#0f172a" opacity="0.75" data-feature-index="1" class="feature-arrow"/>
+<text x="111.11" y="62" font-size="10" font-family="Menlo, monospace" fill="#111827" data-feature-index="1" class="feature-label">g1</text>
+<text x="40" y="138" font-size="12" font-family="Menlo, monospace" fill="#334155">Translation frame 1</text>
+<rect x="40.00" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="1" data-codon-end="3" data-residue="E" class="codon-cell"><title>codon 1-3: GAA -> E</title></rect>
+<text x="57.78" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">E</text>
+<rect x="93.33" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="4" data-codon-end="6" data-residue="F" class="codon-cell"><title>codon 4-6: TTC -> F</title></rect>
+<text x="111.11" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">F</text>
+<rect x="146.67" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="7" data-codon-end="9" data-residue="R" class="codon-cell"><title>codon 7-9: CGG -> R</title></rect>
+<text x="164.44" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">R</text>
+<rect x="200.00" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="10" data-codon-end="12" data-residue="I" class="codon-cell"><title>codon 10-12: ATC -> I</title></rect>
+<text x="217.78" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">I</text>
+<rect x="253.33" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="13" data-codon-end="15" data-residue="H" class="codon-cell"><title>codon 13-15: CAT -> H</title></rect>
+<text x="271.11" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">H</text>
+<rect x="306.67" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="16" data-codon-end="18" data-residue="G" class="codon-cell"><title>codon 16-18: GGC -> G</title></rect>
+<text x="324.44" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">G</text>
+<rect x="360.00" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="19" data-codon-end="21" data-residue="H" class="codon-cell"><title>codon 19-21: CAT -> H</title></rect>
+<text x="377.78" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">H</text>
+<rect x="413.33" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="22" data-codon-end="24" data-residue="C" class="codon-cell"><title>codon 22-24: TGT -> C</title></rect>
+<text x="431.11" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">C</text>
+<rect x="466.67" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="25" data-codon-end="27" data-residue="N" class="codon-cell"><title>codon 25-27: AAT -> N</title></rect>
+<text x="484.44" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">N</text>
+<rect x="520.00" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="28" data-codon-end="30" data-residue="G" class="codon-cell"><title>codon 28-30: GGG -> G</title></rect>
+<text x="537.78" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">G</text>
+<rect x="573.33" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="31" data-codon-end="33" data-residue="P" class="codon-cell"><title>codon 31-33: CCG -> P</title></rect>
+<text x="591.11" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">P</text>
+<rect x="626.67" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="34" data-codon-end="36" data-residue="L" class="codon-cell"><title>codon 34-36: CTG -> L</title></rect>
+<text x="644.44" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">L</text>
+<rect x="680.00" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="37" data-codon-end="39" data-residue="K" class="codon-cell"><title>codon 37-39: AAA -> K</title></rect>
+<text x="697.78" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">K</text>
+<rect x="733.33" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="40" data-codon-end="42" data-residue="G" class="codon-cell"><title>codon 40-42: GGG -> G</title></rect>
+<text x="751.11" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">G</text>
+<rect x="786.67" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="43" data-codon-end="45" data-residue="C" class="codon-cell"><title>codon 43-45: TGC -> C</title></rect>
+<text x="804.44" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">C</text>
+<rect x="840.00" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="46" data-codon-end="48" data-residue="P" class="codon-cell"><title>codon 46-48: CCG -> P</title></rect>
+<text x="857.78" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">P</text>
+<rect x="893.33" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="49" data-codon-end="51" data-residue="I" class="codon-cell"><title>codon 49-51: ATA -> I</title></rect>
+<text x="911.11" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">I</text>
+<rect x="946.67" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="52" data-codon-end="54" data-residue="E" class="codon-cell"><title>codon 52-54: GAA -> E</title></rect>
+<text x="964.44" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">E</text>
+<rect x="1000.00" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="55" data-codon-end="57" data-residue="A" class="codon-cell"><title>codon 55-57: GCT -> A</title></rect>
+<text x="1017.78" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">A</text>
+<rect x="1053.33" y="150" width="35.56" height="18" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.5" data-codon-start="58" data-codon-end="60" data-residue="F" class="codon-cell"><title>codon 58-60: TTC -> F</title></rect>
+<text x="1071.11" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">F</text>
+<rect x="1106.67" y="150" width="35.56" height="18" rx="2" fill="#fca5a5" stroke="#93c5fd" stroke-width="0.5" data-codon-start="61" data-codon-end="63" data-residue="*" class="codon-cell"><title>codon 61-63: TAG -> *</title></rect>
+<text x="1124.44" y="163" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">*</text>
+<line x1="40.00" y1="198" x2="40.00" y2="204" stroke="#334155" stroke-width="1"/>
+<text x="40.00" y="210" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">1</text>
+<line x1="217.78" y1="198" x2="217.78" y2="204" stroke="#334155" stroke-width="1"/>
+<text x="217.78" y="210" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">11</text>
+<line x1="395.56" y1="198" x2="395.56" y2="204" stroke="#334155" stroke-width="1"/>
+<text x="395.56" y="210" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">21</text>
+<line x1="573.33" y1="198" x2="573.33" y2="204" stroke="#334155" stroke-width="1"/>
+<text x="573.33" y="210" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">31</text>
+<line x1="751.11" y1="198" x2="751.11" y2="204" stroke="#334155" stroke-width="1"/>
+<text x="751.11" y="210" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">41</text>
+<line x1="928.89" y1="198" x2="928.89" y2="204" stroke="#334155" stroke-width="1"/>
+<text x="928.89" y="210" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">51</text>
+<line x1="1106.67" y1="198" x2="1106.67" y2="204" stroke="#334155" stroke-width="1"/>
+<text x="1106.67" y="210" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">61</text>
+</svg>

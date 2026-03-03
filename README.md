@@ -46,6 +46,10 @@ Then open:
 http://127.0.0.1:8080
 ```
 
+Training materials:
+- HTML tutorial: `docs/tutorial/user_training_tutorial.html`
+- PDF tutorial: `docs/tutorial/user_training_tutorial.pdf`
+
 The UI supports:
 - Sequence info and translation
 - Restriction digest + SVG map rendering

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="320" viewBox="0 0 980 320">
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="20" y="30" font-family="Menlo, monospace" font-size="18" fill="#0f172a">Ligation Product Ranking</text>
+<rect x="40" y="70" width="120" height="40" rx="10" fill="#0369a1"/><text x="100" y="95" text-anchor="middle" font-family="Menlo, monospace" font-size="13" fill="white">Vector</text>
+<rect x="40" y="130" width="120" height="40" rx="10" fill="#16a34a"/><text x="100" y="155" text-anchor="middle" font-family="Menlo, monospace" font-size="13" fill="white">Insert</text>
+<path d="M160 90 C 260 90, 260 95, 340 95" stroke="#94a3b8" stroke-width="2" fill="none"/>
+<path d="M160 150 C 260 150, 260 95, 340 95" stroke="#94a3b8" stroke-width="2" fill="none"/>
+<rect x="340" y="80" width="360" height="34" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="352" y="95" font-family="Menlo, monospace" font-size="11" fill="#0f172a">desired_insert (forward)</text>
+<text x="688" y="95" text-anchor="end" font-family="Menlo, monospace" font-size="11" fill="#334155">38 bp</text>
+<rect x="352" y="100" width="220" height="8" rx="4" fill="#e2e8f0"/>
+<rect x="352" y="100" width="220" height="8" rx="4" fill="#0f766e"/>
+<text x="580" y="108" font-family="Menlo, monospace" font-size="10" fill="#0f766e">100.0%</text>
+</svg>

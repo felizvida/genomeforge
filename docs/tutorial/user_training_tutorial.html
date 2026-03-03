@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Genome Forge User Training Tutorial</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 0; color: #0f172a; background: #f8fafc; }
+    .container { max-width: 980px; margin: 0 auto; padding: 24px; }
+    h1, h2, h3 { margin: 0 0 12px; }
+    p { line-height: 1.5; }
+    .card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+    .step { margin-bottom: 24px; }
+    .step h3 { color: #0f766e; }
+    .imgbox { border: 1px solid #cbd5e1; border-radius: 10px; padding: 8px; background: #fff; }
+    img { width: 100%; height: auto; display: block; border-radius: 8px; }
+    ol li { margin-bottom: 6px; }
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 6px; }
+    .toc a { color: #0f4f8a; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Genome Forge: Step-by-Step User Training Tutorial</h1>
+      <p>This guide teaches core daily workflows in the Genome Forge web app, from sequence loading and map inspection through cloning simulation and project sharing.</p>
+      <p><strong>Prerequisite:</strong> start the app with <code>python3 web_ui.py --port 8080</code> and open <code>http://127.0.0.1:8080</code>.</p>
+      <div class="toc">
+        <h2>Contents</h2>
+        <ol>
+          <li><a href="#step1">Load a sequence and check basic info</a></li>
+          <li><a href="#step2">Render plasmid map with cut sites</a></li>
+          <li><a href="#step3">Inspect sequence track and translation</a></li>
+          <li><a href="#step4">Run alignment and heatmap analysis</a></li>
+          <li><a href="#step5">Review history and recency coloring</a></li>
+          <li><a href="#step6">Assess star activity risk</a></li>
+          <li><a href="#step7">Simulate ligation products</a></li>
+          <li><a href="#step8">Primer/PCR and gel lane simulation</a></li>
+          <li><a href="#step9">Save projects, collections, and shares</a></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card step" id="step1">
+      <h3>Step 1. Load a Sequence and Check Basic Info</h3>
+      <ol>
+        <li>Paste FASTA/GenBank/EMBL/raw DNA into the <code>Sequence / FASTA / GenBank</code> box.</li>
+        <li>Set <code>Name</code> and <code>Topology</code>.</li>
+        <li>Click <code>Refresh Info</code> to confirm length, GC, and feature count.</li>
+      </ol>
+      <p>Tip: if you import EMBL, Genome Forge parses both sequence and feature lines.</p>
+    </div>
+
+    <div class="card step" id="step2">
+      <h3>Step 2. Render Plasmid Map with Restriction Cuts</h3>
+      <ol>
+        <li>Open <code>Map</code> tab.</li>
+        <li>Enter enzymes (for example <code>EcoRI,BamHI</code>).</li>
+        <li>Click <code>Render Map</code>.</li>
+        <li>Use mouse wheel to zoom and drag to pan.</li>
+        <li>Click feature arcs or cut markers to inspect details in the inspector panel.</li>
+      </ol>
+      <div class="imgbox"><img src="assets/01_map.png" alt="Plasmid map with features and cuts" /></div>
+    </div>
+
+    <div class="card step" id="step3">
+      <h3>Step 3. Inspect Sequence Track and Translation</h3>
+      <ol>
+        <li>Set <code>trackStart</code>/<code>trackEnd</code> and translation frame.</li>
+        <li>Click <code>Render Sequence Track</code>.</li>
+        <li>Use the minimap brush to move and resize the view window.</li>
+        <li>Click codon cells to inspect residue mapping.</li>
+      </ol>
+      <div class="imgbox"><img src="assets/02_sequence_track.png" alt="Sequence track with features and translation" /></div>
+    </div>
+
+    <div class="card step" id="step4">
+      <h3>Step 4. Run Alignment and Identity Heatmap</h3>
+      <ol>
+        <li>Open <code>Advanced</code> tab and provide multiple sequences.</li>
+        <li>Select MSA method (<code>progressive</code> or installed external aligners).</li>
+        <li>Click <code>Run MSA</code>, then <code>MSA Identity Heatmap</code>.</li>
+      </ol>
+      <div class="imgbox"><img src="assets/03_msa_heatmap.png" alt="MSA identity heatmap" /></div>
+    </div>
+
+    <div class="card step" id="step5">
+      <h3>Step 5. Review Project History Graph</h3>
+      <ol>
+        <li>Save your current sequence as a project.</li>
+        <li>Perform edits and save additional snapshots.</li>
+        <li>Click <code>Project History Graph</code> to render version nodes.</li>
+        <li>Recency coloring highlights newer versions.</li>
+      </ol>
+      <div class="imgbox"><img src="assets/04_history_graph.png" alt="Project history graph" /></div>
+    </div>
+
+    <div class="card step" id="step6">
+      <h3>Step 6. Assess Star Activity Risk</h3>
+      <ol>
+        <li>Set enzymes and choose star activity level.</li>
+        <li>Run <code>Star Activity Scan</code>.</li>
+        <li>Review off-target burden by enzyme and click top cuts to center sequence track.</li>
+      </ol>
+      <div class="imgbox"><img src="assets/05_star_activity.png" alt="Star activity off-target chart" /></div>
+    </div>
+
+    <div class="card step" id="step7">
+      <h3>Step 7. Simulate Ligation and Rank Products</h3>
+      <ol>
+        <li>Provide vector/insert sequences and enzyme ends.</li>
+        <li>Enable byproducts for realistic reaction scenarios.</li>
+        <li>Run <code>Simulate Ligation Products</code>.</li>
+        <li>Use graph filters and inspect product probabilities and junction diagnostics.</li>
+      </ol>
+      <div class="imgbox"><img src="assets/06_ligation_products.png" alt="Ligation product ranking" /></div>
+    </div>
+
+    <div class="card step" id="step8">
+      <h3>Step 8. Primer/PCR and Gel Lanes</h3>
+      <ol>
+        <li>Design primers around a target region.</li>
+        <li>Run <code>Virtual PCR</code>.</li>
+        <li>Use <code>PCR Gel Lanes</code> with selected marker ladder to visualize expected product bands.</li>
+      </ol>
+    </div>
+
+    <div class="card step" id="step9">
+      <h3>Step 9. Save Projects, Collections, and Shares</h3>
+      <ol>
+        <li>Save projects from current sequence state.</li>
+        <li>Group related projects into a collection.</li>
+        <li>Create a share bundle and copy the generated <code>/share/&lt;id&gt;</code> URL.</li>
+      </ol>
+      <p>This enables portable handoff and quick viewer access later.</p>
+    </div>
+
+    <div class="card">
+      <h2>Recommended Practice Sequence</h2>
+      <ol>
+        <li>Map + digest analysis</li>
+        <li>Track + translation inspection</li>
+        <li>Primer design + PCR + gel</li>
+        <li>Cloning compatibility + ligation ranking</li>
+        <li>Save project + collection + share bundle</li>
+      </ol>
+    </div>
+  </div>
+</body>
+</html>

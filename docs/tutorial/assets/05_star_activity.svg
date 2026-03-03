@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="340" viewBox="0 0 900 340">
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="24" y="30" font-family="Menlo, monospace" font-size="18" fill="#0f172a">Star Activity Risk (Off-target hits by enzyme)</text>
+<text x="24" y="82" font-family="Menlo, monospace" font-size="14" fill="#334155">BamHI</text>
+<rect x="140" y="68" width="640" height="20" rx="8" fill="#e2e8f0"/>
+<rect x="140" y="68" width="640" height="20" rx="8" fill="#0f766e"/>
+<text x="790" y="83" font-family="Menlo, monospace" font-size="14" fill="#0f172a">3</text>
+<text x="24" y="138" font-family="Menlo, monospace" font-size="14" fill="#334155">EcoRI</text>
+<rect x="140" y="124" width="640" height="20" rx="8" fill="#e2e8f0"/>
+<rect x="140" y="124" width="426" height="20" rx="8" fill="#0f766e"/>
+<text x="790" y="139" font-family="Menlo, monospace" font-size="14" fill="#0f172a">2</text>
+<text x="24" y="194" font-family="Menlo, monospace" font-size="14" fill="#334155">HindIII</text>
+<rect x="140" y="180" width="640" height="20" rx="8" fill="#e2e8f0"/>
+<rect x="140" y="180" width="213" height="20" rx="8" fill="#0f766e"/>
+<text x="790" y="195" font-family="Menlo, monospace" font-size="14" fill="#0f172a">1</text>
+</svg>
