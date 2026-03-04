@@ -51,6 +51,7 @@ Training materials:
 - PDF tutorial: `docs/tutorial/user_training_tutorial.pdf`
 - 12-sprint implementation plan: `docs/SPRINT_PLAN_12W.md`
 - P0 implementation notes: `docs/P0_IMPLEMENTATION_NOTES.md`
+- P1 implementation notes: `docs/P1_IMPLEMENTATION_NOTES.md`
 
 The UI supports:
 - Sequence info and translation
@@ -65,6 +66,7 @@ The UI supports:
 - Predefined built-in enzyme sets
 - Primer pair design and virtual PCR
 - Primer diagnostics (TmNN with salt/primer concentration, dimer/hairpin risk report)
+- Primer specificity/off-target risk scanning and primer-pair ranking (`/api/primer-specificity`, `/api/primer-rank`)
 - PCR gel-lane simulation from primer pairs
 - Codon optimization
 - ORF browser
@@ -98,6 +100,7 @@ The UI supports:
 - TA/GC cloning simulation
 - In-Fusion-style homology assembly simulation
 - Overlap-extension PCR simulation
+- CRISPR helper workflows: gRNA candidate design, off-target scan, HDR donor template design (`/api/grna-design`, `/api/crispr-offtarget`, `/api/hdr-template`)
 - Cloning compatibility checks (restriction/golden-gate/gibson/in-fusion rule checks)
 - Sticky-end ligation product simulation with orientation prediction
 - Sequence-derived sticky ends from cut sites (optional) with ranked byproduct classes, condition-adjusted probabilities, star-activity risk flags, and phosphatase-treated vector mode

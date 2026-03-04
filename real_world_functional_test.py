@@ -225,6 +225,40 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
             {"forward": r.ctx["fwd"], "reverse": r.ctx["rev"], "na_mM": 50, "primer_nM": 250},
         ),
     )
+    r.check(
+        "primer_specificity",
+        "Estimate primer specificity against real CDS backgrounds",
+        lambda: r.post(
+            "/api/primer-specificity",
+            {
+                "forward": r.ctx["fwd"],
+                "reverse": r.ctx["rev"],
+                "background_sequences": [
+                    {"name": "EGFP", "sequence": EGFP_CDS},
+                    {"name": "mCherry", "sequence": MCHERRY_CDS},
+                ],
+                "max_mismatch": 1,
+            },
+        ),
+    )
+    r.check(
+        "primer_rank",
+        "Rank competing primer pairs by specificity risk",
+        lambda: r.post(
+            "/api/primer-rank",
+            {
+                "candidates": [
+                    {"forward": r.ctx["fwd"], "reverse": r.ctx["rev"]},
+                    {"forward": EGFP_CDS[60:85], "reverse": EGFP_CDS[500:525]},
+                ],
+                "background_sequences": [
+                    {"name": "EGFP", "sequence": EGFP_CDS},
+                    {"name": "mCherry", "sequence": MCHERRY_CDS},
+                ],
+                "max_mismatch": 1,
+            },
+        ),
+    )
     r.check("virtual_pcr", "Simulate PCR amplification using designed EGFP primers", lambda: r.post("/api/pcr", {**egfp_payload, "forward": r.ctx["fwd"], "reverse": r.ctx["rev"]}))
     r.check(
         "pcr_gel_lanes",
@@ -314,6 +348,41 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         return r.post("/api/pairwise-align", {"seq_a": p1, "seq_b": p2, "mode": "protein"})
 
     r.check("pairwise_protein", "Run protein alignment between EGFP and mCherry", _pairwise_protein)
+    r.check(
+        "grna_design",
+        "Design gRNA candidates on EGFP sequence",
+        lambda: r.post("/api/grna-design", {"sequence": EGFP_CDS, "pam": "NGG", "spacer_len": 20, "max_candidates": 50}),
+    )
+    r.check(
+        "crispr_offtarget",
+        "Scan gRNA off-targets across EGFP and mCherry",
+        lambda: r.post(
+            "/api/crispr-offtarget",
+            {
+                "guide": EGFP_CDS[:20],
+                "background_sequences": [
+                    {"name": "EGFP", "sequence": EGFP_CDS},
+                    {"name": "mCherry", "sequence": MCHERRY_CDS},
+                ],
+                "max_mismatch": 3,
+            },
+        ),
+    )
+    r.check(
+        "hdr_template",
+        "Design HDR donor around targeted edit window",
+        lambda: r.post(
+            "/api/hdr-template",
+            {
+                "sequence": EGFP_CDS,
+                "edit_start_1based": 100,
+                "edit_end_1based": 102,
+                "edit_sequence": "GCC",
+                "left_arm_bp": 60,
+                "right_arm_bp": 60,
+            },
+        ),
+    )
     r.check("multi_align_ref", "Reference-based multiple alignment of real CDS inputs", lambda: r.post("/api/multi-align", {"sequences": [EGFP_CDS, MCHERRY_CDS, EGFP_CDS[:300]]}))
 
     def _msa_progressive() -> dict[str, Any]:

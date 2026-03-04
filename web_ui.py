@@ -21,6 +21,8 @@ from canonical_schema import (
     record_to_canonical,
 )
 from bio.trace_tools import align_trace_to_reference, edit_trace_base, trace_consensus, trace_summary
+from bio.crispr_design import crispr_offtarget_scan, design_grna_candidates, design_hdr_template
+from bio.primer_specificity import primer_specificity_report, rank_primer_pairs
 from compat.ab1_format import parse_ab1_bytes, synthetic_trace_from_sequence
 from compat.dna_format import export_dna_container, import_dna_container
 from snapgene_like import (
@@ -2640,6 +2642,80 @@ class Handler(BaseHTTPRequestHandler):
                         "trace_id": tr.get("trace_id"),
                         **trace_consensus(tr, min_quality=int(payload.get("min_quality", 20))),
                     }
+                )
+            elif self.path == "/api/primer-specificity":
+                backgrounds = payload.get("background_sequences", [])
+                if isinstance(backgrounds, str):
+                    backgrounds = [x.strip() for x in backgrounds.splitlines() if x.strip()]
+                if not backgrounds:
+                    rec = get_record()
+                    backgrounds = [{"name": rec.name, "sequence": rec.sequence}]
+                self._send_json(
+                    primer_specificity_report(
+                        forward=str(payload.get("forward", "")),
+                        reverse=str(payload.get("reverse", "")),
+                        background_sequences=backgrounds,
+                        max_mismatch=int(payload.get("max_mismatch", 1)),
+                        min_amplicon_bp=int(payload.get("min_amplicon_bp", 80)),
+                        max_amplicon_bp=int(payload.get("max_amplicon_bp", 3000)),
+                    )
+                )
+            elif self.path == "/api/primer-rank":
+                backgrounds = payload.get("background_sequences", [])
+                if isinstance(backgrounds, str):
+                    backgrounds = [x.strip() for x in backgrounds.splitlines() if x.strip()]
+                if not backgrounds:
+                    rec = get_record()
+                    backgrounds = [{"name": rec.name, "sequence": rec.sequence}]
+                candidates = payload.get("candidates", [])
+                if isinstance(candidates, str):
+                    candidates = json.loads(candidates)
+                self._send_json(
+                    rank_primer_pairs(
+                        candidates=[dict(x) for x in candidates if isinstance(x, dict)],
+                        background_sequences=backgrounds,
+                        max_mismatch=int(payload.get("max_mismatch", 1)),
+                    )
+                )
+            elif self.path == "/api/grna-design":
+                sequence = str(payload.get("sequence", ""))
+                if not sequence.strip():
+                    sequence = get_record().sequence
+                self._send_json(
+                    design_grna_candidates(
+                        sequence=sequence,
+                        pam=str(payload.get("pam", "NGG")),
+                        spacer_len=int(payload.get("spacer_len", 20)),
+                        max_candidates=int(payload.get("max_candidates", 200)),
+                    )
+                )
+            elif self.path == "/api/crispr-offtarget":
+                backgrounds = payload.get("background_sequences", [])
+                if isinstance(backgrounds, str):
+                    backgrounds = [x.strip() for x in backgrounds.splitlines() if x.strip()]
+                if not backgrounds:
+                    rec = get_record()
+                    backgrounds = [{"name": rec.name, "sequence": rec.sequence}]
+                self._send_json(
+                    crispr_offtarget_scan(
+                        guide=str(payload.get("guide", "")),
+                        background_sequences=backgrounds,
+                        max_mismatch=int(payload.get("max_mismatch", 3)),
+                    )
+                )
+            elif self.path == "/api/hdr-template":
+                sequence = str(payload.get("sequence", ""))
+                if not sequence.strip():
+                    sequence = get_record().sequence
+                self._send_json(
+                    design_hdr_template(
+                        sequence=sequence,
+                        edit_start_1based=int(payload.get("edit_start_1based", 1)),
+                        edit_end_1based=int(payload.get("edit_end_1based", 1)),
+                        edit_sequence=str(payload.get("edit_sequence", "")),
+                        left_arm_bp=int(payload.get("left_arm_bp", 60)),
+                        right_arm_bp=int(payload.get("right_arm_bp", 60)),
+                    )
                 )
             elif self.path == "/api/info":
                 rec = get_record()

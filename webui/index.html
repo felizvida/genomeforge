@@ -630,6 +630,41 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
           <button onclick="runReverseTranslate()">Reverse Translate</button>
           <button onclick="runMutagenesis()">Mutagenesis Replace</button>
         </div>
+        <label>Primer Specificity (backgrounds: one sequence per line)</label>
+        <textarea id="primerSpecificityBackgrounds">ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTGGTCGAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGCGAGGGCGATGCCACCTACGGCAAGCTGACCCTGAAG</textarea>
+        <div class="row">
+          <input id="primerSpecificityMaxMm" type="number" value="1" />
+          <button onclick="runPrimerSpecificity()">Primer Specificity</button>
+        </div>
+        <label>Primer Rank Candidates (JSON)</label>
+        <textarea id="primerRankCandidates">[
+  {"forward":"ATGGCCATTGTAATGGGCCG","reverse":"TCTAGAAGCTTCTATCGGGC"},
+  {"forward":"GAATTCCGGATCCATGGCC","reverse":"TCTAGAAGCTTCTATCGGGC"}
+]</textarea>
+        <button onclick="runPrimerRank()">Rank Primer Pairs</button>
+        <label>CRISPR PAM / Spacer</label>
+        <div class="row3">
+          <input id="crisprPam" value="NGG" />
+          <input id="crisprSpacerLen" type="number" value="20" />
+          <input id="crisprMaxCandidates" type="number" value="50" />
+        </div>
+        <div class="row">
+          <button onclick="runGrnaDesign()">gRNA Design</button>
+          <button onclick="runCrisprOfftarget()">CRISPR Off-target</button>
+        </div>
+        <label>Selected Guide (for off-target scan)</label>
+        <input id="crisprGuide" value="" placeholder="Paste guide from gRNA results" />
+        <label>HDR Template Design</label>
+        <div class="row3">
+          <input id="hdrEditStart" type="number" value="10" />
+          <input id="hdrEditEnd" type="number" value="12" />
+          <input id="hdrEditSeq" value="GCC" />
+        </div>
+        <div class="row3">
+          <input id="hdrLeftArm" type="number" value="60" />
+          <input id="hdrRightArm" type="number" value="60" />
+          <button onclick="runHdrTemplate()">Design HDR Donor</button>
+        </div>
         <label>Canonical Schema Converter</label>
         <div class="row">
           <button onclick="runCanonicalizeRecord()">Canonicalize Record</button>
@@ -1693,6 +1728,73 @@ TTTCCCGGGAAATTT</textarea>
       try {
         const trace_id = document.getElementById('traceId').value.trim();
         show(await callApi('/api/trace-consensus', { trace_id, min_quality: 20 }));
+      } catch (e) { show(String(e)); }
+    }
+
+    function splitSeqLines(id) {
+      return document.getElementById(id).value.split('\n').map((s) => s.trim()).filter(Boolean);
+    }
+
+    async function runPrimerSpecificity() {
+      try {
+        const backgrounds = splitSeqLines('primerSpecificityBackgrounds').map((sequence, i) => ({ name: `bg_${i+1}`, sequence }));
+        show(await callApi('/api/primer-specificity', payload({
+          forward: document.getElementById('forward').value,
+          reverse: document.getElementById('reverse').value,
+          background_sequences: backgrounds,
+          max_mismatch: Number(document.getElementById('primerSpecificityMaxMm').value),
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runPrimerRank() {
+      try {
+        const candidates = JSON.parse(document.getElementById('primerRankCandidates').value);
+        const backgrounds = splitSeqLines('primerSpecificityBackgrounds').map((sequence, i) => ({ name: `bg_${i+1}`, sequence }));
+        show(await callApi('/api/primer-rank', {
+          candidates,
+          background_sequences: backgrounds,
+          max_mismatch: Number(document.getElementById('primerSpecificityMaxMm').value),
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runGrnaDesign() {
+      try {
+        const r = await callApi('/api/grna-design', {
+          sequence: plainSeq(document.getElementById('content').value) || plainSeq(document.getElementById('traceReference').value),
+          pam: document.getElementById('crisprPam').value,
+          spacer_len: Number(document.getElementById('crisprSpacerLen').value),
+          max_candidates: Number(document.getElementById('crisprMaxCandidates').value),
+        });
+        if (Array.isArray(r.candidates) && r.candidates.length) {
+          document.getElementById('crisprGuide').value = r.candidates[0].guide || '';
+        }
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCrisprOfftarget() {
+      try {
+        const backgrounds = splitSeqLines('primerSpecificityBackgrounds').map((sequence, i) => ({ name: `bg_${i+1}`, sequence }));
+        show(await callApi('/api/crispr-offtarget', payload({
+          guide: document.getElementById('crisprGuide').value,
+          background_sequences: backgrounds,
+          max_mismatch: 3,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runHdrTemplate() {
+      try {
+        show(await callApi('/api/hdr-template', payload({
+          sequence: plainSeq(document.getElementById('content').value),
+          edit_start_1based: Number(document.getElementById('hdrEditStart').value),
+          edit_end_1based: Number(document.getElementById('hdrEditEnd').value),
+          edit_sequence: document.getElementById('hdrEditSeq').value,
+          left_arm_bp: Number(document.getElementById('hdrLeftArm').value),
+          right_arm_bp: Number(document.getElementById('hdrRightArm').value),
+        })));
       } catch (e) { show(String(e)); }
     }
 

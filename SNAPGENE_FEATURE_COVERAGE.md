@@ -20,6 +20,7 @@ Legend:
 ## Primers
 - Design primers: `Implemented`
 - Primer diagnostics: `Implemented` (TmNN + dimer/hairpin heuristics)
+- Primer specificity / off-target ranking: `Implemented` (local background scan + pair risk score + candidate ranking)
 - Anneal two oligos: `Implemented` (heuristic overlap anneal)
 
 ## PCR and Mutagenesis
@@ -51,6 +52,7 @@ Legend:
 - Choose alternative codons: `Implemented` (codon optimize)
 - Sophisticated translated numbering: `Implemented` (translated-feature report with codon/genomic coordinate numbering)
 - Ribosomal slippage: `Implemented` (optional +/-1 slippage model in translated-feature report)
+- CRISPR helper workflows: `Implemented` (gRNA candidate design + off-target scan + HDR donor template generator)
 
 ## Translations
 - View/edit translated features: `Implemented` (translated feature report + codon-level translated feature edit API/UI)

@@ -182,7 +182,60 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
         lambda: "products"
         in r.post("/api/pcr", {**base_payload, "forward": r.ctx.get("fwd"), "reverse": r.ctx.get("rev")})[1],
     )
+    r.check(
+        "api_primer_specificity",
+        lambda: "specificity_risk_score"
+        in r.post(
+            "/api/primer-specificity",
+            {
+                **base_payload,
+                "forward": r.ctx.get("fwd"),
+                "reverse": r.ctx.get("rev"),
+                "background_sequences": [{"name": "bg1", "sequence": seq}],
+                "max_mismatch": 1,
+            },
+        )[1],
+    )
+    r.check(
+        "api_primer_rank",
+        lambda: "ranked_pairs"
+        in r.post(
+            "/api/primer-rank",
+            {
+                "candidates": [
+                    {"forward": r.ctx.get("fwd"), "reverse": r.ctx.get("rev")},
+                    {"forward": "ATGGCCATTGTAATGGGCCG", "reverse": "TCTAGAAGCTTCTATCGGGC"},
+                ],
+                "background_sequences": [{"name": "bg1", "sequence": seq}],
+                "max_mismatch": 1,
+            },
+        )[1],
+    )
     r.check("api_codon_optimize", lambda: isinstance(r.post("/api/codon-optimize", {**base_payload, "host": "ecoli"})[1], dict))
+    r.check(
+        "api_grna_design",
+        lambda: "candidates"
+        in r.post(
+            "/api/grna-design",
+            {"sequence": seq * 2 + "GGG", "pam": "NGG", "spacer_len": 20, "max_candidates": 20},
+        )[1],
+    )
+    r.check(
+        "api_crispr_offtarget",
+        lambda: "offtarget_risk_score"
+        in r.post(
+            "/api/crispr-offtarget",
+            {"guide": "ATGGCCATTGTAATGGGCCG", "background_sequences": [{"name": "bg1", "sequence": seq * 2}], "max_mismatch": 3},
+        )[1],
+    )
+    r.check(
+        "api_hdr_template",
+        lambda: "donor_sequence"
+        in r.post(
+            "/api/hdr-template",
+            {"sequence": seq * 2, "edit_start_1based": 10, "edit_end_1based": 12, "edit_sequence": "GCC", "left_arm_bp": 40, "right_arm_bp": 40},
+        )[1],
+    )
     r.check("api_map", lambda: "<svg" in r.post("/api/map", {**base_payload, "enzymes": "EcoRI,BamHI"})[1]["svg"])
     r.check(
         "api_sequence_tracks",
