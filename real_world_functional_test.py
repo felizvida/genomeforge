@@ -555,6 +555,50 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.check("project_list", "List project catalog", lambda: r.post("/api/project-list", {}))
     r.check("project_history_graph", "Build project history graph data", lambda: r.post("/api/project-history-graph", {"project_name": r.created["project"]}))
     r.check("project_history_svg", "Render project history SVG", lambda: r.post("/api/project-history-svg", {"project_name": r.created["project"]}))
+    r.check(
+        "workspace_create",
+        "Create collaboration workspace",
+        lambda: r.post(
+            "/api/workspace-create",
+            {"workspace_name": "rw_workspace", "owner": "owner_user", "members": ["reviewer_user", "editor_user"]},
+        ),
+    )
+    r.check(
+        "project_permissions_set",
+        "Assign reviewer role for project",
+        lambda: r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"reviewer_user": "reviewer"}}),
+    )
+    r.check(
+        "project_permissions_get",
+        "Read project permission map",
+        lambda: r.post("/api/project-permissions", {"project_name": r.created["project"]}),
+    )
+    r.check(
+        "project_audit_log",
+        "Fetch project audit log",
+        lambda: r.post("/api/project-audit-log", {"project_name": r.created["project"], "limit": 200}),
+    )
+    r.check(
+        "project_diff",
+        "Compare project snapshot against edited variant",
+        lambda: r.post(
+            "/api/project-diff",
+            {
+                "project_a": {**egfp_payload, "project_name": "egfp_base"},
+                "project_b": {**egfp_payload, "project_name": "egfp_mod", "content": f">EGFP\n{EGFP_CDS[:120]}GCC{EGFP_CDS[123:]}"},
+            },
+        ),
+    )
+    def _review_flow() -> dict[str, Any]:
+        sub = r.post("/api/review-submit", {"project_name": r.created["project"], "submitter": "editor_user", "summary": "ready for release"})
+        rid = sub["review"]["review_id"]
+        app = r.post(
+            "/api/review-approve",
+            {"review_id": rid, "project_name": r.created["project"], "reviewer": "reviewer_user", "note": "looks good"},
+        )
+        return {"review_id": rid, "status": app["review"]["status"]}
+
+    r.check("review_submit_approve", "Submit and approve review workflow", _review_flow)
     r.check("collection_save", "Save collection with project", lambda: r.post("/api/collection-save", {"collection_name": r.created["collection"], "projects": r.created["project"]}))
     r.check("collection_load", "Load collection", lambda: r.post("/api/collection-load", {"collection_name": r.created["collection"]}))
     r.check("collection_list", "List collections", lambda: r.post("/api/collection-list", {}))
@@ -577,7 +621,7 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
 
 
 def cleanup_artifacts() -> None:
-    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets"]:
+    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "collab_data"]:
         p = ROOT / d
         if p.exists():
             shutil.rmtree(p)

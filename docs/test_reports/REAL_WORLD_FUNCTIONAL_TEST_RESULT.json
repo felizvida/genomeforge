@@ -1,7 +1,7 @@
 {
   "summary": {
-    "total_steps": 80,
-    "passed": 80,
+    "total_steps": 86,
+    "passed": 86,
     "failed": 0,
     "failures": []
   },
@@ -24,7 +24,7 @@
       "name": "info_mcherry",
       "objective": "Compute basic stats for mCherry CDS",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "name": "mCherry_CDS",
         "length": 711,
@@ -197,7 +197,7 @@
       "name": "map_svg",
       "objective": "Render plasmid/linear map SVG",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "svg": "<1969 chars>"
       },
@@ -220,7 +220,7 @@
       "name": "motif_search",
       "objective": "Find canonical EcoRI motif in pUC19 MCS",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "motif": "GAATTC",
         "count": 1,
@@ -234,7 +234,7 @@
       "name": "orf_scan",
       "objective": "Find ORFs in EGFP sequence",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "count": 1,
         "orfs": [
@@ -253,7 +253,7 @@
       "name": "primer_design",
       "objective": "Design primers for EGFP internal region",
       "status": "PASS",
-      "duration_ms": 152,
+      "duration_ms": 156,
       "details": {
         "forward_len": 25,
         "reverse_len": 25
@@ -449,7 +449,7 @@
       "details": {
         "canonical_record": {
           "schema": "1.0.0",
-          "created_at": "2026-03-04T16:24:53.881388+00:00",
+          "created_at": "2026-03-04T17:20:20.323928+00:00",
           "source_format": "fasta",
           "record_id": "8f16e92af26c6f40",
           "name": "EGFP_CDS",
@@ -465,7 +465,7 @@
       "name": "convert_record_roundtrip",
       "objective": "Roundtrip canonical -> FASTA/GenBank/payload",
       "status": "PASS",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "details": {
         "fasta_len": 741,
         "genbank_len": 1185
@@ -504,7 +504,7 @@
         },
         "canonical_record": {
           "schema": "1.0.0",
-          "created_at": "2026-03-04T16:24:53.884344+00:00",
+          "created_at": "2026-03-04T17:20:20.327905+00:00",
           "source_format": "fasta",
           "record_id": "8f16e92af26c6f40",
           "name": "EGFP_CDS",
@@ -520,9 +520,9 @@
       "name": "trace_import_align_consensus",
       "objective": "Synthetic trace import + align + consensus pipeline",
       "status": "PASS",
-      "duration_ms": 254,
+      "duration_ms": 258,
       "details": {
-        "trace_id": "trace_00497467c626",
+        "trace_id": "trace_5af4fab25a90",
         "length": 720,
         "min_quality": 20,
         "low_quality_bases": 0,
@@ -534,7 +534,7 @@
       "name": "search_entities",
       "objective": "Search across features, enzymes, and primer hits",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "query": "GFP",
         "motif_hit_count": 0,
@@ -633,7 +633,7 @@
       "name": "mutagenesis",
       "objective": "Apply mutagenesis edit in EGFP region",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "start": 40,
         "end": 45,
@@ -648,7 +648,7 @@
       "name": "pairwise_dna",
       "objective": "Run pairwise DNA alignment between EGFP and mCherry",
       "status": "PASS",
-      "duration_ms": 127,
+      "duration_ms": 131,
       "details": {
         "score": 62,
         "identity_pct": 58.61,
@@ -780,7 +780,7 @@
       "name": "multi_align_ref",
       "objective": "Reference-based multiple alignment of real CDS inputs",
       "status": "PASS",
-      "duration_ms": 179,
+      "duration_ms": 184,
       "details": {
         "reference_length": 720,
         "sequence_count": 3,
@@ -792,7 +792,7 @@
       "name": "msa_progressive",
       "objective": "Progressive MSA on real coding sequences",
       "status": "PASS",
-      "duration_ms": 215,
+      "duration_ms": 220,
       "details": {
         "rows": 3,
         "columns": 749
@@ -861,7 +861,7 @@
       "name": "phylo_tree",
       "objective": "Generate UPGMA phylogenetic tree from real sequences",
       "status": "PASS",
-      "duration_ms": 301,
+      "duration_ms": 311,
       "details": {
         "sequence_count": 3,
         "merges": [
@@ -1023,9 +1023,9 @@
       "duration_ms": 1,
       "details": {
         "saved": true,
-        "name": "real_db_3b4e84a7",
+        "name": "real_db_2fc8f125",
         "count": 2,
-        "path": "/Users/liux17/Documents/Playground/annotation_db/real_db_3b4e84a7.json"
+        "path": "/Users/liux17/Documents/Playground/annotation_db/real_db_2fc8f125.json"
       },
       "error": ""
     },
@@ -1051,10 +1051,10 @@
       "name": "annotation_db_load",
       "objective": "Load saved annotation DB",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
-        "name": "real_db_3b4e84a7",
-        "updated_at": "2026-03-04T16:24:54.997759+00:00",
+        "name": "real_db_2fc8f125",
+        "updated_at": "2026-03-04T17:20:21.471907+00:00",
         "signatures": [
           {
             "label": "<str>",
@@ -1074,9 +1074,9 @@
       "name": "annotation_db_apply",
       "objective": "Apply saved annotation DB to EGFP",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
-        "db_name": "real_db_3b4e84a7",
+        "db_name": "real_db_2fc8f125",
         "count": 2,
         "annotations": [
           {
@@ -1123,7 +1123,7 @@
       "name": "features_add_update_delete",
       "objective": "Add, update, and delete a feature entry",
       "status": "PASS",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "details": {
         "count": 1,
         "features": [
@@ -1216,12 +1216,12 @@
       "name": "enzyme_set_save",
       "objective": "Save custom enzyme panel",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "saved": true,
-        "name": "real_set_3b4e84a7",
+        "name": "real_set_2fc8f125",
         "count": 3,
-        "path": "/Users/liux17/Documents/Playground/enzyme_sets/real_set_3b4e84a7.json"
+        "path": "/Users/liux17/Documents/Playground/enzyme_sets/real_set_2fc8f125.json"
       },
       "error": ""
     },
@@ -1229,7 +1229,7 @@
       "name": "enzyme_set_list",
       "objective": "List custom enzyme panels",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "count": 5,
         "sets": [
@@ -1277,8 +1277,8 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "name": "real_set_3b4e84a7",
-        "updated_at": "2026-03-04T16:24:55.008786+00:00",
+        "name": "real_set_2fc8f125",
+        "updated_at": "2026-03-04T17:20:21.480323+00:00",
         "enzymes": [
           "BamHI",
           "EcoRI",
@@ -1295,7 +1295,7 @@
       "duration_ms": 0,
       "details": {
         "deleted": true,
-        "name": "real_set_3b4e84a7"
+        "name": "real_set_2fc8f125"
       },
       "error": ""
     },
@@ -1303,7 +1303,7 @@
       "name": "batch_digest",
       "objective": "Run batch digest across multiple real records",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "count": 3,
         "results": [
@@ -1608,8 +1608,8 @@
       "duration_ms": 1,
       "details": {
         "saved": true,
-        "project_name": "real_proj_3b4e84a7",
-        "path": "/Users/liux17/Documents/Playground/projects/real_proj_3b4e84a7.json"
+        "project_name": "real_proj_2fc8f125",
+        "path": "/Users/liux17/Documents/Playground/projects/real_proj_2fc8f125.json"
       },
       "error": ""
     },
@@ -1619,8 +1619,8 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "project_name": "real_proj_3b4e84a7",
-        "updated_at": "2026-03-04T16:24:55.019950+00:00",
+        "project_name": "real_proj_2fc8f125",
+        "updated_at": "2026-03-04T17:20:21.490499+00:00",
         "name": "EGFP_CDS",
         "topology": "linear",
         "content": ">EGFP_CDS\nATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTGGTCGAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGCGAGGGCGA... <730 chars total>",
@@ -1649,7 +1649,7 @@
       "name": "project_list",
       "objective": "List project catalog",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "count": 1,
         "projects": [
@@ -1668,7 +1668,7 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "project_name": "real_proj_3b4e84a7",
+        "project_name": "real_proj_2fc8f125",
         "node_count": 2,
         "nodes": [
           {
@@ -1697,7 +1697,7 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "project_name": "real_proj_3b4e84a7",
+        "project_name": "real_proj_2fc8f125",
         "svg": "<521 chars>",
         "node_count": 2,
         "nodes": [
@@ -1722,15 +1722,127 @@
       "error": ""
     },
     {
+      "name": "workspace_create",
+      "objective": "Create collaboration workspace",
+      "status": "PASS",
+      "duration_ms": 1,
+      "details": {
+        "created": true,
+        "workspace": {
+          "workspace_name": "rw_workspace",
+          "owner": "owner_user",
+          "members": [
+            "<str>",
+            "<str>",
+            "<str>"
+          ],
+          "created_at": "2026-03-04T17:20:21.495831+00:00",
+          "updated_at": "2026-03-04T17:20:21.495834+00:00"
+        },
+        "path": "/Users/liux17/Documents/Playground/collab_data/workspaces/rw_workspace.json"
+      },
+      "error": ""
+    },
+    {
+      "name": "project_permissions_set",
+      "objective": "Assign reviewer role for project",
+      "status": "PASS",
+      "duration_ms": 0,
+      "details": {
+        "saved": true,
+        "permissions": {
+          "project_name": "real_proj_2fc8f125",
+          "roles": {
+            "reviewer_user": "<str>"
+          },
+          "updated_at": "2026-03-04T17:20:21.497304+00:00"
+        },
+        "path": "/Users/liux17/Documents/Playground/collab_data/permissions/real_proj_2fc8f125.json"
+      },
+      "error": ""
+    },
+    {
+      "name": "project_permissions_get",
+      "objective": "Read project permission map",
+      "status": "PASS",
+      "duration_ms": 0,
+      "details": {
+        "project_name": "real_proj_2fc8f125",
+        "roles": {
+          "reviewer_user": "reviewer"
+        },
+        "updated_at": "2026-03-04T17:20:21.497304+00:00"
+      },
+      "error": ""
+    },
+    {
+      "name": "project_audit_log",
+      "objective": "Fetch project audit log",
+      "status": "PASS",
+      "duration_ms": 0,
+      "details": {
+        "project_name": "real_proj_2fc8f125",
+        "count": 1,
+        "events": [
+          {
+            "timestamp": "<str>",
+            "actor": "<str>",
+            "action": "<str>",
+            "details": "<dict>"
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "name": "project_diff",
+      "objective": "Compare project snapshot against edited variant",
+      "status": "PASS",
+      "duration_ms": 0,
+      "details": {
+        "name_a": "egfp_base",
+        "name_b": "egfp_mod",
+        "seq_len_a": 720,
+        "seq_len_b": 720,
+        "sequence_identity_pct": 16.806,
+        "sequence_change_count": 1,
+        "sequence_changes": [
+          {
+            "op": "<str>",
+            "a_start_1based": "<int>",
+            "a_end_1based": "<int>",
+            "b_start_1based": "<int>",
+            "b_end_1based": "<int>",
+            "a_len": "<int>",
+            "b_len": "<int>"
+          }
+        ],
+        "feature_count_a": 2,
+        "...": "+5 keys"
+      },
+      "error": ""
+    },
+    {
+      "name": "review_submit_approve",
+      "objective": "Submit and approve review workflow",
+      "status": "PASS",
+      "duration_ms": 7,
+      "details": {
+        "review_id": "rev_571e23a160",
+        "status": "approved"
+      },
+      "error": ""
+    },
+    {
       "name": "collection_save",
       "objective": "Save collection with project",
       "status": "PASS",
       "duration_ms": 0,
       "details": {
         "saved": true,
-        "collection_name": "real_col_3b4e84a7",
+        "collection_name": "real_col_2fc8f125",
         "count": 1,
-        "path": "/Users/liux17/Documents/Playground/collections/real_col_3b4e84a7.json"
+        "path": "/Users/liux17/Documents/Playground/collections/real_col_2fc8f125.json"
       },
       "error": ""
     },
@@ -1738,12 +1850,12 @@
       "name": "collection_load",
       "objective": "Load collection",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
-        "collection_name": "real_col_3b4e84a7",
-        "updated_at": "2026-03-04T16:24:55.024005+00:00",
+        "collection_name": "real_col_2fc8f125",
+        "updated_at": "2026-03-04T17:20:21.507853+00:00",
         "projects": [
-          "real_proj_3b4e84a7"
+          "real_proj_2fc8f125"
         ],
         "notes": ""
       },
@@ -1753,7 +1865,7 @@
       "name": "collection_list",
       "objective": "List collections",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "count": 1,
         "collections": [
@@ -1774,9 +1886,9 @@
       "duration_ms": 1,
       "details": {
         "saved": true,
-        "collection_name": "real_col_3b4e84a7",
+        "collection_name": "real_col_2fc8f125",
         "count": 1,
-        "path": "/Users/liux17/Documents/Playground/collections/real_col_3b4e84a7.json"
+        "path": "/Users/liux17/Documents/Playground/collections/real_col_2fc8f125.json"
       },
       "error": ""
     },
@@ -1784,9 +1896,9 @@
       "name": "share_create_load_get",
       "objective": "Create/load/share bundle over HTTP",
       "status": "PASS",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "details": {
-        "share_id": "913949134355",
+        "share_id": "63d1b10473cf",
         "html_bytes": 1577
       },
       "error": ""
@@ -1798,7 +1910,7 @@
       "duration_ms": 0,
       "details": {
         "deleted": true,
-        "collection_name": "real_col_3b4e84a7"
+        "collection_name": "real_col_2fc8f125"
       },
       "error": ""
     },
@@ -1806,10 +1918,10 @@
       "name": "project_delete",
       "objective": "Delete project",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "deleted": true,
-        "project_name": "real_proj_3b4e84a7"
+        "project_name": "real_proj_2fc8f125"
       },
       "error": ""
     },

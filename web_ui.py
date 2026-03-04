@@ -22,7 +22,17 @@ from canonical_schema import (
 )
 from bio.trace_tools import align_trace_to_reference, edit_trace_base, trace_consensus, trace_summary
 from bio.crispr_design import crispr_offtarget_scan, design_grna_candidates, design_hdr_template
+from bio.project_diff import diff_projects
 from bio.primer_specificity import primer_specificity_report, rank_primer_pairs
+from collab.review import approve_review, submit_review
+from collab.store import (
+    append_audit_event,
+    create_workspace,
+    get_audit_log,
+    get_project_permissions,
+    role_for_user,
+    set_project_permissions,
+)
 from compat.ab1_format import parse_ab1_bytes, synthetic_trace_from_sequence
 from compat.dna_format import export_dna_container, import_dna_container
 from snapgene_like import (
@@ -52,6 +62,7 @@ ANNOT_DB_DIR = ROOT / "annotation_db"
 ENZYME_SET_DIR = ROOT / "enzyme_sets"
 COLLECTIONS_DIR = ROOT / "collections"
 SHARES_DIR = ROOT / "shares"
+COLLAB_ROOT = ROOT / "collab_data"
 TRACE_CACHE: Dict[str, Dict[str, Any]] = {}
 
 
@@ -1656,6 +1667,13 @@ def save_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         "canonical_record": canon,
     }
     p.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    append_audit_event(
+        COLLAB_ROOT,
+        project_name=name,
+        action="project_save",
+        actor=str(payload.get("actor", "system")),
+        details={"path": str(p), "length": rec.length, "feature_count": len(rec.features)},
+    )
     return {"saved": True, "project_name": name, "path": str(p)}
 
 
@@ -1707,6 +1725,7 @@ def delete_project(name: str) -> Dict[str, Any]:
     if not p.exists():
         raise ValueError("Project not found")
     p.unlink()
+    append_audit_event(COLLAB_ROOT, project_name=name, action="project_delete", actor="system", details={})
     return {"deleted": True, "project_name": name}
 
 
@@ -3120,6 +3139,103 @@ class Handler(BaseHTTPRequestHandler):
                         primers=[str(x) for x in primers],
                     )
                 )
+            elif self.path == "/api/workspace-create":
+                members = payload.get("members", [])
+                if isinstance(members, str):
+                    members = [x.strip() for x in members.split(",") if x.strip()]
+                self._send_json(
+                    create_workspace(
+                        COLLAB_ROOT,
+                        workspace_name=str(payload.get("workspace_name", "")).strip(),
+                        owner=str(payload.get("owner", "")).strip(),
+                        members=[str(x) for x in members],
+                    )
+                )
+            elif self.path == "/api/project-permissions":
+                project_name = str(payload.get("project_name", "")).strip()
+                if not project_name:
+                    raise ValueError("project_name is required")
+                if isinstance(payload.get("roles"), dict):
+                    self._send_json(
+                        set_project_permissions(
+                            COLLAB_ROOT,
+                            project_name=project_name,
+                            roles={str(k): str(v) for k, v in dict(payload.get("roles", {})).items()},
+                        )
+                    )
+                else:
+                    self._send_json(get_project_permissions(COLLAB_ROOT, project_name))
+            elif self.path == "/api/project-audit-log":
+                project_name = str(payload.get("project_name", "")).strip()
+                if not project_name:
+                    raise ValueError("project_name is required")
+                if str(payload.get("action", "")).strip():
+                    evt = append_audit_event(
+                        COLLAB_ROOT,
+                        project_name=project_name,
+                        action=str(payload.get("action", "")),
+                        actor=str(payload.get("actor", "system")),
+                        details=dict(payload.get("details", {})) if isinstance(payload.get("details"), dict) else {},
+                    )
+                    self._send_json({"logged": True, "event": evt})
+                else:
+                    self._send_json(get_audit_log(COLLAB_ROOT, project_name, limit=int(payload.get("limit", 200))))
+            elif self.path == "/api/project-diff":
+                if str(payload.get("project_name_a", "")).strip() and str(payload.get("project_name_b", "")).strip():
+                    a = load_project(str(payload.get("project_name_a", "")).strip())
+                    b = load_project(str(payload.get("project_name_b", "")).strip())
+                elif isinstance(payload.get("project_a"), dict) and isinstance(payload.get("project_b"), dict):
+                    a = payload["project_a"]
+                    b = payload["project_b"]
+                else:
+                    raise ValueError("Provide project_name_a/project_name_b or project_a/project_b")
+                self._send_json(diff_projects(a, b))
+            elif self.path == "/api/review-submit":
+                project_name = str(payload.get("project_name", "")).strip()
+                if not project_name:
+                    raise ValueError("project_name is required")
+                snapshot = load_project(project_name)
+                out = submit_review(
+                    COLLAB_ROOT,
+                    project_name=project_name,
+                    submitter=str(payload.get("submitter", "")).strip(),
+                    summary=str(payload.get("summary", "")),
+                    project_snapshot=snapshot,
+                )
+                append_audit_event(
+                    COLLAB_ROOT,
+                    project_name=project_name,
+                    action="review_submit",
+                    actor=str(payload.get("submitter", "system")),
+                    details={"review_id": out["review"]["review_id"]},
+                )
+                self._send_json(out)
+            elif self.path == "/api/review-approve":
+                review_id = str(payload.get("review_id", "")).strip()
+                reviewer = str(payload.get("reviewer", "")).strip()
+                if not review_id or not reviewer:
+                    raise ValueError("review_id and reviewer are required")
+                project_name = str(payload.get("project_name", "")).strip()
+                if project_name:
+                    role = role_for_user(COLLAB_ROOT, project_name, reviewer)
+                    if role not in {"reviewer", "owner"}:
+                        raise ValueError("reviewer lacks permission (requires reviewer|owner role)")
+                out = approve_review(
+                    COLLAB_ROOT,
+                    review_id=review_id,
+                    reviewer=reviewer,
+                    note=str(payload.get("note", "")),
+                )
+                proj = project_name or str(out.get("review", {}).get("project_name", "")).strip()
+                if proj:
+                    append_audit_event(
+                        COLLAB_ROOT,
+                        project_name=proj,
+                        action="review_approve",
+                        actor=reviewer,
+                        details={"review_id": review_id},
+                    )
+                self._send_json(out)
             elif self.path == "/api/project-save":
                 self._send_json(save_project(payload))
             elif self.path == "/api/project-load":

@@ -52,6 +52,7 @@ Training materials:
 - 12-sprint implementation plan: `docs/SPRINT_PLAN_12W.md`
 - P0 implementation notes: `docs/P0_IMPLEMENTATION_NOTES.md`
 - P1 implementation notes: `docs/P1_IMPLEMENTATION_NOTES.md`
+- P2 implementation notes: `docs/P2_IMPLEMENTATION_NOTES.md`
 
 The UI supports:
 - Sequence info and translation
@@ -114,6 +115,7 @@ The UI supports:
 - Project collections (save/load/list/delete + add project)
 - Local share bundles (create/load portable JSON snapshots)
 - Share-view pages at `/share/<share_id>`
+- Collaboration core: workspace create, project permissions, project audit logs, structured project diff, and review submit/approve workflows
 - Feature editor APIs (list/add/update/delete)
 - Project history graph endpoint
 - Project history graph SVG rendering in UI with recency-based node coloring

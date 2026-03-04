@@ -384,6 +384,52 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r.check("api_project_history_graph", lambda: "nodes" in r.post("/api/project-history-graph", {"project_name": r.created["project"]})[1])
     r.check("api_project_history_svg", lambda: "<svg" in r.post("/api/project-history-svg", {"project_name": r.created["project"]})[1]["svg"])
     r.check(
+        "api_workspace_create",
+        lambda: r.post(
+            "/api/workspace-create",
+            {"workspace_name": "ws_" + suffix, "owner": "owner_user", "members": ["reviewer_user", "editor_user"]},
+        )[1].get("created")
+        is True,
+    )
+    r.check(
+        "api_project_permissions_set",
+        lambda: r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"reviewer_user": "reviewer"}})[1].get("saved")
+        is True,
+    )
+    r.check(
+        "api_project_permissions_get",
+        lambda: "roles" in r.post("/api/project-permissions", {"project_name": r.created["project"]})[1],
+    )
+    r.check(
+        "api_project_audit_log",
+        lambda: "events" in r.post("/api/project-audit-log", {"project_name": r.created["project"], "limit": 50})[1],
+    )
+    r.check(
+        "api_project_diff",
+        lambda: "sequence_identity_pct"
+        in r.post(
+            "/api/project-diff",
+            {
+                "project_a": {**base_payload, "project_name": "A"},
+                "project_b": {**base_payload, "project_name": "B", "content": seq + "ATG"},
+            },
+        )[1],
+    )
+    r.check(
+        "api_review_submit",
+        lambda: (
+            lambda d: (r.ctx.__setitem__("review_id", d["review"]["review_id"]), True)[1]
+        )(r.post("/api/review-submit", {"project_name": r.created["project"], "submitter": "editor_user", "summary": "ready"})[1]),
+    )
+    r.check(
+        "api_review_approve",
+        lambda: r.post(
+            "/api/review-approve",
+            {"review_id": r.ctx.get("review_id"), "project_name": r.created["project"], "reviewer": "reviewer_user", "note": "approved"},
+        )[1].get("approved")
+        is True,
+    )
+    r.check(
         "api_collection_save",
         lambda: r.post("/api/collection-save", {"collection_name": r.created["collection"], "projects": r.created["project"]})[1].get("saved")
         is True,
@@ -464,7 +510,7 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
 
 
 def cleanup_artifacts() -> None:
-    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets"]:
+    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "collab_data"]:
         p = ROOT / d
         if p.exists():
             shutil.rmtree(p)

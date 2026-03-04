@@ -81,6 +81,7 @@ Legend:
 - Comprehensive undo: `Implemented` (UI undo/redo with persisted local history state)
 - Graphical history: `Implemented` (project history graph data + SVG rendering)
 - Change coloring by recency: `Implemented` (project history graph node coloring by version recency)
+- Audit trail: `Implemented` (project audit-log endpoint with mutation event capture for save/delete + manual event append)
 
 ## Data Management
 - Import common formats with annotations: `Implemented` (FASTA/GenBank/EMBL parsing with feature import)
@@ -89,6 +90,7 @@ Legend:
 - Viewer sharing: `Implemented` (local share-bundle create/load + `/share/<id>` HTML viewer pages)
 - Batch operations: `Implemented` (batch digest)
 - Project persistence: `Implemented` (save/load/list/delete local project JSON)
+- Team collaboration core: `Implemented` (workspace creation + per-project role map + review submit/approve workflow + project diff endpoint)
 
 ## Search
 - Search DNA/protein: `Implemented` (DNA motif search)

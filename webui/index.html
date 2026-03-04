@@ -665,6 +665,43 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
           <input id="hdrRightArm" type="number" value="60" />
           <button onclick="runHdrTemplate()">Design HDR Donor</button>
         </div>
+        <label>Collaboration / Review</label>
+        <div class="row3">
+          <input id="workspaceName" value="lab_workspace" />
+          <input id="workspaceOwner" value="owner_user" />
+          <input id="workspaceMembers" value="reviewer_user,editor_user" />
+        </div>
+        <button onclick="runWorkspaceCreate()">Create Workspace</button>
+        <div class="row3">
+          <input id="permProjectName" value="demo_project" />
+          <input id="permUser" value="reviewer_user" />
+          <select id="permRole">
+            <option value="viewer">viewer</option>
+            <option value="editor">editor</option>
+            <option value="reviewer">reviewer</option>
+            <option value="owner">owner</option>
+          </select>
+        </div>
+        <div class="row">
+          <button onclick="runProjectPermissionsSet()">Set Permission</button>
+          <button onclick="runProjectPermissionsGet()">Get Permissions</button>
+        </div>
+        <div class="row">
+          <button onclick="runProjectAuditLogGet()">Get Audit Log</button>
+          <button onclick="runProjectDiff()">Project Diff (current vs named)</button>
+        </div>
+        <div class="row3">
+          <input id="reviewProjectName" value="demo_project" />
+          <input id="reviewSubmitter" value="editor_user" />
+          <input id="reviewSummary" value="ready for review" />
+        </div>
+        <button onclick="runReviewSubmit()">Submit Review</button>
+        <div class="row3">
+          <input id="reviewId" value="" placeholder="review id" />
+          <input id="reviewerName" value="reviewer_user" />
+          <input id="reviewNote" value="approved" />
+        </div>
+        <button onclick="runReviewApprove()">Approve Review</button>
         <label>Canonical Schema Converter</label>
         <div class="row">
           <button onclick="runCanonicalizeRecord()">Canonicalize Record</button>
@@ -1795,6 +1832,73 @@ TTTCCCGGGAAATTT</textarea>
           left_arm_bp: Number(document.getElementById('hdrLeftArm').value),
           right_arm_bp: Number(document.getElementById('hdrRightArm').value),
         })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runWorkspaceCreate() {
+      try {
+        const members = document.getElementById('workspaceMembers').value.split(',').map((s) => s.trim()).filter(Boolean);
+        show(await callApi('/api/workspace-create', {
+          workspace_name: document.getElementById('workspaceName').value,
+          owner: document.getElementById('workspaceOwner').value,
+          members,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectPermissionsSet() {
+      try {
+        const project_name = document.getElementById('permProjectName').value;
+        const user = document.getElementById('permUser').value;
+        const role = document.getElementById('permRole').value;
+        show(await callApi('/api/project-permissions', { project_name, roles: { [user]: role } }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectPermissionsGet() {
+      try {
+        const project_name = document.getElementById('permProjectName').value;
+        show(await callApi('/api/project-permissions', { project_name }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectAuditLogGet() {
+      try {
+        const project_name = document.getElementById('permProjectName').value;
+        show(await callApi('/api/project-audit-log', { project_name, limit: 200 }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runProjectDiff() {
+      try {
+        const project_name_b = document.getElementById('permProjectName').value;
+        show(await callApi('/api/project-diff', {
+          project_name_a: document.getElementById('projectName').value,
+          project_name_b,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runReviewSubmit() {
+      try {
+        const r = await callApi('/api/review-submit', {
+          project_name: document.getElementById('reviewProjectName').value,
+          submitter: document.getElementById('reviewSubmitter').value,
+          summary: document.getElementById('reviewSummary').value,
+        });
+        document.getElementById('reviewId').value = r.review?.review_id || '';
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runReviewApprove() {
+      try {
+        show(await callApi('/api/review-approve', {
+          review_id: document.getElementById('reviewId').value,
+          project_name: document.getElementById('reviewProjectName').value,
+          reviewer: document.getElementById('reviewerName').value,
+          note: document.getElementById('reviewNote').value,
+        }));
       } catch (e) { show(String(e)); }
     }
 
