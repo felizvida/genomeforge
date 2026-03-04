@@ -207,6 +207,19 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         "Render sequence track for coding region",
         lambda: r.post("/api/sequence-tracks", {**egfp_payload, "start": 1, "end": 180, "frame": 1}),
     )
+    r.check(
+        "sequence_analytics_svg",
+        "Render multi-track sequence analytics lens (GC/skew/complexity/stop-density)",
+        lambda: r.post("/api/sequence-analytics-svg", {**egfp_payload, "start": 1, "end": 720, "window": 120, "step": 20}),
+    )
+    r.check(
+        "comparison_lens_svg",
+        "Render comparison lens for divergence hotspots between EGFP and mCherry segments",
+        lambda: r.post(
+            "/api/comparison-lens-svg",
+            {"seq_a": EGFP_CDS[:900], "seq_b": MCHERRY_CDS[:900], "window": 60},
+        ),
+    )
     r.check("motif_search", "Find canonical EcoRI motif in pUC19 MCS", lambda: r.post("/api/motif", {**puc_payload, "motif": "GAATTC"}))
     r.check("orf_scan", "Find ORFs in EGFP sequence", lambda: r.post("/api/orfs", {**egfp_payload, "min_aa": 60}))
 
@@ -279,13 +292,25 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         c = r.post("/api/canonicalize-record", egfp_payload)["canonical_record"]
         f = r.post("/api/convert-record", {"canonical_record": c, "target_format": "fasta"})
         g = r.post("/api/convert-record", {"canonical_record": c, "target_format": "genbank"})
+        e = r.post("/api/convert-record", {"canonical_record": c, "target_format": "embl"})
+        j = r.post("/api/convert-record", {"canonical_record": c, "target_format": "json"})
+        d = r.post("/api/convert-record", {"canonical_record": c, "target_format": "dna"})
         p = r.post("/api/convert-record", {"canonical_record": c, "target_format": "payload"})
         assert f["target_format"] == "fasta"
         assert g["target_format"] == "genbank"
+        assert e["target_format"] == "embl"
+        assert j["target_format"] == "json"
+        assert d["target_format"] == "genomeforge_dna" and int(d["bytes"]) > 0
         assert p["target_format"] == "payload"
-        return {"fasta_len": len(f["content"]), "genbank_len": len(g["content"])}
+        return {
+            "fasta_len": len(f["content"]),
+            "genbank_len": len(g["content"]),
+            "embl_len": len(e["content"]),
+            "json_len": len(j["content"]),
+            "dna_bytes": int(d["bytes"]),
+        }
 
-    r.check("convert_record_roundtrip", "Roundtrip canonical -> FASTA/GenBank/payload", _convert_record)
+    r.check("convert_record_roundtrip", "Roundtrip canonical -> FASTA/GenBank/EMBL/JSON/DNA container/payload", _convert_record)
     r.check(
         "dna_export_import",
         "Export and import Genome Forge DNA container",

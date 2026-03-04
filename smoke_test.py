@@ -121,17 +121,65 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
         )[1],
     )
     r.check(
+        "api_sequence_analytics_svg",
+        lambda: "svg"
+        in r.post(
+            "/api/sequence-analytics-svg",
+            {**base_payload, "start": 1, "end": len(seq), "window": 40, "step": 10},
+        )[1],
+    )
+    r.check(
+        "api_comparison_lens_svg",
+        lambda: "hotspots"
+        in r.post(
+            "/api/comparison-lens-svg",
+            {"seq_a": seq, "seq_b": seq.replace("GAATTC", "GAGTTC"), "window": 30},
+        )[1],
+    )
+    r.check(
         "api_canonicalize_record",
         lambda: "canonical_record" in r.post("/api/canonicalize-record", base_payload)[1],
     )
+
+    def _native_dna_dispatch() -> None:
+        # Regression: ensure native .dna magic routes through native parser path.
+        import compat.dna_format as df  # local import to limit side effects
+
+        orig = df._import_native_dna_biopython
+        seen: dict[str, bool] = {}
+        try:
+            def fake_import(data: bytes) -> dict[str, object]:
+                seen["called"] = True
+                assert data.startswith(df.NATIVE_DNA_MAGIC)
+                return {
+                    "source": "native_dna",
+                    "payload": {"name": "native", "topology": "circular", "content": "ACGT", "features": []},
+                    "metadata": {"parser": "mock"},
+                }
+
+            df._import_native_dna_biopython = fake_import  # type: ignore[assignment]
+            out = df.import_dna_container(df.NATIVE_DNA_MAGIC + b"\x00\x01\x02")
+            assert seen.get("called") is True
+            assert out.get("source") == "native_dna"
+            assert isinstance(out.get("payload"), dict)
+        finally:
+            df._import_native_dna_biopython = orig  # type: ignore[assignment]
+
+    r.check("native_dna_dispatch_path", _native_dna_dispatch)
 
     def _convert_record_roundtrip() -> None:
         c = r.post("/api/canonicalize-record", base_payload)[1]["canonical_record"]
         f = r.post("/api/convert-record", {"canonical_record": c, "target_format": "fasta"})[1]
         g = r.post("/api/convert-record", {"canonical_record": c, "target_format": "genbank"})[1]
+        e = r.post("/api/convert-record", {"canonical_record": c, "target_format": "embl"})[1]
+        j = r.post("/api/convert-record", {"canonical_record": c, "target_format": "json"})[1]
+        d = r.post("/api/convert-record", {"canonical_record": c, "target_format": "dna"})[1]
         p = r.post("/api/convert-record", {"canonical_record": c, "target_format": "payload"})[1]
         assert f["target_format"] == "fasta" and f["content"].startswith(">")
         assert g["target_format"] == "genbank" and g["content"].lstrip().startswith("LOCUS")
+        assert e["target_format"] == "embl" and e["content"].lstrip().startswith("ID")
+        assert j["target_format"] == "json" and '"canonical_record"' in j["content"]
+        assert d["target_format"] == "genomeforge_dna" and int(d["bytes"]) > 0 and isinstance(d["dna_base64"], str)
         assert p["target_format"] == "payload" and isinstance(p["payload"], dict)
 
     r.check("api_convert_record_roundtrip", _convert_record_roundtrip)

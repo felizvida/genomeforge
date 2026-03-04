@@ -16,7 +16,7 @@ This repository includes a Python CLI (`genomeforge_toolkit.py`) for practical D
 - Virtual PCR (`pcr`)
 - Codon optimization (`codon-optimize`)
 - Sequence map rendering to SVG (`map`)
-- Sequence export to FASTA/GenBank (`export`)
+- Sequence export to FASTA/GenBank/EMBL/JSON (`export`)
 - Feature listing (`features`)
 
 ## Usage
@@ -30,6 +30,8 @@ python3 genomeforge_toolkit.py <input_file> pcr --forward ATGCGTACGTTAGC --rever
 python3 genomeforge_toolkit.py <input_file> codon-optimize --host ecoli --output optimized.fasta
 python3 genomeforge_toolkit.py <input_file> map --output plasmid_map.svg --enzymes EcoRI BamHI
 python3 genomeforge_toolkit.py <input_file> export --format genbank --output out.gbk
+python3 genomeforge_toolkit.py <input_file> export --format embl --output out.embl
+python3 genomeforge_toolkit.py <input_file> export --format json --output out.json
 ```
 
 ## Web UI
@@ -57,6 +59,8 @@ The UI supports:
 - Annotation-aware sequence track SVG (feature blocks, strand arrows, CDS phase labels, translation frame lane with codon tooltips)
 - Interactive map/track navigation (wheel zoom, drag pan, reset controls) with click-to-inspect feature/cut/codon metadata
 - Long-sequence track minimap with draggable brush window and quick window-shift controls
+- Sequence analytics lens visualization (GC%, GC-skew, local complexity, stop-codon density)
+- Comparison lens visualization (alignment divergence/confidence tracks with hotspot highlighting)
 - Methylation-aware digest simulation
 - Star activity off-target scan with mismatch-tolerant cut discovery
 - Enzyme metadata lookup
@@ -107,6 +111,7 @@ The UI supports:
 - Interactive star-activity risk visualization (enzyme burden ranking + off-target summary cards)
 - Canonical schema normalization and converter endpoints (`/api/canonicalize-record`, `/api/convert-record`)
 - Genome Forge DNA container export/import (`/api/export-dna`, `/api/import-dna`)
+- Visualization APIs for modern analytics overlays (`/api/sequence-analytics-svg`, `/api/comparison-lens-svg`)
 - AB1 trace workflow foundation: import/summarize/align/edit/consensus (`/api/import-ab1`, `/api/trace-summary`, `/api/trace-align`, `/api/trace-edit-base`, `/api/trace-consensus`)
 - Project persistence (save/load/list/delete)
 - Project collections (save/load/list/delete + add project)
@@ -122,4 +127,5 @@ The UI supports:
 
 - This is an open-source implementation focused on practical molecular biology workflows.
 - Primer Tm in design/QC uses nearest-neighbor approximation plus simple secondary-structure heuristics.
-- Some advanced commercial algorithms and proprietary binary formats are intentionally out of scope.
+- Native proprietary `.dna` import is supported via optional Biopython parser when available (`python3 -m pip install biopython`).
+- Some advanced commercial algorithms and proprietary binary internals remain out of scope.

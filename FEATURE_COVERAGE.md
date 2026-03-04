@@ -36,7 +36,7 @@ Legend:
 - Star activity analysis: `Implemented` (off-target star-cut scan + optional star-inclusive digest fragments + risk visualization)
 
 ## Convert File Formats
-- Multiple proprietary formats: `Implemented` (Genome Forge DNA container export/import is fully implemented for project scope; native proprietary vendor binary `.dna` parsing remains intentionally out of scope)
+- Multiple proprietary formats: `Implemented` (Genome Forge DNA container export/import implemented; native proprietary `.dna` import supported via optional Biopython parser)
 - FASTA + GenBank import/export: `Implemented`
 
 ## Agarose Gel Simulation
@@ -72,7 +72,7 @@ Legend:
 - Contig assembly: `Implemented` (greedy overlap contig assembler)
 
 ## Visualizing
-- Multiple sequence views: `Implemented` (sequence tracks + MSA identity heatmap + star-activity risk panel + interactive map/track inspector with zoom/pan + minimap brush navigation)
+- Multiple sequence views: `Implemented` (sequence tracks + MSA identity heatmap + star-activity risk panel + interactive map/track inspector with zoom/pan + minimap brush navigation + sequence analytics lens + comparison lens hotspot view)
 - Large sequence support: `Implemented` (windowed sequence track + minimap navigation for long sequences)
 - Edit DNA/protein sequences: `Implemented` (DNA edit + protein-level codon edit)
 - Color coding: `Implemented` (map, sequence track, and UI color themes)

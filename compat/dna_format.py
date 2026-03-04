@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import json
+import os
 import struct
+import tempfile
 import zlib
 from typing import Any, Dict
 
 
 MAGIC = b"GFORGEDNA\x00"
 FORMAT = "genomeforge.dna/1"
+NATIVE_DNA_MAGIC = bytes.fromhex("536e617047656e65")
 
 
 def _pack_document(doc: Dict[str, Any]) -> bytes:
@@ -46,6 +49,64 @@ def export_dna_container(canonical_record: Dict[str, Any], metadata: Dict[str, A
     return _pack_document(doc)
 
 
+def _import_native_dna_biopython(data: bytes) -> Dict[str, Any]:
+    try:
+        from Bio import SeqIO  # type: ignore
+    except Exception as e:  # noqa: BLE001
+        raise ValueError(
+            "Native proprietary .dna import requires Biopython. Install with: python3 -m pip install biopython"
+        ) from e
+
+    tmp_path: str | None = None
+    try:
+        # Use delete=False to avoid Windows file-lock issues when Biopython reopens by path.
+        with tempfile.NamedTemporaryFile(suffix=".dna", delete=False) as tmp:
+            tmp.write(data)
+            tmp.flush()
+            tmp_path = tmp.name
+        rec = SeqIO.read(tmp_path, "snapgene")
+    except Exception as e:  # noqa: BLE001
+        raise ValueError(f"Failed to parse native proprietary .dna payload: {e}") from e
+    finally:
+        if tmp_path:
+            try:
+                os.unlink(tmp_path)
+            except Exception:  # noqa: BLE001
+                pass
+
+    seq = str(rec.seq or "").upper()
+    if not seq:
+        raise ValueError("Native proprietary .dna parser returned empty sequence")
+
+    topology = str(rec.annotations.get("topology", "circular")).lower()
+    if topology not in {"linear", "circular"}:
+        topology = "circular"
+
+    features = []
+    for feat in list(getattr(rec, "features", []) or []):
+        quals: Dict[str, str] = {}
+        for k, v in dict(getattr(feat, "qualifiers", {}) or {}).items():
+            if isinstance(v, list):
+                quals[str(k)] = str(v[0]) if v else ""
+            else:
+                quals[str(k)] = str(v)
+        features.append(
+            {
+                "key": str(getattr(feat, "type", "misc_feature") or "misc_feature"),
+                "location": str(getattr(feat, "location", "")),
+                "qualifiers": quals,
+            }
+        )
+
+    payload = {
+        "name": str(getattr(rec, "name", "") or getattr(rec, "id", "") or "Untitled"),
+        "topology": topology,
+        "content": seq,
+        "features": features,
+    }
+    return {"source": "native_dna", "payload": payload, "metadata": {"parser": "biopython_snapgene"}}
+
+
 def import_dna_container(data: bytes) -> Dict[str, Any]:
     # Genome Forge DNA container
     if data.startswith(MAGIC):
@@ -70,9 +131,8 @@ def import_dna_container(data: bytes) -> Dict[str, Any]:
             return {"source": "json_sequence", "payload": doc}
         raise ValueError("JSON payload must include canonical_record or sequence")
 
-    # Native proprietary .dna binaries are not fully documented.
-    # We fail explicitly instead of returning misleading results.
-    if data.startswith(bytes.fromhex("536e617047656e65")):
-        raise ValueError("Native proprietary binary .dna is not yet supported by this parser")
+    # Native proprietary .dna binary.
+    if data.startswith(NATIVE_DNA_MAGIC):
+        return _import_native_dna_biopython(data)
 
     raise ValueError("Unrecognized DNA container payload")

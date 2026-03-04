@@ -16,6 +16,7 @@ Implemented feature set:
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import re
 from dataclasses import dataclass, field
@@ -673,6 +674,30 @@ def to_genbank(record: SequenceRecord) -> str:
     return "\n".join(lines) + "\n"
 
 
+def to_embl(record: SequenceRecord) -> str:
+    lines: List[str] = []
+    topo = "circular" if record.topology == "circular" else "linear"
+    lines.append(f"ID   {record.name}; SV 1; {topo}; DNA; UNC; {record.length} BP.")
+    lines.append("XX")
+    lines.append("FH   Key             Location/Qualifiers")
+    lines.append("FH")
+    for feat in record.features:
+        lines.append(f"FT   {feat.key:<15}{feat.location}")
+        for k, v in feat.qualifiers.items():
+            if v:
+                lines.append(f'FT                   /{k}=\"{v}\"')
+            else:
+                lines.append(f"FT                   /{k}")
+    lines.append("XX")
+    lines.append("SQ   Sequence")
+    for i in range(0, record.length, 60):
+        block = record.sequence[i : i + 60].lower()
+        grouped = " ".join(block[j : j + 10] for j in range(0, len(block), 10))
+        lines.append(f"     {grouped}")
+    lines.append("//")
+    return "\n".join(lines) + "\n"
+
+
 def find_cut_sites(seq: str, site: str, circular: bool = False) -> List[int]:
     positions: List[int] = []
     n = len(seq)
@@ -893,7 +918,7 @@ def build_parser() -> argparse.ArgumentParser:
     mp.add_argument("--enzymes", nargs="*", default=[], help="Optional enzyme names to plot cut marks")
 
     exp = sp.add_parser("export", help="Export sequence")
-    exp.add_argument("--format", choices=["fasta", "genbank"], required=True)
+    exp.add_argument("--format", choices=["fasta", "genbank", "embl", "json"], required=True)
     exp.add_argument("--output", required=True)
 
     sp.add_parser("features", help="List annotated features")
@@ -1018,8 +1043,18 @@ def main() -> None:
         out_path = Path(args.output)
         if args.format == "fasta":
             out_path.write_text(to_fasta(record), encoding="utf-8")
-        else:
+        elif args.format == "genbank":
             out_path.write_text(to_genbank(record), encoding="utf-8")
+        elif args.format == "embl":
+            out_path.write_text(to_embl(record), encoding="utf-8")
+        else:
+            payload = {
+                "name": record.name,
+                "topology": record.topology,
+                "content": record.sequence,
+                "features": [{"key": f.key, "location": f.location, "qualifiers": dict(f.qualifiers)} for f in record.features],
+            }
+            out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         print(f"Wrote {out_path}")
 
 

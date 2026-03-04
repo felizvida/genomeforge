@@ -329,6 +329,16 @@
       overflow: auto;
       margin-top: 8px;
     }
+    #seqAnalyticsViz, #compareLensViz {
+      border: 1px solid #2a475f;
+      border-radius: 12px;
+      min-height: 220px;
+      background: linear-gradient(165deg, #f8fbff, #eff7ff);
+      display: grid;
+      place-items: center;
+      overflow: auto;
+      margin-top: 8px;
+    }
     #starViz {
       border: 1px solid #2a475f;
       border-radius: 12px;
@@ -709,10 +719,32 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
             <option value="canonical">canonical</option>
             <option value="fasta">fasta</option>
             <option value="genbank">genbank</option>
+            <option value="embl">embl</option>
+            <option value="json">json</option>
+            <option value="dna">dna (base64)</option>
             <option value="payload">payload</option>
           </select>
         </div>
         <button onclick="runConvertRecord()">Convert Record</button>
+        <label>Cutting-Edge Visualization: Sequence Analytics</label>
+        <div class="row3">
+          <input id="analyticsStart" type="number" value="1" />
+          <input id="analyticsEnd" type="number" value="300" />
+          <input id="analyticsWindow" type="number" value="120" />
+        </div>
+        <div class="row">
+          <input id="analyticsStep" type="number" value="20" />
+          <button onclick="runSequenceAnalyticsViz()">Render Sequence Analytics</button>
+        </div>
+        <label>Cutting-Edge Visualization: Comparison Lens</label>
+        <div class="row">
+          <input id="compareSeqA" placeholder="optional, defaults to current record sequence" />
+          <input id="compareSeqB" value="GAATTCCGGATCCATGACC" />
+        </div>
+        <div class="row">
+          <input id="compareWindow" type="number" value="60" />
+          <button onclick="runComparisonLensViz()">Render Comparison Lens</button>
+        </div>
         <div class="row">
           <input id="proteinEditAaIndex" type="number" value="1" />
           <input id="proteinEditResidue" value="A" />
@@ -1018,6 +1050,22 @@ TTTCCCGGGAAATTT</textarea>
       </div>
       <label class="panel-title">MSA Heatmap</label>
       <div id="msaHeatmap">Run MSA, then click "MSA Identity Heatmap".</div>
+      <label class="panel-title">Sequence Analytics Lens (GC/Skew/Complexity/Stop Density)</label>
+      <div id="seqAnalyticsViz" class="interactive-viz">Run \"Render Sequence Analytics\" from Advanced tab.</div>
+      <div class="viz-controls">
+        <button onclick="zoomPanel('seqAnalyticsViz', 1.2)">Analytics Zoom In</button>
+        <button onclick="zoomPanel('seqAnalyticsViz', 0.84)">Analytics Zoom Out</button>
+        <button onclick="resetPanelView('seqAnalyticsViz')">Analytics Reset</button>
+        <button onclick="runSequenceAnalyticsViz()">Re-render Analytics</button>
+      </div>
+      <label class="panel-title">Comparison Lens (Variant Density + Confidence)</label>
+      <div id="compareLensViz" class="interactive-viz">Run \"Render Comparison Lens\" from Advanced tab.</div>
+      <div class="viz-controls">
+        <button onclick="zoomPanel('compareLensViz', 1.2)">Compare Zoom In</button>
+        <button onclick="zoomPanel('compareLensViz', 0.84)">Compare Zoom Out</button>
+        <button onclick="resetPanelView('compareLensViz')">Compare Reset</button>
+        <button onclick="runComparisonLensViz()">Re-render Compare</button>
+      </div>
       <label class="panel-title">History Graph</label>
       <div id="historyGraph">Load a project and click "Project History Graph".</div>
       <label class="panel-title">Star Activity Risk View</label>
@@ -1691,6 +1739,46 @@ TTTCCCGGGAAATTT</textarea>
         show(await callApi('/api/convert-record', payload({
           target_format: document.getElementById('canonicalTargetFormat').value,
         })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runSequenceAnalyticsViz() {
+      try {
+        const r = await callApi('/api/sequence-analytics-svg', payload({
+          start: Number(document.getElementById('analyticsStart').value),
+          end: Number(document.getElementById('analyticsEnd').value),
+          window: Number(document.getElementById('analyticsWindow').value),
+          step: Number(document.getElementById('analyticsStep').value),
+        }));
+        document.getElementById('seqAnalyticsViz').innerHTML = r.svg || '';
+        enhancePanel('seqAnalyticsViz');
+        show({
+          analytics_points: r.point_count,
+          gc_mean: r.gc_mean,
+          gc_range: [r.gc_min, r.gc_max],
+          window: r.window,
+          step: r.step,
+        });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runComparisonLensViz() {
+      try {
+        const seqA = document.getElementById('compareSeqA').value.trim();
+        const seqB = document.getElementById('compareSeqB').value.trim();
+        const r = await callApi('/api/comparison-lens-svg', payload({
+          seq_a: seqA || undefined,
+          seq_b: seqB,
+          window: Number(document.getElementById('compareWindow').value),
+        }));
+        document.getElementById('compareLensViz').innerHTML = r.svg || '';
+        enhancePanel('compareLensViz');
+        show({
+          identity_pct: r.identity_pct,
+          alignment_length: r.alignment_length,
+          hotspot_count: Array.isArray(r.hotspots) ? r.hotspots.length : 0,
+          hotspots: r.hotspots || [],
+        });
       } catch (e) { show(String(e)); }
     }
 

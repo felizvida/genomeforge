@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import math
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -52,6 +53,7 @@ from genomeforge_toolkit import (
     simulate_digest,
     simulate_pcr,
     to_fasta,
+    to_embl,
     to_genbank,
 )
 
@@ -1641,6 +1643,227 @@ def alignment_heatmap_svg(alignment: List[str]) -> Dict[str, Any]:
     return {"row_count": n, "svg": "\n".join(lines), "identity_matrix_pct": matrix}
 
 
+def sequence_analytics_svg(
+    record: SequenceRecord,
+    start_1based: int = 1,
+    end_1based: int | None = None,
+    window: int = 120,
+    step: int = 20,
+) -> Dict[str, Any]:
+    if end_1based is None:
+        end_1based = record.length
+    start_1based = max(1, int(start_1based))
+    end_1based = min(record.length, int(end_1based))
+    if start_1based > end_1based:
+        raise ValueError("Invalid window range")
+    window = max(30, int(window))
+    step = max(5, int(step))
+    seq = record.sequence[start_1based - 1 : end_1based]
+    if len(seq) < 30:
+        raise ValueError("Sequence range too short for analytics")
+
+    xs: List[float] = []
+    gc_pct: List[float] = []
+    gc_skew: List[float] = []
+    complexity: List[float] = []
+    stop_density: List[float] = []
+    points = 0
+    for i in range(0, max(1, len(seq) - window + 1), step):
+        wseq = seq[i : i + window]
+        if len(wseq) < 20:
+            continue
+        center = start_1based + i + len(wseq) / 2.0
+        points += 1
+        g = wseq.count("G")
+        c = wseq.count("C")
+        gc = 100.0 * (g + c) / max(1, len(wseq))
+        skew = (g - c) / max(1, g + c)
+        kmers = {}
+        for j in range(len(wseq) - 1):
+            k = wseq[j : j + 2]
+            kmers[k] = kmers.get(k, 0) + 1
+        total_k = max(1, sum(kmers.values()))
+        ent = 0.0
+        for v in kmers.values():
+            p = v / total_k
+            ent -= p * math.log2(p)
+        # Normalize dinucleotide entropy to [0,1], max log2(16)=4
+        comp = min(1.0, max(0.0, ent / 4.0))
+        stops = 0
+        codons = max(1, len(wseq) // 3)
+        for j in range(0, len(wseq) - 2, 3):
+            if wseq[j : j + 3] in {"TAA", "TAG", "TGA"}:
+                stops += 1
+        sd = stops / codons
+
+        xs.append(center)
+        gc_pct.append(gc)
+        gc_skew.append(skew)
+        complexity.append(comp)
+        stop_density.append(sd)
+
+    if not xs:
+        raise ValueError("No analytics points generated")
+
+    width = 1200
+    height = 420
+    margin_l = 70
+    margin_r = 24
+    margin_t = 26
+    panel_h = 82
+    panel_gap = 12
+    plot_w = width - margin_l - margin_r
+
+    x_min = float(start_1based)
+    x_max = float(end_1based)
+
+    def x_for(p: float) -> float:
+        return margin_l + (p - x_min) * plot_w / max(1.0, x_max - x_min)
+
+    def to_poly(y_top: float, vals: List[float], vmin: float, vmax: float) -> str:
+        pts = []
+        rng = max(1e-9, vmax - vmin)
+        for x, v in zip(xs, vals):
+            y = y_top + panel_h - ((v - vmin) / rng) * panel_h
+            pts.append(f"{x_for(x):.2f},{y:.2f}")
+        return " ".join(pts)
+
+    panels = [
+        ("GC %", gc_pct, 0.0, 100.0, "#0ea5e9"),
+        ("GC skew", gc_skew, -1.0, 1.0, "#f97316"),
+        ("Complexity (entropy)", complexity, 0.0, 1.0, "#22c55e"),
+        ("Stop codon density", stop_density, 0.0, max(0.25, max(stop_density) * 1.1), "#a855f7"),
+    ]
+
+    lines = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">']
+    lines.append('<rect width="100%" height="100%" fill="#f8fafc"/>')
+    lines.append(
+        f'<text x="{margin_l}" y="18" font-size="13" font-family="Menlo, monospace" fill="#0f172a">'
+        f'Sequence analytics: {record.name}  {start_1based}..{end_1based}</text>'
+    )
+    for idx, (label, vals, vmin, vmax, color) in enumerate(panels):
+        y_top = margin_t + idx * (panel_h + panel_gap)
+        lines.append(f'<rect x="{margin_l}" y="{y_top}" width="{plot_w}" height="{panel_h}" fill="#ffffff" stroke="#dbe5f3"/>')
+        lines.append(f'<text x="8" y="{y_top + 16}" font-size="11" font-family="Menlo, monospace" fill="#334155">{label}</text>')
+        for t in range(5):
+            gx = margin_l + t * (plot_w / 4)
+            lines.append(f'<line x1="{gx:.2f}" y1="{y_top}" x2="{gx:.2f}" y2="{y_top + panel_h}" stroke="#eef2f7" stroke-width="1"/>')
+        lines.append(
+            f'<polyline points="{to_poly(y_top, vals, vmin, vmax)}" fill="none" stroke="{color}" stroke-width="2">'
+            f'<title>{label}</title></polyline>'
+        )
+
+    tick_y = margin_t + len(panels) * (panel_h + panel_gap) - panel_gap + 16
+    for t in range(6):
+        p = int(round(x_min + t * (x_max - x_min) / 5))
+        x = x_for(float(p))
+        lines.append(f'<line x1="{x:.2f}" y1="{tick_y-10}" x2="{x:.2f}" y2="{tick_y-4}" stroke="#334155"/>')
+        lines.append(f'<text x="{x:.2f}" y="{tick_y+8}" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">{p}</text>')
+    lines.append("</svg>")
+
+    return {
+        "start_1based": start_1based,
+        "end_1based": end_1based,
+        "window": window,
+        "step": step,
+        "point_count": points,
+        "gc_mean": round(sum(gc_pct) / len(gc_pct), 3),
+        "gc_min": round(min(gc_pct), 3),
+        "gc_max": round(max(gc_pct), 3),
+        "svg": "\n".join(lines),
+    }
+
+
+def comparison_lens_svg(seq_a: str, seq_b: str, window: int = 60) -> Dict[str, Any]:
+    a = sanitize_sequence(seq_a)
+    b = sanitize_sequence(seq_b)
+    if not a or not b:
+        raise ValueError("seq_a and seq_b are required")
+    window = max(20, int(window))
+    aln = needleman_wunsch(a, b)
+    aa = aln["aligned_a"]
+    bb = aln["aligned_b"]
+    n = len(aa)
+    if n == 0:
+        raise ValueError("Alignment empty")
+
+    centers: List[int] = []
+    divergence: List[float] = []
+    confidence: List[float] = []
+    for i in range(0, max(1, n - window + 1), max(5, window // 3)):
+        wa = aa[i : i + window]
+        wb = bb[i : i + window]
+        if len(wa) < 10:
+            continue
+        mism = 0
+        gap = 0
+        valid = 0
+        for ca, cb in zip(wa, wb):
+            if ca == "-" or cb == "-":
+                gap += 1
+            else:
+                valid += 1
+                if ca != cb:
+                    mism += 1
+        total = max(1, len(wa))
+        div = (mism + gap) / total
+        conf = max(0.0, min(1.0, 1.0 - div))
+        centers.append(i + len(wa) // 2 + 1)
+        divergence.append(div)
+        confidence.append(conf)
+
+    width = 1200
+    height = 260
+    margin_l = 70
+    margin_r = 30
+    margin_t = 26
+    plot_h = 170
+    plot_w = width - margin_l - margin_r
+
+    def x_for(p: float) -> float:
+        return margin_l + (p - 1.0) * plot_w / max(1.0, n - 1.0)
+
+    def y_for(v: float) -> float:
+        return margin_t + plot_h - v * plot_h
+
+    div_pts = " ".join(f"{x_for(c):.2f},{y_for(d):.2f}" for c, d in zip(centers, divergence))
+    conf_pts = " ".join(f"{x_for(c):.2f},{y_for(cf):.2f}" for c, cf in zip(centers, confidence))
+
+    idx_sorted = sorted(range(len(divergence)), key=lambda i: divergence[i], reverse=True)
+    hotspots = []
+    for i in idx_sorted[:5]:
+        center = centers[i]
+        s = max(1, center - window // 2)
+        e = min(n, center + window // 2)
+        hotspots.append({"start_aln_1based": s, "end_aln_1based": e, "divergence": round(divergence[i], 4)})
+
+    lines = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">']
+    lines.append('<rect width="100%" height="100%" fill="#f8fafc"/>')
+    lines.append(f'<text x="{margin_l}" y="18" font-size="13" font-family="Menlo, monospace" fill="#0f172a">Comparison lens (alignment length={n})</text>')
+    lines.append(f'<rect x="{margin_l}" y="{margin_t}" width="{plot_w}" height="{plot_h}" fill="#ffffff" stroke="#dbe5f3"/>')
+    for t in range(5):
+        gy = margin_t + t * (plot_h / 4)
+        lines.append(f'<line x1="{margin_l}" y1="{gy:.2f}" x2="{margin_l+plot_w}" y2="{gy:.2f}" stroke="#eef2f7"/>')
+    lines.append(f'<polyline points="{div_pts}" fill="none" stroke="#ef4444" stroke-width="2"><title>Divergence</title></polyline>')
+    lines.append(f'<polyline points="{conf_pts}" fill="none" stroke="#22c55e" stroke-width="2"><title>Confidence proxy</title></polyline>')
+    for hs in hotspots:
+        x1 = x_for(hs["start_aln_1based"])
+        x2 = x_for(hs["end_aln_1based"])
+        lines.append(
+            f'<rect x="{x1:.2f}" y="{margin_t}" width="{max(1.0, x2-x1):.2f}" height="{plot_h}" fill="#fecaca" opacity="0.22">'
+            f'<title>Hotspot {hs["start_aln_1based"]}-{hs["end_aln_1based"]}: div={hs["divergence"]}</title></rect>'
+        )
+    lines.append(f'<text x="{margin_l}" y="{margin_t+plot_h+18}" font-size="11" font-family="Menlo, monospace" fill="#334155">Red: divergence, Green: confidence proxy</text>')
+    lines.append("</svg>")
+    return {
+        "alignment_length": n,
+        "identity_pct": aln.get("identity_pct", 0.0),
+        "window": window,
+        "hotspots": hotspots,
+        "svg": "\n".join(lines),
+    }
+
+
 def project_path(name: str) -> Path:
     safe = "".join(ch for ch in name if ch.isalnum() or ch in ("-", "_")).strip("_-")
     if not safe:
@@ -2560,12 +2783,44 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json({"target_format": "fasta", "content": to_fasta(rec)})
                 elif target == "genbank":
                     self._send_json({"target_format": "genbank", "content": to_genbank(rec)})
+                elif target == "embl":
+                    self._send_json({"target_format": "embl", "content": to_embl(rec)})
+                elif target == "json":
+                    self._send_json(
+                        {
+                            "target_format": "json",
+                            "content": json.dumps(
+                                {
+                                    "payload": canonical_to_payload(canon),
+                                    "canonical_record": canon,
+                                },
+                                indent=2,
+                                sort_keys=True,
+                            ),
+                        }
+                    )
+                elif target in {"dna", "genomeforge_dna"}:
+                    blob = export_dna_container(
+                        canon,
+                        metadata={
+                            "name": rec.name,
+                            "topology": rec.topology,
+                            "created_by": "genomeforge",
+                        },
+                    )
+                    self._send_json(
+                        {
+                            "target_format": "genomeforge_dna",
+                            "dna_base64": _encode_b64(blob),
+                            "bytes": len(blob),
+                        }
+                    )
                 elif target == "payload":
                     self._send_json({"target_format": "payload", "payload": canonical_to_payload(canon)})
                 elif target in {"canonical", "canonical_json"}:
                     self._send_json({"target_format": "canonical", "canonical_record": canon})
                 else:
-                    raise ValueError("Unsupported target_format. Use fasta|genbank|payload|canonical")
+                    raise ValueError("Unsupported target_format. Use fasta|genbank|embl|json|dna|payload|canonical")
             elif self.path == "/api/import-dna":
                 raw = _decode_b64_field(str(payload.get("dna_base64", "")).strip(), "dna_base64")
                 imported = import_dna_container(raw)
@@ -2842,6 +3097,17 @@ class Handler(BaseHTTPRequestHandler):
                         frame=int(payload.get("frame", 1)),
                     )
                 )
+            elif self.path == "/api/sequence-analytics-svg":
+                rec = get_record()
+                self._send_json(
+                    sequence_analytics_svg(
+                        rec,
+                        start_1based=int(payload.get("start", 1)),
+                        end_1based=int(payload.get("end", rec.length)),
+                        window=int(payload.get("window", 120)),
+                        step=int(payload.get("step", 20)),
+                    )
+                )
             elif self.path == "/api/orfs":
                 rec = get_record()
                 min_aa = int(payload.get("min_aa", 50))
@@ -3003,6 +3269,18 @@ class Handler(BaseHTTPRequestHandler):
                     out = needleman_wunsch(seq_a, seq_b)
                     out["mode"] = "dna"
                     self._send_json(out)
+            elif self.path == "/api/comparison-lens-svg":
+                seq_a = str(payload.get("seq_a", ""))
+                seq_b = str(payload.get("seq_b", ""))
+                if not seq_a.strip():
+                    seq_a = get_record().sequence
+                self._send_json(
+                    comparison_lens_svg(
+                        seq_a=seq_a,
+                        seq_b=seq_b,
+                        window=int(payload.get("window", 60)),
+                    )
+                )
             elif self.path == "/api/multi-align":
                 sequences = payload.get("sequences", [])
                 if isinstance(sequences, str):
