@@ -1,0 +1,75 @@
+{
+  "dataset_name": "genomeforge_training_real_world_v1",
+  "created_at": "2026-03-04T00:00:00Z",
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "topology": "linear",
+      "sequence_ref": "training_real_world_sequences.fasta:EGFP_CDS",
+      "suggested_features": [
+        {"key": "CDS", "location": "1..720", "qualifiers": {"label": "EGFP", "codon_start": "1"}},
+        {"key": "gene", "location": "1..720", "qualifiers": {"label": "gfp"}}
+      ]
+    },
+    {
+      "name": "mCherry_CDS",
+      "topology": "linear",
+      "sequence_ref": "training_real_world_sequences.fasta:mCherry_CDS",
+      "suggested_features": [
+        {"key": "CDS", "location": "1..711", "qualifiers": {"label": "mCherry", "codon_start": "1"}}
+      ]
+    },
+    {
+      "name": "pUC19_MCS",
+      "topology": "circular",
+      "sequence_ref": "training_real_world_sequences.fasta:pUC19_MCS",
+      "suggested_features": [
+        {"key": "misc_feature", "location": "1..63", "qualifiers": {"label": "MCS"}}
+      ]
+    },
+    {
+      "name": "BRAF_exon15_fragment",
+      "topology": "linear",
+      "sequence_ref": "training_real_world_sequences.fasta:BRAF_exon15_fragment",
+      "notes": "Use for CRISPR and HDR training case."
+    }
+  ],
+  "enzyme_panels": {
+    "mapping_panel": ["EcoRI", "BamHI", "HindIII", "XbaI", "PstI", "KpnI"],
+    "ligation_panel": {"vector_left_enzyme": "EcoRI", "vector_right_enzyme": "BamHI", "insert_left_enzyme": "BamHI", "insert_right_enzyme": "EcoRI"}
+  },
+  "primer_training": {
+    "egfp_target": {"target_start": 60, "target_end": 520, "window": 140},
+    "candidate_pairs": [
+      {"forward": "ATGGCCATTGTAATGGGCCG", "reverse": "TCTAGAAGCTTCTATCGGGC"},
+      {"forward": "GAATTCCGGATCCATGGCC", "reverse": "TCTAGAAGCTTCTATCGGGC"},
+      {"forward": "ACGGCCACAAGTTCAGCGTG", "reverse": "TCCGCCGCCGGGATCACTCT"}
+    ],
+    "background_records": ["EGFP_CDS", "mCherry_CDS", "BRAF_exon15_fragment"]
+  },
+  "crispr_training": {
+    "pam": "NGG",
+    "spacer_len": 20,
+    "max_candidates": 50,
+    "offtarget_background_records": ["EGFP_CDS", "mCherry_CDS", "BRAF_exon15_fragment"],
+    "hdr_example": {
+      "edit_start_1based": 100,
+      "edit_end_1based": 102,
+      "edit_sequence": "GCC",
+      "left_arm_bp": 60,
+      "right_arm_bp": 60
+    }
+  },
+  "collaboration_training": {
+    "workspace_name": "lab_workspace_training",
+    "owner": "owner_user",
+    "editor": "editor_user",
+    "reviewer": "reviewer_user",
+    "permission_roles": {
+      "owner_user": "owner",
+      "editor_user": "editor",
+      "reviewer_user": "reviewer"
+    },
+    "review_summary_template": "Ready for technical review after full in-silico validation."
+  }
+}

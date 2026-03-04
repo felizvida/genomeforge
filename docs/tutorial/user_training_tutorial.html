@@ -3,376 +3,430 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Genome Forge Professional User Training (v0.1.0)</title>
+  <title>Genome Forge Professional Training Manual (v0.1.0)</title>
   <style>
     @page {
       size: A4;
       margin: 16mm 14mm 18mm 14mm;
       @bottom-right {
-        content: "Page " counter(page);
+        content: "Genome Forge Training  |  Page " counter(page);
+        font-size: 9px;
         color: #64748b;
-        font-size: 10px;
       }
     }
     :root {
       --ink: #0f172a;
       --muted: #475569;
-      --soft: #64748b;
       --line: #d6e0ee;
       --panel: #f8fbff;
-      --brand: #0369a1;
-      --accent: #16a34a;
+      --brand: #0b4f78;
+      --accent: #0369a1;
+      --good: #166534;
       --warn: #b45309;
-      --code: #0b1220;
+      --code-bg: #0b1220;
+      --code-ink: #dbeafe;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       color: var(--ink);
       font-family: "Segoe UI", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
-      line-height: 1.55;
-      background: white;
-      font-size: 12.2px;
+      line-height: 1.54;
+      font-size: 12px;
+      background: #fff;
     }
     .doc {
+      width: 100%;
       max-width: 980px;
       margin: 0 auto;
-      padding: 14px 8px 28px;
+      padding: 10px 6px 24px;
     }
     .cover {
       border: 1px solid var(--line);
       border-radius: 14px;
-      padding: 18px;
-      background: linear-gradient(180deg, #f8fcff, #eef6ff);
-      margin-bottom: 14px;
+      padding: 16px;
+      background: linear-gradient(180deg, #f7fcff, #eef6ff);
+      margin-bottom: 12px;
+      page-break-inside: avoid;
     }
     .eyebrow {
       text-transform: uppercase;
       letter-spacing: .08em;
-      color: var(--brand);
+      color: var(--accent);
       font-weight: 700;
-      font-size: 11px;
-      margin: 0 0 8px;
+      font-size: 10.5px;
+      margin: 0 0 7px;
     }
     h1 {
       margin: 0 0 8px;
-      font-size: 30px;
+      font-size: 28px;
+      line-height: 1.12;
       letter-spacing: -0.02em;
-      line-height: 1.15;
     }
     h2 {
-      margin: 0 0 8px;
-      font-size: 19px;
-      color: #0b3a63;
+      margin: 0 0 7px;
+      font-size: 18px;
+      color: var(--brand);
       page-break-after: avoid;
     }
     h3 {
-      margin: 0 0 6px;
-      font-size: 14px;
-      color: #0b3a63;
+      margin: 0 0 5px;
+      font-size: 13.5px;
+      color: var(--brand);
       page-break-after: avoid;
     }
     p { margin: 6px 0; }
     .muted { color: var(--muted); }
     .meta {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 7px;
       margin-top: 10px;
     }
     .meta .k {
       border: 1px solid var(--line);
-      border-radius: 10px;
+      border-radius: 9px;
+      background: #fff;
       padding: 8px;
-      background: white;
-      font-size: 11px;
-      color: var(--soft);
+      font-size: 10px;
+      color: var(--muted);
     }
     .meta .k b {
       display: block;
-      color: var(--ink);
-      margin-top: 3px;
       font-size: 12px;
+      margin-top: 3px;
+      color: var(--ink);
     }
     .section {
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 14px;
-      margin: 12px 0;
-      background: white;
+      background: #fff;
+      padding: 13px;
+      margin: 10px 0;
       page-break-inside: avoid;
     }
     .toc {
       border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 11px;
       background: var(--panel);
-      margin: 12px 0;
+      padding: 10px 12px;
+      margin: 10px 0;
     }
     .toc ol { margin: 6px 0 0 18px; padding: 0; }
-    .toc li { margin: 4px 0; }
+    .toc li { margin: 3px 0; }
     .step {
-      margin: 8px 0;
       border-left: 3px solid #7dd3fc;
       padding-left: 10px;
+      margin: 8px 0;
     }
     .tip, .note, .caution {
-      border-radius: 10px;
-      padding: 9px 11px;
+      border-radius: 9px;
+      padding: 8px 10px;
       margin: 8px 0;
-      font-size: 11.5px;
+      font-size: 11px;
     }
-    .tip { background: #ecfeff; border: 1px solid #bae6fd; }
-    .note { background: #f8fafc; border: 1px solid #dbe8f8; }
-    .caution { background: #fff7ed; border: 1px solid #fed7aa; }
-    .imgbox {
+    .tip { border: 1px solid #bae6fd; background: #ecfeff; }
+    .note { border: 1px solid #dbe8f8; background: #f8fafc; }
+    .caution { border: 1px solid #fed7aa; background: #fff7ed; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .figure {
       border: 1px solid #d9e5f3;
       border-radius: 10px;
-      padding: 6px;
       background: #f8fbff;
-      margin-top: 8px;
+      padding: 6px;
+      margin: 8px 0 6px;
+      page-break-inside: avoid;
+      text-align: center;
     }
-    .imgbox img {
+    .figure img {
       display: block;
       width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
       height: auto;
       border-radius: 6px;
+      image-rendering: auto;
     }
-    .imgcap {
-      color: var(--muted);
-      font-size: 10.8px;
+    .figure.narrow img { max-width: 620px; }
+    .caption {
       margin-top: 4px;
+      font-size: 10.4px;
+      color: var(--muted);
+      text-align: left;
     }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    ul, ol { margin: 6px 0 6px 18px; padding: 0; }
+    li { margin: 3px 0; }
     code {
-      font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+      font-family: "IBM Plex Mono", Menlo, Consolas, monospace;
       background: #eaf2fb;
       color: #0f2741;
       padding: 2px 5px;
-      border-radius: 6px;
-      font-size: 11px;
+      border-radius: 5px;
+      font-size: 10.8px;
     }
     pre {
       margin: 8px 0;
-      background: var(--code);
-      color: #d8e7ff;
-      border-radius: 10px;
       padding: 10px;
-      overflow: auto;
-      font-size: 10.8px;
-      line-height: 1.45;
+      border-radius: 10px;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      font-family: "IBM Plex Mono", Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      line-height: 1.43;
+      white-space: pre-wrap;
       page-break-inside: avoid;
     }
-    ul, ol { margin: 6px 0 6px 18px; padding: 0; }
-    li { margin: 4px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.8px;
+      margin: 6px 0;
+    }
+    th, td {
+      border: 1px solid #dbe5f3;
+      padding: 6px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: #f1f6fc;
+      color: #0f2741;
+      font-weight: 700;
+    }
     .break { page-break-before: always; }
     .footer {
-      margin-top: 12px;
-      padding-top: 10px;
+      margin-top: 10px;
+      padding-top: 8px;
       border-top: 1px solid var(--line);
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10.8px;
     }
   </style>
 </head>
 <body>
   <main class="doc">
     <section class="cover">
-      <p class="eyebrow">Genome Forge Training Program</p>
-      <h1>Professional User Training Tutorial</h1>
+      <p class="eyebrow">Genome Forge v0.1.0</p>
+      <h1>Professional User Training Manual</h1>
       <p class="muted">
-        Comprehensive user guide for Genome Forge v0.1.0 covering cloning workflows,
-        advanced visualization, interop/trace, primer specificity, CRISPR helpers,
+        Advanced, case-based training guide for day-to-day molecular cloning workflows,
+        interop and trace analysis, primer specificity, CRISPR helper design,
         and collaboration/review operations.
       </p>
       <div class="meta">
-        <div class="k">Version<b>v0.1.0</b></div>
-        <div class="k">Release Date<b>2026-03-04</b></div>
-        <div class="k">Primary Interface<b>Web UI</b></div>
+        <div class="k">Audience<b>Molecular Biology Users</b></div>
+        <div class="k">Coverage<b>P0 + P1 + P2</b></div>
+        <div class="k">Primary UI<b>Web Workstation</b></div>
+        <div class="k">Release<b>2026-03-04</b></div>
       </div>
       <div class="tip">
-        <b>Startup Command</b><br />
-        <code>python3 web_ui.py --port 8080</code><br />
-        Open <code>http://127.0.0.1:8080</code> in your browser.
+        <b>System Startup</b><br />
+        <code>python3 web_ui.py --port 8080</code> then open <code>http://127.0.0.1:8080</code>.
       </div>
     </section>
 
     <section class="toc">
-      <h2>Training Flow</h2>
+      <h2>Contents</h2>
       <ol>
-        <li>Foundation: sequence loading, map, and sequence track navigation.</li>
-        <li>Experimental design: digest, primers, PCR, gel, and cloning simulation.</li>
-        <li>P0 interop: DNA container import/export and AB1 trace workflows.</li>
-        <li>P1 analysis: primer specificity, ranking, CRISPR, and HDR donor design.</li>
-        <li>P2 governance: permissions, audit logs, project diff, and review approval.</li>
-        <li>Operational completion: project persistence, sharing, and final checks.</li>
+        <li>Training dataset and environment preparation.</li>
+        <li>Case A: plasmid map, digest, and sequence-track interpretation.</li>
+        <li>Case B: primer design, specificity ranking, PCR, and gel expectation.</li>
+        <li>Case C: assembly and ligation decision workflow.</li>
+        <li>Case D: P0 interop and AB1 trace handling.</li>
+        <li>Case E: P1 CRISPR candidate and HDR donor workflow.</li>
+        <li>Case F: P2 workspace, audit trail, diff, and review approval.</li>
+        <li>Capstone scenario and quality gate checklist.</li>
       </ol>
     </section>
 
     <section class="section">
-      <h2>1. Foundation Workflow</h2>
-      <div class="step">
-        <h3>1.1 Load and Validate Sequence</h3>
-        <ol>
-          <li>Paste FASTA/GenBank/EMBL/raw DNA into <code>Sequence / FASTA / GenBank</code>.</li>
-          <li>Set <code>Name</code>, <code>Topology</code>, and click <code>Refresh Info</code>.</li>
-          <li>Confirm stats: length, GC%, topology, feature count.</li>
-        </ol>
+      <h2>1) Training Dataset (Real-World)</h2>
+      <p>
+        Use the bundled dataset files under <code>docs/tutorial/datasets/</code>:
+      </p>
+      <ul>
+        <li><code>training_real_world_sequences.fasta</code> (EGFP, mCherry, pUC19 MCS, BRAF exon 15 region, lacZ alpha fragment).</li>
+        <li><code>training_real_world_dataset.json</code> (structured records, enzyme panels, primer candidates, CRISPR seeds, and collaboration actors).</li>
+        <li><code>case_playbook.md</code> (scenario prompts and expected outputs).</li>
+      </ul>
+      <div class="note">
+        <b>Why this dataset:</b> it combines common cloning inserts, reporter genes, and a medically relevant target region,
+        allowing realistic analysis without requiring private lab data.
       </div>
-      <div class="step">
-        <h3>1.2 Render Map and Inspect Features</h3>
-        <ol>
-          <li>Open <code>Map</code> tab and set enzymes (for example <code>EcoRI,BamHI,HindIII</code>).</li>
-          <li>Click <code>Render Map</code> and interact with cuts/features.</li>
-          <li>Use zoom/pan and read details from the <code>Selection Inspector</code>.</li>
-        </ol>
-      </div>
-      <div class="imgbox">
-        <img src="assets/01_map.png" alt="Map visualization" />
-        <p class="imgcap">Figure 1: Restriction map with interactive feature and cut inspection.</p>
-      </div>
+      <pre>cat docs/tutorial/datasets/training_real_world_sequences.fasta
+cat docs/tutorial/datasets/training_real_world_dataset.json | head -n 80</pre>
     </section>
 
     <section class="section">
-      <h2>2. Sequence Track and Alignment Views</h2>
+      <h2>2) Case A: Restriction Mapping and Track Interpretation</h2>
+      <div class="step">
+        <h3>A1. Load pUC19 MCS Training Record</h3>
+        <ol>
+          <li>Copy <code>pUC19_MCS</code> from dataset JSON or FASTA.</li>
+          <li>Set topology to <code>circular</code>.</li>
+          <li>Run <code>Refresh Info</code>, then <code>Render Map</code>.</li>
+        </ol>
+      </div>
+      <div class="step">
+        <h3>A2. Digest Interpretation</h3>
+        <ol>
+          <li>Use enzymes <code>EcoRI,BamHI,HindIII,XbaI,PstI,KpnI</code>.</li>
+          <li>Run <code>Digest</code> and record fragment pattern.</li>
+          <li>Run <code>Digest (Methylation Aware)</code> with motif list to compare blocked cuts.</li>
+        </ol>
+      </div>
+      <div class="figure">
+        <img src="assets/01_map.svg" alt="Map visualization (SVG)" />
+        <p class="caption">Figure A: SVG map rendering (vector source) for sharp zoom and crisp PDF output.</p>
+      </div>
+      <div class="figure">
+        <img src="assets/02_sequence_track.svg" alt="Sequence track visualization (SVG)" />
+        <p class="caption">Figure B: Sequence track with frame translation and codon-level click inspection.</p>
+      </div>
+    </section>
+
+    <section class="section break">
+      <h2>3) Case B: Primer Design, Specificity, and PCR Outcome</h2>
       <div class="grid-2">
         <div>
-          <h3>2.1 Sequence Track Navigation</h3>
+          <h3>B1. Primer Generation</h3>
           <ol>
-            <li>Set track start/end and frame, then click <code>Render Sequence Track</code>.</li>
-            <li>Use minimap brush to move/resize window for large sequences.</li>
-            <li>Click codons for residue mapping and feature context.</li>
+            <li>Load EGFP CDS from dataset.</li>
+            <li>Set target window and run <code>Design Primers</code>.</li>
+            <li>Run <code>Primer Diagnostics</code> and capture Tm/risk flags.</li>
           </ol>
         </div>
         <div>
-          <h3>2.2 MSA Heatmap</h3>
+          <h3>B2. Specificity Ranking</h3>
           <ol>
-            <li>In <code>Advanced</code>, add multiple sequences and run <code>Run MSA</code>.</li>
-            <li>Click <code>MSA Identity Heatmap</code>.</li>
-            <li>Use consensus and phylogeny tools for sequence comparison.</li>
+            <li>Paste background panel (EGFP + mCherry + BRAF fragment).</li>
+            <li>Run <code>Primer Specificity</code>.</li>
+            <li>Run <code>Rank Primer Pairs</code> using candidate JSON from dataset.</li>
           </ol>
         </div>
       </div>
-      <div class="imgbox">
-        <img src="assets/02_sequence_track.png" alt="Sequence track" />
-        <p class="imgcap">Figure 2: Sequence track with translated frame lane and feature overlays.</p>
-      </div>
-      <div class="imgbox">
-        <img src="assets/03_msa_heatmap.png" alt="MSA heatmap" />
-        <p class="imgcap">Figure 3: Identity heatmap generated from multiple sequence alignment.</p>
-      </div>
+      <h3>B3. PCR and Gel Lanes</h3>
+      <ol>
+        <li>Run <code>Virtual PCR</code> and verify predicted product size.</li>
+        <li>Run <code>PCR Gel Lanes</code> with <code>1kb_plus</code> ladder.</li>
+        <li>Compare expected and observed in-silico band positions.</li>
+      </ol>
+      <table>
+        <thead>
+          <tr><th>Checkpoint</th><th>Expected Signal</th><th>Pass Criterion</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Primer quality</td><td>Tm proximity and low dimer flags</td><td>Pair accepted for PCR</td></tr>
+          <tr><td>Specificity score</td><td>Lower off-target product burden</td><td>Top-ranked pair selected</td></tr>
+          <tr><td>PCR lanes</td><td>Dominant lane near expected amplicon</td><td>Band concordance confirmed</td></tr>
+        </tbody>
+      </table>
     </section>
 
-    <section class="section break">
-      <h2>3. Core Experimental Workflows</h2>
-      <div class="step">
-        <h3>3.1 Primers, PCR, and Gel</h3>
-        <ol>
-          <li>Design primers in <code>Primers/PCR</code> using target region fields.</li>
-          <li>Run <code>Virtual PCR</code> and inspect product sizes.</li>
-          <li>Run <code>PCR Gel Lanes</code> to visualize expected bands against marker ladder.</li>
-        </ol>
-      </div>
-      <div class="step">
-        <h3>3.2 Cloning and Ligation</h3>
-        <ol>
-          <li>Use Gibson / Golden Gate / Gateway / TOPO / TA-GC tools in <code>Advanced</code>.</li>
-          <li>Run <code>Simulate Ligation Products</code> and inspect ranked pathways.</li>
-          <li>Apply graph filters (<code>all</code>, <code>desired</code>, <code>byproducts</code>) and inspect top candidates.</li>
-        </ol>
-      </div>
-      <div class="imgbox">
-        <img src="assets/06_ligation_products.png" alt="Ligation products graph" />
-        <p class="imgcap">Figure 4: Ligation pathway graph with probability-weighted product ranking.</p>
+    <section class="section">
+      <h2>4) Case C: Cloning Strategy and Ligation Product Ranking</h2>
+      <ol>
+        <li>Use dataset vector/insert examples for Gateway/TOPO/TA-GC trials.</li>
+        <li>Run <code>Cloning Compatibility</code> and document reasoned pass/fail.</li>
+        <li>Run <code>Simulate Ligation Products</code> with byproducts enabled.</li>
+        <li>Inspect pathway graph and prioritize highest probability, in-frame product.</li>
+      </ol>
+      <div class="figure narrow">
+        <img src="assets/06_ligation_products.svg" alt="Ligation graph (SVG)" />
+        <p class="caption">Figure C: Ligation graph as vector SVG; no blur when scaled in PDF.</p>
       </div>
     </section>
 
     <section class="section">
-      <h2>4. P0: Interop and AB1 Trace Training</h2>
-      <h3>4.1 DNA Container Import/Export</h3>
+      <h2>5) Case D: P0 Interop and AB1 Trace Operations</h2>
+      <h3>D1. DNA Container Roundtrip</h3>
       <ol>
-        <li>Open <code>Trace/Interop</code> tab.</li>
-        <li>Click <code>Export DNA Container</code> to generate base64 package.</li>
-        <li>Paste base64 into <code>DNA Container</code> and click <code>Import DNA Container</code>.</li>
-        <li>Confirm sequence/name/topology and feature restoration.</li>
+        <li>Export current record via <code>Export DNA Container</code>.</li>
+        <li>Re-import via <code>Import DNA Container</code>.</li>
+        <li>Verify name/topology/length/features are preserved.</li>
       </ol>
-      <h3>4.2 AB1 Trace Workflow</h3>
+      <h3>D2. AB1 Trace Routine</h3>
       <ol>
-        <li>Paste AB1 base64 (or use synthetic sequence fallback) and click <code>Import AB1</code>.</li>
-        <li>Run <code>Trace Summary</code> to review quality metrics.</li>
-        <li>Provide reference and run <code>Trace Align</code>.</li>
-        <li>Edit a base using <code>Edit Trace Base</code>, then run <code>Trace Consensus</code>.</li>
-      </ol>
-      <div class="note">
-        <b>Operational Note:</b> Current interop supports Genome Forge DNA container robustly.
-        Native proprietary SnapGene binary parsing remains partial.
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>5. P1: Primer Specificity and CRISPR Helpers</h2>
-      <h3>5.1 Primer Specificity and Ranking</h3>
-      <ol>
-        <li>In <code>Advanced</code>, provide background sequences (one per line).</li>
-        <li>Click <code>Primer Specificity</code> to estimate off-target product risk.</li>
-        <li>Provide candidate JSON and click <code>Rank Primer Pairs</code>.</li>
-      </ol>
-      <h3>5.2 CRISPR and HDR</h3>
-      <ol>
-        <li>Set PAM/spacer settings and run <code>gRNA Design</code>.</li>
-        <li>Select a guide and run <code>CRISPR Off-target</code>.</li>
-        <li>Configure edit window and homology arms, then run <code>Design HDR Donor</code>.</li>
+        <li>Import AB1 payload (or use synthetic seed sequence from dataset).</li>
+        <li>Run <code>Trace Summary</code>, then <code>Trace Align</code> to EGFP reference.</li>
+        <li>Edit one low-confidence base and regenerate <code>Trace Consensus</code>.</li>
       </ol>
       <div class="caution">
-        <b>Scientific Caution:</b> P1 scoring is heuristic and intended for design triage.
-        Validate final candidates with independent wet-lab and genome-aware tools.
+        <b>Interop boundary:</b> Genome Forge DNA container is robust.
+        Native proprietary SnapGene binary parsing remains limited in this release.
       </div>
     </section>
 
     <section class="section break">
-      <h2>6. P2: Collaboration, Audit, and Review</h2>
+      <h2>6) Case E: P1 CRISPR and HDR Workflow</h2>
       <ol>
-        <li>Create workspace with owner/members using <code>Create Workspace</code>.</li>
-        <li>Assign reviewer role via <code>Set Permission</code>.</li>
-        <li>Run <code>Get Audit Log</code> after save/delete events for traceability.</li>
-        <li>Use <code>Project Diff</code> to compare project states.</li>
-        <li>Run <code>Submit Review</code>, then approve using <code>Approve Review</code>.</li>
+        <li>Load BRAF exon 15 fragment from dataset.</li>
+        <li>Run <code>gRNA Design</code> with PAM <code>NGG</code>, spacer length <code>20</code>.</li>
+        <li>Select top guide and run <code>CRISPR Off-target</code> across background panel.</li>
+        <li>Configure edit coordinates and run <code>Design HDR Donor</code>.</li>
       </ol>
-      <div class="tip">
-        <b>Recommended Governance Pattern:</b> editor submits review, reviewer/owner approves,
-        and audit log is exported into release evidence.
-      </div>
-      <div class="imgbox">
-        <img src="assets/04_history_graph.png" alt="Project history graph" />
-        <p class="imgcap">Figure 5: History and review-ready version tracking context.</p>
+      <div class="note">
+        Capture: selected guide, off-target risk score, donor length, and PAM disruption suggestions for review package.
       </div>
     </section>
 
     <section class="section">
-      <h2>7. End-to-End Lab Exercise</h2>
+      <h2>7) Case F: P2 Collaboration, Audit, and Approval</h2>
       <ol>
-        <li>Load sequence and annotate/inspect map.</li>
-        <li>Design primers, run PCR, and simulate gel lanes.</li>
-        <li>Run cloning compatibility and ligation simulation.</li>
-        <li>Export DNA container and re-import.</li>
-        <li>Run AB1 trace align/edit/consensus workflow.</li>
-        <li>Run primer specificity and CRISPR + HDR design.</li>
-        <li>Save project, assign reviewer role, submit and approve review.</li>
-        <li>Create share bundle and verify <code>/share/&lt;id&gt;</code> output.</li>
+        <li>Create workspace with owner, editor, reviewer from dataset actors.</li>
+        <li>Assign reviewer role through <code>Set Permission</code>.</li>
+        <li>Save project snapshot and query <code>Get Audit Log</code>.</li>
+        <li>Use <code>Project Diff</code> for current vs baseline comparison.</li>
+        <li>Run <code>Submit Review</code> and <code>Approve Review</code>.</li>
       </ol>
-      <pre>python3 web_ui.py --port 8080
-python3 smoke_test.py
+      <div class="figure narrow">
+        <img src="assets/04_history_graph.svg" alt="History graph (SVG)" />
+        <p class="caption">Figure D: version history context for review and change validation.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>8) Capstone Exercise (All Features)</h2>
+      <p>Objective: deliver a review-approved cloning package with evidence trail.</p>
+      <ol>
+        <li>Map + digest + track inspection for chosen construct.</li>
+        <li>Primer generation + specificity ranking + PCR lane prediction.</li>
+        <li>Assembly/ligation pathway selection.</li>
+        <li>DNA container export/import verification.</li>
+        <li>Trace align/edit/consensus check.</li>
+        <li>CRISPR candidate + off-target + HDR donor design.</li>
+        <li>Save project, assign reviewer, submit and approve review.</li>
+        <li>Create share bundle and archive artifact IDs.</li>
+      </ol>
+      <pre>python3 smoke_test.py
 python3 real_world_functional_test.py</pre>
-      <p class="muted">Completion criteria: all required endpoints produce expected outputs and both regression suites pass.</p>
+      <div class="tip">
+        <b>Completion Gate:</b> include smoke/real-world summaries, chosen primer pair, selected guide,
+        donor template metadata, project diff summary, and review approval record.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>9) Illustration Quality Policy</h2>
+      <ul>
+        <li>All tutorial figures are linked to SVG assets for vector fidelity.</li>
+        <li>No upscaling beyond source viewport bounds (<code>max-width</code> constrained).</li>
+        <li>PDF generated via WeasyPrint with native SVG rendering to avoid blur.</li>
+      </ul>
+      <div class="figure narrow">
+        <img src="assets/03_msa_heatmap.svg" alt="MSA heatmap (SVG)" />
+        <p class="caption">Figure E: heatmap included as SVG to preserve line/text sharpness in print.</p>
+      </div>
+      <div class="figure narrow">
+        <img src="assets/05_star_activity.svg" alt="Star activity (SVG)" />
+        <p class="caption">Figure F: star activity view in vector source for non-blurry export.</p>
+      </div>
     </section>
 
     <section class="footer">
-      <p>Document: Genome Forge Professional User Training Tutorial (v0.1.0)</p>
-      <p>Maintained with release artifacts in <code>docs/releases/</code> and <code>docs/test_reports/</code>.</p>
+      <p>Document: Genome Forge Professional Training Manual (v0.1.0)</p>
+      <p>Dataset bundle: <code>docs/tutorial/datasets/</code></p>
     </section>
   </main>
 </body>
