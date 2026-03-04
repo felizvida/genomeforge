@@ -13,6 +13,12 @@ import tempfile
 import uuid
 from typing import Any, Dict, List, Tuple
 
+from canonical_schema import (
+    canonical_to_payload,
+    canonical_to_record,
+    infer_source_format,
+    record_to_canonical,
+)
 from snapgene_like import (
     CODON_TABLE,
     ENZYMES,
@@ -29,6 +35,8 @@ from snapgene_like import (
     seq_tm_nn,
     simulate_digest,
     simulate_pcr,
+    to_fasta,
+    to_genbank,
 )
 
 ROOT = Path(__file__).resolve().parent
@@ -153,6 +161,8 @@ def parse_embl(text: str) -> SequenceRecord:
 
 
 def parse_record(payload: Dict[str, Any]) -> SequenceRecord:
+    if isinstance(payload.get("canonical_record"), dict):
+        return canonical_to_record(payload["canonical_record"])
     content = (payload.get("content") or "").strip()
     name = (payload.get("name") or "Untitled").strip() or "Untitled"
     topology = (payload.get("topology") or "circular").strip().lower()
@@ -1590,6 +1600,8 @@ def save_project(payload: Dict[str, Any]) -> Dict[str, Any]:
     rec = parse_record(payload)
     name = str(payload.get("project_name") or rec.name).strip()
     p = project_path(name)
+    src_format = infer_source_format(str(payload.get("content", "")))
+    canon = record_to_canonical(rec, source_format=src_format, source_id=name)
     doc = {
         "project_name": name,
         "updated_at": datetime.now(timezone.utc).isoformat(),
@@ -1599,6 +1611,7 @@ def save_project(payload: Dict[str, Any]) -> Dict[str, Any]:
         "notes": str(payload.get("notes", "")),
         "history": payload.get("history", []),
         "features": features_to_dict(rec.features),
+        "canonical_record": canon,
     }
     p.write_text(json.dumps(doc, indent=2), encoding="utf-8")
     return {"saved": True, "project_name": name, "path": str(p)}
@@ -1608,7 +1621,25 @@ def load_project(name: str) -> Dict[str, Any]:
     p = project_path(name)
     if not p.exists():
         raise ValueError("Project not found")
-    return json.loads(p.read_text(encoding="utf-8"))
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    if not isinstance(doc.get("canonical_record"), dict):
+        try:
+            rec = parse_record(
+                {
+                    "name": doc.get("name", doc.get("project_name", "Untitled")),
+                    "topology": doc.get("topology", "linear"),
+                    "content": doc.get("content", ""),
+                    "features": doc.get("features", []),
+                }
+            )
+            doc["canonical_record"] = record_to_canonical(
+                rec,
+                source_format=infer_source_format(str(doc.get("content", ""))),
+                source_id=str(doc.get("project_name", name)),
+            )
+        except Exception:
+            pass
+    return doc
 
 
 def list_projects() -> Dict[str, Any]:
@@ -2441,7 +2472,40 @@ class Handler(BaseHTTPRequestHandler):
                     record = parse_record(payload)
                 return record
 
-            if self.path == "/api/info":
+            if self.path == "/api/canonicalize-record":
+                rec = get_record()
+                self._send_json(
+                    {
+                        "canonical_record": record_to_canonical(
+                            rec,
+                            source_format=infer_source_format(str(payload.get("content", ""))),
+                            source_id=str(payload.get("record_id", "")).strip(),
+                        )
+                    }
+                )
+            elif self.path == "/api/convert-record":
+                target = str(payload.get("target_format", "fasta")).strip().lower()
+                if isinstance(payload.get("canonical_record"), dict):
+                    rec = canonical_to_record(payload["canonical_record"])
+                    canon = payload["canonical_record"]
+                else:
+                    rec = get_record()
+                    canon = record_to_canonical(
+                        rec,
+                        source_format=infer_source_format(str(payload.get("content", ""))),
+                        source_id=str(payload.get("record_id", "")).strip(),
+                    )
+                if target == "fasta":
+                    self._send_json({"target_format": "fasta", "content": to_fasta(rec)})
+                elif target == "genbank":
+                    self._send_json({"target_format": "genbank", "content": to_genbank(rec)})
+                elif target == "payload":
+                    self._send_json({"target_format": "payload", "payload": canonical_to_payload(canon)})
+                elif target in {"canonical", "canonical_json"}:
+                    self._send_json({"target_format": "canonical", "canonical_record": canon})
+                else:
+                    raise ValueError("Unsupported target_format. Use fasta|genbank|payload|canonical")
+            elif self.path == "/api/info":
                 rec = get_record()
                 self._send_json(
                     {

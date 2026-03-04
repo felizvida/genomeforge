@@ -457,6 +457,17 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
           <button onclick="runReverseTranslate()">Reverse Translate</button>
           <button onclick="runMutagenesis()">Mutagenesis Replace</button>
         </div>
+        <label>Canonical Schema Converter</label>
+        <div class="row">
+          <button onclick="runCanonicalizeRecord()">Canonicalize Record</button>
+          <select id="canonicalTargetFormat">
+            <option value="canonical">canonical</option>
+            <option value="fasta">fasta</option>
+            <option value="genbank">genbank</option>
+            <option value="payload">payload</option>
+          </select>
+        </div>
+        <button onclick="runConvertRecord()">Convert Record</button>
         <div class="row">
           <input id="proteinEditAaIndex" type="number" value="1" />
           <input id="proteinEditResidue" value="A" />
@@ -1420,6 +1431,20 @@ TTTCCCGGGAAATTT</textarea>
           protein: document.getElementById('protein').value,
           host: document.getElementById('host').value,
         }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runCanonicalizeRecord() {
+      try {
+        show(await callApi('/api/canonicalize-record', payload({})));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runConvertRecord() {
+      try {
+        show(await callApi('/api/convert-record', payload({
+          target_format: document.getElementById('canonicalTargetFormat').value,
+        })));
       } catch (e) { show(String(e)); }
     }
 

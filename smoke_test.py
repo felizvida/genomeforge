@@ -119,6 +119,21 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
             {**base_payload, "enzymes": "EcoRI,BamHI", "star_activity_level": 0.8, "include_star_cuts": True},
         )[1],
     )
+    r.check(
+        "api_canonicalize_record",
+        lambda: "canonical_record" in r.post("/api/canonicalize-record", base_payload)[1],
+    )
+
+    def _convert_record_roundtrip() -> None:
+        c = r.post("/api/canonicalize-record", base_payload)[1]["canonical_record"]
+        f = r.post("/api/convert-record", {"canonical_record": c, "target_format": "fasta"})[1]
+        g = r.post("/api/convert-record", {"canonical_record": c, "target_format": "genbank"})[1]
+        p = r.post("/api/convert-record", {"canonical_record": c, "target_format": "payload"})[1]
+        assert f["target_format"] == "fasta" and f["content"].startswith(">")
+        assert g["target_format"] == "genbank" and g["content"].lstrip().startswith("LOCUS")
+        assert p["target_format"] == "payload" and isinstance(p["payload"], dict)
+
+    r.check("api_convert_record_roundtrip", _convert_record_roundtrip)
 
     def _primers() -> None:
         d = r.post("/api/primers", {**base_payload, "target_start": 12, "target_end": 48, "window": 80})[1]

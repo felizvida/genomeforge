@@ -102,6 +102,7 @@ The UI supports:
 - Junction integrity diagnostics for ligation products (scar sequence, expected site recreation, fusion frame impact)
 - Interactive ligation pathway graph (substrate-to-product flow with probability-weighted edges and clickable product diagnostics)
 - Interactive star-activity risk visualization (enzyme burden ranking + off-target summary cards)
+- Canonical schema normalization and converter endpoints (`/api/canonicalize-record`, `/api/convert-record`)
 - Project persistence (save/load/list/delete)
 - Project collections (save/load/list/delete + add project)
 - Local share bundles (create/load portable JSON snapshots)
