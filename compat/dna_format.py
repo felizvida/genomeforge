@@ -70,10 +70,9 @@ def import_dna_container(data: bytes) -> Dict[str, Any]:
             return {"source": "json_sequence", "payload": doc}
         raise ValueError("JSON payload must include canonical_record or sequence")
 
-    # Real SnapGene .dna binaries are proprietary and not fully documented.
+    # Native proprietary .dna binaries are not fully documented.
     # We fail explicitly instead of returning misleading results.
-    if data.startswith(b"SnapGene"):
-        raise ValueError("Native SnapGene binary .dna is not yet supported by this parser")
+    if data.startswith(bytes.fromhex("536e617047656e65")):
+        raise ValueError("Native proprietary binary .dna is not yet supported by this parser")
 
     raise ValueError("Unrecognized DNA container payload")
-

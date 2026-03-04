@@ -39,5 +39,5 @@ Date: 2026-03-04
 
 ## Known Limitation
 
-1. Native proprietary SnapGene binary `.dna` parsing is still limited.
-   - Parser explicitly returns clear error for unsupported SnapGene-native binary payload.
+1. Native proprietary binary `.dna` parsing is still limited.
+   - Parser explicitly returns clear error for unsupported proprietary-native binary payload.

@@ -1,6 +1,6 @@
-# SnapGene-Inspired Toolkit
+# Genome Forge Toolkit
 
-This repository includes a Python CLI (`snapgene_like.py`) that implements practical DNA sequence design/analysis features inspired by SnapGene.
+This repository includes a Python CLI (`genomeforge_toolkit.py`) for practical DNA sequence design and analysis workflows.
 
 ## Implemented functions
 
@@ -22,14 +22,14 @@ This repository includes a Python CLI (`snapgene_like.py`) that implements pract
 ## Usage
 
 ```bash
-python3 snapgene_like.py <input_file> info
-python3 snapgene_like.py <input_file> digest EcoRI BamHI
-python3 snapgene_like.py <input_file> primers --target-start 100 --target-end 900 --na-mM 50 --primer-nM 250
-python3 snapgene_like.py <input_file> primer-check --primer ATGCGTACGTTAGC --with-primer CGAACCGTATCGTA
-python3 snapgene_like.py <input_file> pcr --forward ATGCGTACGTTAGC --reverse CGAACCGTATCGTA
-python3 snapgene_like.py <input_file> codon-optimize --host ecoli --output optimized.fasta
-python3 snapgene_like.py <input_file> map --output plasmid_map.svg --enzymes EcoRI BamHI
-python3 snapgene_like.py <input_file> export --format genbank --output out.gbk
+python3 genomeforge_toolkit.py <input_file> info
+python3 genomeforge_toolkit.py <input_file> digest EcoRI BamHI
+python3 genomeforge_toolkit.py <input_file> primers --target-start 100 --target-end 900 --na-mM 50 --primer-nM 250
+python3 genomeforge_toolkit.py <input_file> primer-check --primer ATGCGTACGTTAGC --with-primer CGAACCGTATCGTA
+python3 genomeforge_toolkit.py <input_file> pcr --forward ATGCGTACGTTAGC --reverse CGAACCGTATCGTA
+python3 genomeforge_toolkit.py <input_file> codon-optimize --host ecoli --output optimized.fasta
+python3 genomeforge_toolkit.py <input_file> map --output plasmid_map.svg --enzymes EcoRI BamHI
+python3 genomeforge_toolkit.py <input_file> export --format genbank --output out.gbk
 ```
 
 ## Web UI
@@ -123,7 +123,6 @@ The UI supports:
 
 ## Notes
 
-- This is not a full reimplementation of proprietary SnapGene software.
-- It is a practical open-source subset suitable for common molecular biology workflows.
+- This is an open-source implementation focused on practical molecular biology workflows.
 - Primer Tm in design/QC uses nearest-neighbor approximation plus simple secondary-structure heuristics.
-- Feature coverage is broad but still an open-source approximation of SnapGene, not full proprietary parity.
+- Some advanced commercial algorithms and proprietary binary formats are intentionally out of scope.

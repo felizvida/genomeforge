@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
-from snapgene_like import Feature, SequenceRecord, sanitize_sequence
+from genomeforge_toolkit import Feature, SequenceRecord, sanitize_sequence
 
 
 CANONICAL_SCHEMA_VERSION = "1.0.0"

@@ -35,7 +35,7 @@ from collab.store import (
 )
 from compat.ab1_format import parse_ab1_bytes, synthetic_trace_from_sequence
 from compat.dna_format import export_dna_container, import_dna_container
-from snapgene_like import (
+from genomeforge_toolkit import (
     CODON_TABLE,
     ENZYMES,
     Feature,
@@ -699,7 +699,7 @@ def primer_diagnostics(
     na_mM: float = 50.0,
     primer_nM: float = 250.0,
 ) -> Dict[str, Any]:
-    from snapgene_like import end_complement_run, max_complement_run, hairpin_risk
+    from genomeforge_toolkit import end_complement_run, max_complement_run, hairpin_risk
 
     f = sanitize_sequence(forward)
     r = sanitize_sequence(reverse)
@@ -3379,12 +3379,12 @@ class Handler(BaseHTTPRequestHandler):
 
 def run(host: str = "127.0.0.1", port: int = 8080) -> None:
     server = ThreadingHTTPServer((host, port), Handler)
-    print(f"SnapGene-like web UI running at http://{host}:{port}")
+    print(f"Genome Forge web UI running at http://{host}:{port}")
     server.serve_forever()
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Run SnapGene-like local web UI")
+    ap = argparse.ArgumentParser(description="Run Genome Forge local web UI")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8080)
     args = ap.parse_args()

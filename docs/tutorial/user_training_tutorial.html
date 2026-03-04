@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Genome Forge Professional Training Manual (v0.1.0)</title>
+  <title>Genome Forge Extended Professional Training Manual (v0.1.0)</title>
   <style>
     @page {
       size: A4;
       margin: 16mm 14mm 18mm 14mm;
       @bottom-right {
-        content: "Genome Forge Training  |  Page " counter(page);
-        font-size: 9px;
+        content: "Genome Forge Training | Page " counter(page);
         color: #64748b;
+        font-size: 9px;
       }
     }
     :root {
@@ -35,12 +35,7 @@
       font-size: 12px;
       background: #fff;
     }
-    .doc {
-      width: 100%;
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 10px 6px 24px;
-    }
+    .doc { max-width: 980px; margin: 0 auto; padding: 10px 6px 22px; }
     .cover {
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -73,6 +68,12 @@
       margin: 0 0 5px;
       font-size: 13.5px;
       color: var(--brand);
+      page-break-after: avoid;
+    }
+    h4 {
+      margin: 8px 0 4px;
+      font-size: 12px;
+      color: #0f2741;
       page-break-after: avoid;
     }
     p { margin: 6px 0; }
@@ -114,10 +115,24 @@
     }
     .toc ol { margin: 6px 0 0 18px; padding: 0; }
     .toc li { margin: 3px 0; }
-    .step {
-      border-left: 3px solid #7dd3fc;
-      padding-left: 10px;
-      margin: 8px 0;
+    .case {
+      border-top: 1px dashed #cbdbea;
+      margin-top: 10px;
+      padding-top: 10px;
+      page-break-inside: avoid;
+    }
+    .case:first-child {
+      border-top: none;
+      margin-top: 0;
+      padding-top: 0;
+    }
+    .bio {
+      border: 1px solid #dbe8f8;
+      border-radius: 9px;
+      background: #f8fbff;
+      padding: 8px 10px;
+      margin: 7px 0 8px;
+      font-size: 11.2px;
     }
     .tip, .note, .caution {
       border-radius: 9px;
@@ -129,7 +144,6 @@
     .note { border: 1px solid #dbe8f8; background: #f8fafc; }
     .caution { border: 1px solid #fed7aa; background: #fff7ed; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .figure {
       border: 1px solid #d9e5f3;
       border-radius: 10px;
@@ -145,8 +159,8 @@
       max-width: 860px;
       margin: 0 auto;
       height: auto;
-      border-radius: 6px;
       image-rendering: auto;
+      border-radius: 6px;
     }
     .figure.narrow img { max-width: 620px; }
     .caption {
@@ -208,224 +222,739 @@
   <main class="doc">
     <section class="cover">
       <p class="eyebrow">Genome Forge v0.1.0</p>
-      <h1>Professional User Training Manual</h1>
+      <h1>Extended Professional Training Manual</h1>
       <p class="muted">
-        Advanced, case-based training guide for day-to-day molecular cloning workflows,
-        interop and trace analysis, primer specificity, CRISPR helper design,
-        and collaboration/review operations.
+        Case-library training for cloning design, interop and trace analytics, primer and CRISPR workflows,
+        and collaboration/review operations with biological context for each task.
       </p>
       <div class="meta">
-        <div class="k">Audience<b>Molecular Biology Users</b></div>
-        <div class="k">Coverage<b>P0 + P1 + P2</b></div>
-        <div class="k">Primary UI<b>Web Workstation</b></div>
+        <div class="k">Coverage<b>Full Workflow Suite</b></div>
+        <div class="k">Cases<b>20 Workflows</b></div>
+        <div class="k">Dataset<b>Real-World Bundle</b></div>
         <div class="k">Release<b>2026-03-04</b></div>
       </div>
       <div class="tip">
-        <b>System Startup</b><br />
+        <b>Startup</b><br />
         <code>python3 web_ui.py --port 8080</code> then open <code>http://127.0.0.1:8080</code>.
       </div>
     </section>
 
     <section class="toc">
-      <h2>Contents</h2>
+      <h2>Case Library by Biological Cluster</h2>
+      <h3>Cluster A: DNA Processing and Construct Entry</h3>
       <ol>
-        <li>Training dataset and environment preparation.</li>
-        <li>Case A: plasmid map, digest, and sequence-track interpretation.</li>
-        <li>Case B: primer design, specificity ranking, PCR, and gel expectation.</li>
-        <li>Case C: assembly and ligation decision workflow.</li>
-        <li>Case D: P0 interop and AB1 trace handling.</li>
-        <li>Case E: P1 CRISPR candidate and HDR donor workflow.</li>
-        <li>Case F: P2 workspace, audit trail, diff, and review approval.</li>
-        <li>Capstone scenario and quality gate checklist.</li>
+        <li>Case A: Restriction map for cloning entry design.</li>
+        <li>Case B: Methylation-aware digest interpretation.</li>
+        <li>Case C: Star-activity off-target cut risk review.</li>
+      </ol>
+      <h3>Cluster B: Sequence Interpretation and Assay Design</h3>
+      <ol>
+        <li>Case D: Sequence track and translation-frame interpretation.</li>
+        <li>Case E: Primer design with thermodynamic diagnostics.</li>
+        <li>Case F: Primer specificity ranking and virtual PCR/gel.</li>
+      </ol>
+      <h3>Cluster C: Construct Assembly and Comparative Evidence</h3>
+      <ol>
+        <li>Case G: End compatibility and ligation product ranking.</li>
+        <li>Case H: MSA, identity heatmap, and phylogeny.</li>
+      </ol>
+      <h3>Cluster D: Experimental Verification and Data Fidelity</h3>
+      <ol>
+        <li>Case I: DNA container roundtrip integrity validation.</li>
+        <li>Case J: AB1 trace alignment and consensus editing.</li>
+      </ol>
+      <h3>Cluster E: Genome Editing Design</h3>
+      <ol>
+        <li>Case K: CRISPR gRNA and HDR donor proposal.</li>
+      </ol>
+      <h3>Cluster F: Collaboration, Traceability, and Governance</h3>
+      <ol>
+        <li>Case L: Collaboration governance and review approvals.</li>
+      </ol>
+      <h3>Cluster G: Advanced Sequence QA and Expression Engineering</h3>
+      <ol>
+        <li>Case M: ORF scanning and coding-potential triage.</li>
+        <li>Case N: GC landscape and repeat-fragility analysis.</li>
+        <li>Case O: Homopolymer and low-complexity risk detection.</li>
+        <li>Case P: Variant annotation from reference-aligned edits.</li>
+        <li>Case Q: Multiplex PCR panel balancing strategy.</li>
+        <li>Case R: Promoter and RBS context for expression tuning.</li>
+        <li>Case S: Circular construct integrity and junction validation.</li>
+        <li>Case T: Batch workflow reproducibility and parameter locking.</li>
       </ol>
     </section>
 
     <section class="section">
-      <h2>1) Training Dataset (Real-World)</h2>
+      <h2>0) Case Selection Matrix + Interpretation Playbook</h2>
       <p>
-        Use the bundled dataset files under <code>docs/tutorial/datasets/</code>:
+        Use this as a routing table: start from your practical question, choose the case, then read outputs using the interpretation cues.
+        It is written for software engineers new to biology.
       </p>
-      <ul>
-        <li><code>training_real_world_sequences.fasta</code> (EGFP, mCherry, pUC19 MCS, BRAF exon 15 region, lacZ alpha fragment).</li>
-        <li><code>training_real_world_dataset.json</code> (structured records, enzyme panels, primer candidates, CRISPR seeds, and collaboration actors).</li>
-        <li><code>case_playbook.md</code> (scenario prompts and expected outputs).</li>
-      </ul>
-      <div class="note">
-        <b>Why this dataset:</b> it combines common cloning inserts, reporter genes, and a medically relevant target region,
-        allowing realistic analysis without requiring private lab data.
+      <table>
+        <thead>
+          <tr><th>Case</th><th>When To Use</th><th>Input Data (Detailed)</th><th>Biological Meaning</th><th>Interpretation Cues</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>A</td>
+            <td>Choose restriction enzymes for cloning entry</td>
+            <td>Circular plasmid sequence, enzyme motif/cut-offset metadata, protected feature coordinates</td>
+            <td>Find safe cut locations that open vector without damaging required biological modules</td>
+            <td>Good: one unique linearization cut or two directional cuts outside critical features. Red flag: dense cuts or cuts inside promoter/CDS.</td>
+          </tr>
+          <tr>
+            <td>B</td>
+            <td>Digest prediction disagrees with wet-lab gel</td>
+            <td>Target sequence plus methylation motif rules and enzyme sensitivity map</td>
+            <td>Chemical base modification can hide motifs from enzymes</td>
+            <td>Good: methylation-aware model explains missing/shifted bands. Red flag: mismatch persists after methylation modeling.</td>
+          </tr>
+          <tr>
+            <td>C</td>
+            <td>Assess non-specific cutting risk</td>
+            <td>Enzyme panel, sequence, fuzzy-match/star parameters, condition severity setting</td>
+            <td>Non-ideal conditions relax specificity and can create unintended cuts</td>
+            <td>Good: low off-target burden concentrated in non-critical regions. Red flag: high burden near functional regions/junctions.</td>
+          </tr>
+          <tr>
+            <td>D</td>
+            <td>Interpret nucleotide edits at protein level</td>
+            <td>CDS coordinates, strand, translation table, target variants</td>
+            <td>Protein function depends on codon frame integrity, not just base-level differences</td>
+            <td>Good: expected synonymous or controlled missense edit. Red flag: frameshift or early stop in essential region.</td>
+          </tr>
+          <tr>
+            <td>E</td>
+            <td>Generate robust primer candidates</td>
+            <td>Target interval, primer length/GC/Tm bounds, salt and oligo assumptions, structure thresholds</td>
+            <td>Primer physics governs whether amplification starts correctly</td>
+            <td>Good: balanced Tm pair, limited hairpin/dimer risk. Red flag: strong self-annealing or extreme GC clamps.</td>
+          </tr>
+          <tr>
+            <td>F</td>
+            <td>Pick best assay-ready primer pair</td>
+            <td>Candidate primers, background sequence panel, mismatch tolerance, expected amplicon windows</td>
+            <td>Specificity avoids false-positive products from related templates</td>
+            <td>Good: one dominant on-target amplicon and clean virtual lane. Red flag: multiple similar-size off-target products.</td>
+          </tr>
+          <tr>
+            <td>G</td>
+            <td>Prioritize likely correct ligation products</td>
+            <td>Vector/insert sequences, end type/overhangs, orientation constraints, ligation simulation options</td>
+            <td>DNA assembly is constrained by end compatibility and orientation</td>
+            <td>Good: desired construct ranked top with large probability gap. Red flag: vector self-ligation dominates.</td>
+          </tr>
+          <tr>
+            <td>H</td>
+            <td>Estimate conservation/divergence across records</td>
+            <td>Multi-record FASTA, alignment scoring params, distance metric and tree method</td>
+            <td>Conservation predicts reuse potential for primers/gRNAs</td>
+            <td>Good: conserved block at intended assay anchor. Red flag: anchor region highly divergent across panel.</td>
+          </tr>
+          <tr>
+            <td>I</td>
+            <td>Validate data portability across files/tools</td>
+            <td>Construct with topology + features + annotations, export/import pipeline</td>
+            <td>Lossless interchange is required for reproducible collaboration</td>
+            <td>Good: sequence hash, topology, and feature coordinates unchanged. Red flag: coordinate shifts or missing features.</td>
+          </tr>
+          <tr>
+            <td>J</td>
+            <td>Confirm sequence from AB1 trace</td>
+            <td>Raw chromatogram channels, base quality values, called sequence, reference template</td>
+            <td>Signal-level quality determines whether base differences are trustworthy</td>
+            <td>Good: high-quality peaks support consistent mismatches. Red flag: ambiguous mixed peaks at claimed edit site.</td>
+          </tr>
+          <tr>
+            <td>K</td>
+            <td>Select CRISPR guide + donor strategy</td>
+            <td>Target locus, PAM model, spacer length, off-target background, desired edit, homology-arm rules</td>
+            <td>Balance edit efficiency with genome-wide specificity and repair correctness</td>
+            <td>Good: high on-target, low off-target, donor preserves intended change and reduces recut. Red flag: risky off-target cluster.</td>
+          </tr>
+          <tr>
+            <td>L</td>
+            <td>Prepare compliant, reviewable project handoff</td>
+            <td>User-role graph, permissions matrix, snapshots, diffs, audit events, review records</td>
+            <td>Biology decisions require provenance and accountable approval</td>
+            <td>Good: complete audit trail and explicit reviewer approval. Red flag: undocumented edits or missing approver identity.</td>
+          </tr>
+          <tr>
+            <td>M</td>
+            <td>Triage unknown sequences for coding potential</td>
+            <td>DNA sequence, start/stop definitions, min ORF length, strand/frame sweep settings</td>
+            <td>Long open reading frames indicate plausible protein-coding regions</td>
+            <td>Good: long coherent ORF with plausible start/stop context. Red flag: fragmented short ORFs only.</td>
+          </tr>
+          <tr>
+            <td>N</td>
+            <td>Diagnose sequence regions likely to fail amplification</td>
+            <td>Windowed GC analysis params, repeat motif dictionary, repeat length cutoffs</td>
+            <td>Extreme GC and repeats create polymerase and assembly fragility</td>
+            <td>Good: moderate GC and sparse repeats near assay anchors. Red flag: extreme GC hotspots at primer binding sites.</td>
+          </tr>
+          <tr>
+            <td>O</td>
+            <td>Screen synthesis/sequencing artifact zones</td>
+            <td>Homopolymer threshold, local complexity metric parameters, sequence windows</td>
+            <td>Low-complexity tracts can cause slippage and base-calling artifacts</td>
+            <td>Good: assay anchors outside long homopolymers. Red flag: critical junction overlaps low-complexity run.</td>
+          </tr>
+          <tr>
+            <td>P</td>
+            <td>Convert edited sequence into actionable variant report</td>
+            <td>Reference, edited sequence, alignment settings, feature map, codon/AA mapping table</td>
+            <td>Variant type determines likely functional biological consequence</td>
+            <td>Good: expected edit class with coherent protein consequence. Red flag: unplanned indel causing frameshift cascade.</td>
+          </tr>
+          <tr>
+            <td>Q</td>
+            <td>Build multi-target PCR assay panel</td>
+            <td>Primer pool, interaction matrix, Tm spread constraints, product size spacing targets</td>
+            <td>Multiplex success requires low cross-interference among many primers</td>
+            <td>Good: low aggregate dimer score + separable products. Red flag: high pairwise conflicts and overlapping band sizes.</td>
+          </tr>
+          <tr>
+            <td>R</td>
+            <td>Explain or tune expression-level differences</td>
+            <td>Promoter/RBS annotations, motif quality, spacer length to start codon, strand context</td>
+            <td>Regulatory context controls expression strength and consistency</td>
+            <td>Good: canonical motif spacing and orientation. Red flag: weak motifs or atypical spacing despite intact CDS.</td>
+          </tr>
+          <tr>
+            <td>S</td>
+            <td>Verify full circular construct correctness</td>
+            <td>Circular assembly, expected junction signatures, feature boundary set, digest validation panel</td>
+            <td>Correct plasmid behavior depends on exact junction continuity</td>
+            <td>Good: all junctions validated with expected digest pattern. Red flag: junction mismatch or unexpected fragment profile.</td>
+          </tr>
+          <tr>
+            <td>T</td>
+            <td>Prove pipeline reproducibility at scale</td>
+            <td>Batch sequence list, pinned params, tool versions, baseline output schema and checksums</td>
+            <td>Deterministic reruns are required for trustworthy scientific computation</td>
+            <td>Good: no drift in key outputs. Red flag: silent output shifts under same inputs and parameters.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tip">
+        <b>Interpretation principle:</b> never treat a single score in isolation. Combine sequence context, model assumptions,
+        and cross-check evidence (for example gel simulation + alignment + trace quality) before making biological decisions.
       </div>
-      <pre>cat docs/tutorial/datasets/training_real_world_sequences.fasta
-cat docs/tutorial/datasets/training_real_world_dataset.json | head -n 80</pre>
     </section>
 
     <section class="section">
-      <h2>2) Case A: Restriction Mapping and Track Interpretation</h2>
-      <div class="step">
-        <h3>A1. Load pUC19 MCS Training Record</h3>
+      <h2>1) Training Dataset and Setup</h2>
+      <p>Use dataset assets from <code>docs/tutorial/datasets/</code>:</p>
+      <ul>
+        <li><code>training_real_world_sequences.fasta</code></li>
+        <li><code>training_real_world_dataset.json</code></li>
+        <li><code>case_playbook.md</code></li>
+      </ul>
+      <div class="bio">
+        <b>Biology primer for software engineers</b><br />
+        DNA is a string over alphabet <code>{A,C,G,T}</code>. A gene is a substring that can be translated to protein using triplets (codons).
+        A plasmid is a circular DNA container, similar to a deployable package that carries multiple modules (promoter, coding sequence, selection marker).
+        Restriction enzymes are deterministic substring matchers that cut DNA at specific motifs. PCR primers are short query strings used to copy a target interval.
+        CRISPR gRNAs are programmable matchers that guide edits near a motif called PAM.
+      </div>
+      <h3>Input Data Deep Dive</h3>
+      <table>
+        <thead>
+          <tr><th>File</th><th>Structure</th><th>What Each Field Means</th><th>How It Is Used</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>training_real_world_sequences.fasta</code></td>
+            <td>Header+sequence blocks</td>
+            <td>Each record starts with <code>&gt;record_id description</code>, followed by DNA lines; line breaks are formatting only.</td>
+            <td>Primary sequence source for mapping, primer design, PCR simulation, and CRISPR target scanning.</td>
+          </tr>
+          <tr>
+            <td><code>training_real_world_dataset.json</code></td>
+            <td>Nested JSON metadata</td>
+            <td>Contains workflow parameters: enzyme panels, methylation motifs, primer settings, PAM models, role maps, and expected checkpoints.</td>
+            <td>Acts like a typed config file that drives reproducible runs and keeps case assumptions explicit.</td>
+          </tr>
+          <tr>
+            <td><code>case_playbook.md</code></td>
+            <td>Narrative protocol</td>
+            <td>Human-readable run order, rationale, and expected observations.</td>
+            <td>Bridges algorithm outputs to bench-facing interpretation and review sign-off.</td>
+          </tr>
+        </tbody>
+      </table>
+      <table>
+        <thead>
+          <tr><th>Record</th><th>Biological Role</th><th>Why Included</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>EGFP_CDS</td><td>Reporter protein coding sequence</td><td>Common insert for cloning and expression QC.</td></tr>
+          <tr><td>mCherry_CDS</td><td>Alternative reporter coding sequence</td><td>Specificity/off-target contrast with EGFP primers/gRNAs.</td></tr>
+          <tr><td>pUC19_MCS</td><td>Classic cloning MCS region</td><td>Restriction map and digest interpretation training.</td></tr>
+          <tr><td>BRAF_exon15_fragment</td><td>Disease-relevant target region</td><td>CRISPR/HDR example with translational relevance.</td></tr>
+          <tr><td>lacZ_alpha_fragment</td><td>Screening-related fragment</td><td>Additional motif and primer background complexity.</td></tr>
+        </tbody>
+      </table>
+      <pre>cat docs/tutorial/datasets/training_real_world_sequences.fasta
+cat docs/tutorial/datasets/training_real_world_dataset.json | head -n 80</pre>
+      <h3>How To Read FASTA and JSON For This Tutorial</h3>
+      <ul>
+        <li><b>FASTA record ID</b>: stable key (for example <code>EGFP_CDS</code>) used by commands and reports.</li>
+        <li><b>Sequence length</b>: first QC metric; length drift often means parsing or copy errors.</li>
+        <li><b>GC content</b>: affects primer Tm, secondary structure tendency, and amplification behavior.</li>
+        <li><b>Feature coordinates</b>: 1-based biological indexing; verify if command output is 0-based or 1-based before comparing.</li>
+        <li><b>Topology flag</b>: circular vs linear changes cut-fragment logic and map rendering.</li>
+        <li><b>Background panel</b>: non-target records used to estimate off-target binding/cutting risk.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>2) Cluster A: DNA Processing and Construct Entry (Cases A-C)</h2>
+
+      <article class="case">
+        <h3>Case A: Restriction Map for Cloning Entry Design</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> In cloning, we must open a plasmid at intended positions without breaking essential modules.
+          Restriction mapping is equivalent to locating all regex matches before executing a string-splitting operation.<br />
+          <b>Detailed input data:</b> sequence <code>pUC19_MCS</code> (circular context) and enzyme catalog entries
+          containing recognition motif, cut offset, and strand behavior. Circular topology means position arithmetic wraps at sequence end.<br />
+          <b>What we can infer:</b> cut count, cut spacing, and fragment sizes reveal if a single cutter can linearize and whether two-cutter strategies can enforce directionality.
+          If a cut lands inside a required feature, that enzyme is disqualified.
+        </div>
         <ol>
-          <li>Copy <code>pUC19_MCS</code> from dataset JSON or FASTA.</li>
-          <li>Set topology to <code>circular</code>.</li>
-          <li>Run <code>Refresh Info</code>, then <code>Render Map</code>.</li>
+          <li>Load <code>pUC19_MCS</code>, set topology <code>circular</code>.</li>
+          <li>Run <code>Render Map</code> with <code>EcoRI,BamHI,HindIII,XbaI,PstI,KpnI</code>.</li>
+          <li>Inspect cut positions and verify expected multi-site MCS behavior.</li>
         </ol>
-      </div>
-      <div class="step">
-        <h3>A2. Digest Interpretation</h3>
+      </article>
+
+      <article class="case">
+        <h3>Case B: Methylation-Aware Digest</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Real DNA is chemically modified. Methyl groups can mask recognition motifs and cause expected cuts to fail.<br />
+          <b>Detailed input data:</b> same target sequence plus methylation-rule metadata
+          (<code>motif</code>, modified base index, affected enzymes, block/partial-block behavior). This is analogous to conditional parsing rules that override default token matching.<br />
+          <b>What we can infer:</b> differences between theoretical and methylation-aware fragment sets explain lab outcomes where gel bands do not match naive in-silico digest predictions.
+        </div>
         <ol>
-          <li>Use enzymes <code>EcoRI,BamHI,HindIII,XbaI,PstI,KpnI</code>.</li>
-          <li>Run <code>Digest</code> and record fragment pattern.</li>
-          <li>Run <code>Digest (Methylation Aware)</code> with motif list to compare blocked cuts.</li>
+          <li>Run <code>Digest</code> and note baseline fragments.</li>
+          <li>Run <code>Digest (Methylation Aware)</code> with motifs like <code>GAATTC,GGATCC</code>.</li>
+          <li>Compare fragment changes and annotate blocked enzymes.</li>
         </ol>
-      </div>
+      </article>
+
+      <article class="case">
+        <h3>Case C: Star Activity Risk Review</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Under non-ideal buffer/time/concentration conditions, enzymes may cut near-matches (star activity),
+          similar to relaxing exact-match constraints and allowing fuzzy matches.<br />
+          <b>Detailed input data:</b> enzyme panel, base sequence, star sensitivity parameters
+          (mismatch tolerance, positional penalty model, condition severity level).<br />
+          <b>What we can infer:</b> star-burden score per enzyme and off-target site distribution identify safer enzyme choices and reaction settings.
+        </div>
+        <ol>
+          <li>Run <code>Star Activity Scan</code> with increasing star level.</li>
+          <li>Inspect enzyme burden and top risk positions.</li>
+          <li>Shift sequence track to highlighted risk sites for context.</li>
+        </ol>
+      </article>
+
       <div class="figure">
-        <img src="assets/01_map.svg" alt="Map visualization (SVG)" />
-        <p class="caption">Figure A: SVG map rendering (vector source) for sharp zoom and crisp PDF output.</p>
+        <img src="assets/01_map.svg" alt="Map SVG" />
+        <p class="caption">Map view rendered from SVG source for crisp print quality.</p>
       </div>
-      <div class="figure">
-        <img src="assets/02_sequence_track.svg" alt="Sequence track visualization (SVG)" />
-        <p class="caption">Figure B: Sequence track with frame translation and codon-level click inspection.</p>
+      <div class="figure narrow">
+        <img src="assets/05_star_activity.svg" alt="Star activity SVG" />
+        <p class="caption">Star activity visualization shown as vector graphic for non-blurry scaling.</p>
       </div>
     </section>
 
     <section class="section break">
-      <h2>3) Case B: Primer Design, Specificity, and PCR Outcome</h2>
-      <div class="grid-2">
-        <div>
-          <h3>B1. Primer Generation</h3>
-          <ol>
-            <li>Load EGFP CDS from dataset.</li>
-            <li>Set target window and run <code>Design Primers</code>.</li>
-            <li>Run <code>Primer Diagnostics</code> and capture Tm/risk flags.</li>
-          </ol>
+      <h2>3) Cluster B: Sequence Interpretation and Assay Design (Cases D-F)</h2>
+
+      <article class="case">
+        <h3>Case D: Sequence Track + Translation Context</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> DNA edits are evaluated at protein level. A one-base insertion can shift the reading frame and alter all downstream amino acids.<br />
+          <b>Detailed input data:</b> coding DNA record <code>EGFP_CDS</code>, CDS coordinates, strand direction, and translation table.
+          Translation consumes bases in triplets from a defined start frame.<br />
+          <b>What we can infer:</b> codon-to-amino-acid mapping lets you classify a variant as synonymous, missense, nonsense, or frameshift.
+          This determines likely functional impact.
         </div>
-        <div>
-          <h3>B2. Specificity Ranking</h3>
-          <ol>
-            <li>Paste background panel (EGFP + mCherry + BRAF fragment).</li>
-            <li>Run <code>Primer Specificity</code>.</li>
-            <li>Run <code>Rank Primer Pairs</code> using candidate JSON from dataset.</li>
-          </ol>
+        <ol>
+          <li>Load EGFP and render sequence track with frame 1.</li>
+          <li>Inspect codon cells and translated feature coordinates.</li>
+          <li>Validate mutation targets against amino-acid numbering.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case E: Primer Design and Thermodynamic Screening</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> PCR success depends on short oligos binding correctly and not self-binding.
+          Think of this as generating robust query strings with strong target affinity and low self-collision probability.<br />
+          <b>Detailed input data:</b> target interval, allowed primer length range, GC bounds, target amplicon length, Tm model, salt/oligo concentration assumptions,
+          and structural heuristics (hairpin/dimer thresholds).<br />
+          <b>What we can infer:</b> balanced forward/reverse Tm and low self-structure risk produce candidates with higher expected amplification reliability.
         </div>
+        <ol>
+          <li>Run <code>Design Primers</code> on EGFP window.</li>
+          <li>Run <code>Primer Diagnostics</code>.</li>
+          <li>Reject high-risk pairs and retain viable candidates.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case F: Specificity Ranking + PCR + Gel</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Even good primers can bind unintended templates. Specificity ranking estimates false-positive amplification risk.<br />
+          <b>Detailed input data:</b> candidate primer pairs, primary target, background panel, mismatch tolerances by primer position,
+          expected product size windows, and simulation settings for virtual PCR and gel rendering.<br />
+          <b>What we can infer:</b> top-ranked pairs should show one dominant on-target product and minimal off-target products.
+          Predicted gel lanes provide a sanity-check visual before wet-lab execution.
+        </div>
+        <ol>
+          <li>Run <code>Primer Specificity</code> with background panel.</li>
+          <li>Run <code>Rank Primer Pairs</code> and select top candidate.</li>
+          <li>Run <code>Virtual PCR</code> and <code>PCR Gel Lanes</code>.</li>
+        </ol>
+      </article>
+
+      <div class="figure">
+        <img src="assets/02_sequence_track.svg" alt="Sequence track SVG" />
+        <p class="caption">Sequence-track SVG maintains codon text sharpness in PDF.</p>
       </div>
-      <h3>B3. PCR and Gel Lanes</h3>
+    </section>
+
+    <section class="section">
+      <h2>4) Cluster C: Construct Assembly and Comparative Evidence (Cases G-H)</h2>
+
+      <article class="case">
+        <h3>Case G: Cloning Compatibility and Ligation Product Ranking</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Joining DNA parts is a constrained graph assembly problem where end compatibility governs possible edges.<br />
+          <b>Detailed input data:</b> vector and insert sequences, end types (blunt/sticky/homology), overhang sequences, orientation constraints,
+          and ligation model parameters (self-ligation allowance, byproduct reporting).<br />
+          <b>What we can infer:</b> ranked product probabilities highlight likely desired construct versus byproducts (vector recircularization, concatemer artifacts).
+          This reduces trial-and-error cloning.
+        </div>
+        <ol>
+          <li>Run compatibility checks for selected method.</li>
+          <li>Run <code>Simulate Ligation Products</code> with byproducts on.</li>
+          <li>Focus top product and review junction integrity.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case H: MSA, Heatmap, and Phylogeny</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Reagent reuse across related sequences requires knowing which regions are conserved versus divergent.<br />
+          <b>Detailed input data:</b> multi-record FASTA panel, alignment scoring parameters (match/mismatch/gap penalties),
+          and tree settings (distance metric, clustering method).<br />
+          <b>What we can infer:</b> conserved blocks are safer for universal primers/gRNAs; divergent blocks are safer for target-specific assays.
+          Heatmaps and trees summarize pairwise relatedness at a glance.
+        </div>
+        <ol>
+          <li>Run MSA and consensus.</li>
+          <li>Generate heatmap and UPGMA tree.</li>
+          <li>Document divergence hotspots.</li>
+        </ol>
+      </article>
+
+      <div class="figure narrow">
+        <img src="assets/06_ligation_products.svg" alt="Ligation graph SVG" />
+        <p class="caption">Ligation pathway graph in SVG for edge-label readability at print scale.</p>
+      </div>
+      <div class="figure narrow">
+        <img src="assets/03_msa_heatmap.svg" alt="MSA heatmap SVG" />
+        <p class="caption">MSA heatmap as vector image; grid and labels remain crisp.</p>
+      </div>
+    </section>
+
+    <section class="section break">
+      <h2>5) Cluster D: Experimental Verification and Data Fidelity (Cases I-J)</h2>
+
+      <article class="case">
+        <h3>Case I: DNA Container Roundtrip Validation</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Collaboration requires lossless serialization. A roundtrip test validates that import/export preserves semantics.<br />
+          <b>Detailed input data:</b> one complete construct including sequence, topology, feature annotations, enzyme notes, and optional provenance metadata.<br />
+          <b>What we can infer:</b> if sequence hash, length, topology, and feature coordinate sets are unchanged post-roundtrip, interchange is reliable for downstream users.
+        </div>
+        <ol>
+          <li>Export via <code>Export DNA Container</code>.</li>
+          <li>Re-import via <code>Import DNA Container</code>.</li>
+          <li>Compare key fields and preserve as handoff artifact.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case J: AB1 Trace to Consensus</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Sanger sequencing returns signal traces, not perfect strings. Base calls must be validated against quality and alignment context.<br />
+          <b>Detailed input data:</b> AB1 chromatogram channels (A/C/G/T intensity vectors), per-base quality estimates,
+          called sequence, and a reference sequence for alignment.<br />
+          <b>What we can infer:</b> consistent high-quality mismatches support true variants, while low-quality discordant regions indicate ambiguous calls requiring repeat sequencing.
+        </div>
+        <ol>
+          <li>Import trace and inspect summary metrics.</li>
+          <li>Align to reference and review mismatches.</li>
+          <li>Edit suspicious base call and regenerate consensus.</li>
+        </ol>
+      </article>
+      <div class="caution">
+        Native proprietary binary parsing remains partial; use Genome Forge DNA container for reliable roundtrip in this release.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>6) Cluster E: Genome Editing Design (Case K)</h2>
+      <div class="bio">
+        <b>Biological meaning</b><br />
+        <b>Why this task exists:</b> CRISPR editing combines a targeting component (gRNA) and a repair process.
+        We optimize for efficient on-target cutting while minimizing unintended cuts elsewhere.<br />
+        <b>Detailed input data:</b> target locus sequence (<code>BRAF_exon15_fragment</code>), PAM model (<code>NGG</code>),
+        spacer length, off-target background sequences, mismatch tolerance model, desired edit coordinates, and homology-arm length rules for HDR donor design.<br />
+        <b>What we can infer:</b> best candidates have high efficiency score, low predicted off-target burden,
+        and donor templates that encode the intended edit while reducing recutting risk (for example PAM-disrupting silent changes).
+      </div>
       <ol>
-        <li>Run <code>Virtual PCR</code> and verify predicted product size.</li>
-        <li>Run <code>PCR Gel Lanes</code> with <code>1kb_plus</code> ladder.</li>
-        <li>Compare expected and observed in-silico band positions.</li>
+        <li>Run <code>gRNA Design</code> (<code>NGG</code>, 20-mer spacer).</li>
+        <li>Run <code>CRISPR Off-target</code> using training background set.</li>
+        <li>Generate donor with <code>Design HDR Donor</code> and evaluate PAM disruption hints.</li>
       </ol>
       <table>
         <thead>
-          <tr><th>Checkpoint</th><th>Expected Signal</th><th>Pass Criterion</th></tr>
+          <tr><th>Output</th><th>Biological Use</th><th>Decision Signal</th></tr>
         </thead>
         <tbody>
-          <tr><td>Primer quality</td><td>Tm proximity and low dimer flags</td><td>Pair accepted for PCR</td></tr>
-          <tr><td>Specificity score</td><td>Lower off-target product burden</td><td>Top-ranked pair selected</td></tr>
-          <tr><td>PCR lanes</td><td>Dominant lane near expected amplicon</td><td>Band concordance confirmed</td></tr>
+          <tr><td>gRNA efficiency score</td><td>Prioritize likely active guides</td><td>Higher score is preferable</td></tr>
+          <tr><td>Off-target risk score</td><td>Estimate specificity risk</td><td>Lower score is preferable</td></tr>
+          <tr><td>HDR donor template</td><td>Precise edit delivery</td><td>Correct edit + sufficient homology arms</td></tr>
         </tbody>
       </table>
     </section>
 
-    <section class="section">
-      <h2>4) Case C: Cloning Strategy and Ligation Product Ranking</h2>
-      <ol>
-        <li>Use dataset vector/insert examples for Gateway/TOPO/TA-GC trials.</li>
-        <li>Run <code>Cloning Compatibility</code> and document reasoned pass/fail.</li>
-        <li>Run <code>Simulate Ligation Products</code> with byproducts enabled.</li>
-        <li>Inspect pathway graph and prioritize highest probability, in-frame product.</li>
-      </ol>
-      <div class="figure narrow">
-        <img src="assets/06_ligation_products.svg" alt="Ligation graph (SVG)" />
-        <p class="caption">Figure C: Ligation graph as vector SVG; no blur when scaled in PDF.</p>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>5) Case D: P0 Interop and AB1 Trace Operations</h2>
-      <h3>D1. DNA Container Roundtrip</h3>
-      <ol>
-        <li>Export current record via <code>Export DNA Container</code>.</li>
-        <li>Re-import via <code>Import DNA Container</code>.</li>
-        <li>Verify name/topology/length/features are preserved.</li>
-      </ol>
-      <h3>D2. AB1 Trace Routine</h3>
-      <ol>
-        <li>Import AB1 payload (or use synthetic seed sequence from dataset).</li>
-        <li>Run <code>Trace Summary</code>, then <code>Trace Align</code> to EGFP reference.</li>
-        <li>Edit one low-confidence base and regenerate <code>Trace Consensus</code>.</li>
-      </ol>
-      <div class="caution">
-        <b>Interop boundary:</b> Genome Forge DNA container is robust.
-        Native proprietary SnapGene binary parsing remains limited in this release.
-      </div>
-    </section>
-
     <section class="section break">
-      <h2>6) Case E: P1 CRISPR and HDR Workflow</h2>
-      <ol>
-        <li>Load BRAF exon 15 fragment from dataset.</li>
-        <li>Run <code>gRNA Design</code> with PAM <code>NGG</code>, spacer length <code>20</code>.</li>
-        <li>Select top guide and run <code>CRISPR Off-target</code> across background panel.</li>
-        <li>Configure edit coordinates and run <code>Design HDR Donor</code>.</li>
-      </ol>
-      <div class="note">
-        Capture: selected guide, off-target risk score, donor length, and PAM disruption suggestions for review package.
+      <h2>7) Cluster F: Collaboration, Audit, and Review Governance (Case L)</h2>
+      <div class="bio">
+        <b>Biological meaning</b><br />
+        <b>Why this task exists:</b> Biological conclusions are high-impact and must be reproducible.
+        Governance layers provide provenance similar to software change-control in regulated environments.<br />
+        <b>Detailed input data:</b> workspace user graph (owner/editor/reviewer), permission matrix,
+        project snapshots, structured diff records, and audit events (timestamp, actor, action, object).<br />
+        <b>What we can infer:</b> a signed review chain with complete audit history supports trust, reproducibility, and compliance requirements.
       </div>
-    </section>
-
-    <section class="section">
-      <h2>7) Case F: P2 Collaboration, Audit, and Approval</h2>
       <ol>
-        <li>Create workspace with owner, editor, reviewer from dataset actors.</li>
-        <li>Assign reviewer role through <code>Set Permission</code>.</li>
-        <li>Save project snapshot and query <code>Get Audit Log</code>.</li>
-        <li>Use <code>Project Diff</code> for current vs baseline comparison.</li>
-        <li>Run <code>Submit Review</code> and <code>Approve Review</code>.</li>
+        <li>Create workspace with owner/editor/reviewer.</li>
+        <li>Assign reviewer role with <code>Set Permission</code>.</li>
+        <li>Save project and retrieve audit log entries.</li>
+        <li>Run project diff against baseline snapshot.</li>
+        <li>Submit and approve review; capture review ID.</li>
       </ol>
       <div class="figure narrow">
-        <img src="assets/04_history_graph.svg" alt="History graph (SVG)" />
-        <p class="caption">Figure D: version history context for review and change validation.</p>
+        <img src="assets/04_history_graph.svg" alt="History graph SVG" />
+        <p class="caption">History graph supports review context and change chronology.</p>
       </div>
     </section>
 
     <section class="section">
-      <h2>8) Capstone Exercise (All Features)</h2>
-      <p>Objective: deliver a review-approved cloning package with evidence trail.</p>
+      <h2>8) Cluster G: Advanced Sequence QA and Expression Engineering (Cases M-T)</h2>
+      <article class="case">
+        <h3>Case M: ORF Scan and Coding Potential Triage</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Before expression experiments, we need to know whether a sequence contains plausible protein-coding intervals.<br />
+          <b>Detailed input data:</b> linear DNA record, genetic code table, minimum ORF length threshold, start/stop codon sets,
+          and strand/frame options (three frames per strand).<br />
+          <b>What we can infer:</b> long uninterrupted ORFs suggest coding potential; early stop-rich frames suggest non-coding or fragmented sequence.
+        </div>
+        <ol>
+          <li>Run ORF scan across both strands.</li>
+          <li>Filter candidates by length and frame consistency.</li>
+          <li>Annotate top ORFs for downstream primer and expression planning.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case N: GC Landscape and Repeat Fragility Analysis</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Extreme GC regions and repeats can reduce PCR robustness and complicate cloning/sequencing.<br />
+          <b>Detailed input data:</b> sequence record, sliding-window size, GC thresholds, and repeat motif definitions (direct/inverted repeats).<br />
+          <b>What we can infer:</b> hotspots with very high/low GC or dense repeats identify regions needing modified primers or adjusted PCR chemistry.
+        </div>
+        <ol>
+          <li>Compute GC% in sliding windows.</li>
+          <li>Run repeat scanner for direct and inverted motifs.</li>
+          <li>Flag unstable intervals in the project notes.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case O: Homopolymer and Low-Complexity Risk Detection</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Long single-base runs and low-complexity tracts are error-prone in synthesis and sequencing.<br />
+          <b>Detailed input data:</b> sequence record, homopolymer run threshold, complexity metric parameters (for example entropy or k-mer diversity).<br />
+          <b>What we can infer:</b> identified low-complexity spans indicate potential slippage/artifact zones that should be avoided for assay anchors.
+        </div>
+        <ol>
+          <li>Run homopolymer detection at multiple thresholds.</li>
+          <li>Compute local complexity score along sequence.</li>
+          <li>Blacklist risky spans for primer/gRNA placement.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case P: Variant Annotation from Reference-Aligned Edits</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Sequence edits are only meaningful when mapped to a reference and interpreted at nucleotide and protein layers.<br />
+          <b>Detailed input data:</b> reference sequence with features, edited sequence, alignment settings, CDS boundaries, and codon table.<br />
+          <b>What we can infer:</b> each mismatch/indel can be labeled as synonymous, missense, nonsense, or frameshift with likely functional consequence.
+        </div>
+        <ol>
+          <li>Align edited sequence to reference.</li>
+          <li>Export structured variant list with coordinates.</li>
+          <li>Annotate protein-level consequence for coding regions.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case Q: Multiplex PCR Panel Balancing</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Multiplex PCR runs many primer pairs in one reaction, so cross-interference must be minimized.<br />
+          <b>Detailed input data:</b> primer pool candidates, pairwise dimer matrix, Tm spread constraints, amplicon size spacing, and background panel.<br />
+          <b>What we can infer:</b> balanced panels show limited cross-dimer risk, compatible Tm ranges, and clearly separable predicted bands.
+        </div>
+        <ol>
+          <li>Generate pairwise interaction matrix for all primers.</li>
+          <li>Select subset with minimal aggregate conflict score.</li>
+          <li>Validate panel using virtual multiplex PCR and gel simulation.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case R: Promoter and RBS Context for Expression Tuning</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Expression level depends on regulatory context, not only coding sequence identity.<br />
+          <b>Detailed input data:</b> annotated promoter region, RBS motif candidates, spacer lengths to start codon, and strand orientation metadata.<br />
+          <b>What we can infer:</b> suboptimal motif/spacing patterns explain weak expression and guide redesign of upstream regulatory architecture.
+        </div>
+        <ol>
+          <li>Inspect promoter and RBS annotations on sequence track.</li>
+          <li>Measure spacing from regulatory motifs to CDS start.</li>
+          <li>Generate alternative architecture notes for higher expression consistency.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case S: Circular Construct Integrity and Junction Validation</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Circular plasmids require seamless junctions; one incorrect boundary can invalidate the entire construct.<br />
+          <b>Detailed input data:</b> circular assembled sequence, expected junction signatures, feature boundary list, and restriction-validation panel.<br />
+          <b>What we can infer:</b> confirmed junction motifs and expected digest signatures indicate correct assembly topology and orientation.
+        </div>
+        <ol>
+          <li>Validate all declared junction sequences.</li>
+          <li>Cross-check orientation-sensitive features.</li>
+          <li>Run confirmatory in-silico digest against expected pattern.</li>
+        </ol>
+      </article>
+
+      <article class="case">
+        <h3>Case T: Batch Workflow Reproducibility and Parameter Locking</h3>
+        <div class="bio">
+          <b>Biological meaning</b><br />
+          <b>Why this task exists:</b> Reproducible biology requires deterministic reruns over many sequences with fixed parameters.<br />
+          <b>Detailed input data:</b> batch record list, pinned algorithm parameters, software version metadata, and expected-output schema.<br />
+          <b>What we can infer:</b> identical outputs across reruns indicate stable pipeline behavior; drift highlights hidden state or version mismatch.
+        </div>
+        <ol>
+          <li>Create batch job using fixed parameter profile.</li>
+          <li>Run across all training records and collect outputs.</li>
+          <li>Compare with baseline report and record any drift.</li>
+        </ol>
+      </article>
+    </section>
+
+    <section class="section">
+      <h2>9) Capstone: End-to-End Bench Planning Scenario</h2>
+      <p>
+        Build a reviewer-approved cloning and validation package for EGFP insertion with CRISPR edit support.
+      </p>
+      <div class="bio">
+        <b>Biological meaning for non-biologists</b><br />
+        This capstone combines all pipeline stages into a single decision artifact: can we design, build, verify, and document a DNA edit
+        with enough confidence to run it in the lab? Input data combines sequence records, enzyme metadata, primer and CRISPR settings,
+        trace evidence, and collaboration logs. The final package is useful because it converts raw molecular data into traceable engineering decisions.
+      </div>
       <ol>
-        <li>Map + digest + track inspection for chosen construct.</li>
-        <li>Primer generation + specificity ranking + PCR lane prediction.</li>
-        <li>Assembly/ligation pathway selection.</li>
-        <li>DNA container export/import verification.</li>
-        <li>Trace align/edit/consensus check.</li>
-        <li>CRISPR candidate + off-target + HDR donor design.</li>
-        <li>Save project, assign reviewer, submit and approve review.</li>
-        <li>Create share bundle and archive artifact IDs.</li>
+        <li>Map + digest + methylation/star-risk review.</li>
+        <li>Primer design + specificity ranking + PCR/gel simulation.</li>
+        <li>Assembly/ligation product prioritization.</li>
+        <li>DNA container export/import and trace consensus validation.</li>
+        <li>CRISPR guide + off-target + HDR donor proposal.</li>
+        <li>Project diff + audit log + review approval.</li>
       </ol>
       <pre>python3 smoke_test.py
 python3 real_world_functional_test.py</pre>
       <div class="tip">
-        <b>Completion Gate:</b> include smoke/real-world summaries, chosen primer pair, selected guide,
-        donor template metadata, project diff summary, and review approval record.
+        <b>Completion package:</b> include selected primer pair, selected guide, donor sequence, ligation top-product rationale,
+        audit-log excerpt, diff summary, and review approval event.
       </div>
     </section>
 
     <section class="section">
-      <h2>9) Illustration Quality Policy</h2>
+      <h2>10) Illustration Quality and Anti-Blur Policy</h2>
       <ul>
-        <li>All tutorial figures are linked to SVG assets for vector fidelity.</li>
-        <li>No upscaling beyond source viewport bounds (<code>max-width</code> constrained).</li>
-        <li>PDF generated via WeasyPrint with native SVG rendering to avoid blur.</li>
+        <li>All tutorial figures are sourced from SVG assets (<code>assets/*.svg</code>).</li>
+        <li>Figure width is constrained to avoid raster upscaling artifacts.</li>
+        <li>PDF generation uses native SVG rendering through WeasyPrint.</li>
       </ul>
-      <div class="figure narrow">
-        <img src="assets/03_msa_heatmap.svg" alt="MSA heatmap (SVG)" />
-        <p class="caption">Figure E: heatmap included as SVG to preserve line/text sharpness in print.</p>
-      </div>
-      <div class="figure narrow">
-        <img src="assets/05_star_activity.svg" alt="Star activity (SVG)" />
-        <p class="caption">Figure F: star activity view in vector source for non-blurry export.</p>
+      <div class="note">
+        If replacing figures, prefer SVG export from the app; only use PNG when no vector source is available.
       </div>
     </section>
 
+    <section class="section">
+      <h2>11) Quick Glossary for CS Readers</h2>
+      <table>
+        <thead>
+          <tr><th>Term</th><th>Plain Meaning</th><th>Computing Analogy</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Gene/CDS</td><td>DNA interval that encodes a protein</td><td>Function body compiled into executable behavior</td></tr>
+          <tr><td>Codon</td><td>3-base token mapped to one amino acid</td><td>Fixed-width instruction token</td></tr>
+          <tr><td>Plasmid</td><td>Circular DNA carrier used in cloning</td><td>Deployable package/container image</td></tr>
+          <tr><td>Restriction enzyme</td><td>Protein that cuts DNA at motif</td><td>Deterministic parser + split operator</td></tr>
+          <tr><td>PCR primer</td><td>Short sequence that seeds amplification</td><td>Indexed query string for targeted retrieval</td></tr>
+          <tr><td>Off-target</td><td>Unintended match outside desired locus</td><td>False positive pattern match</td></tr>
+          <tr><td>PAM</td><td>Short motif required for Cas binding</td><td>Required guard token before operation</td></tr>
+          <tr><td>HDR donor</td><td>Template used for precise repair edit</td><td>Patch payload with context lines</td></tr>
+          <tr><td>Sanger trace</td><td>Raw fluorescence signal for base calls</td><td>Noisy sensor stream before decoding</td></tr>
+          <tr><td>Homology arm</td><td>Flanking sequence matching target</td><td>Context anchors for safe patch apply</td></tr>
+        </tbody>
+      </table>
+    </section>
+
     <section class="footer">
-      <p>Document: Genome Forge Professional Training Manual (v0.1.0)</p>
+      <p>Document: Genome Forge Extended Professional Training Manual (v0.1.0)</p>
       <p>Dataset bundle: <code>docs/tutorial/datasets/</code></p>
     </section>
   </main>

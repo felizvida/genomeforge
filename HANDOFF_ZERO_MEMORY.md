@@ -4,24 +4,24 @@ This document is designed so a new engineer can resume work with no prior contex
 
 ## 1. What This Project Is
 
-Genome Forge is a local SnapGene-like DNA/plasmid workbench implemented as:
+Genome Forge is a local DNA/plasmid workbench implemented as:
 
-- `snapgene_like.py`: core sequence engine + CLI utilities
+- `genomeforge_toolkit.py`: core sequence engine + CLI utilities
 - `web_ui.py`: HTTP server exposing JSON APIs and serving web UI
 - `webui/index.html`: single-page frontend
 - `smoke_test.py`: extensive automated regression test suite
 
-Current state: broad feature-complete implementation with all coverage rows marked `Implemented` in `SNAPGENE_FEATURE_COVERAGE.md`.
+Current state: broad feature-complete implementation with all coverage rows marked `Implemented` in `FEATURE_COVERAGE.md`.
 
 ## 2. Current Repo State
 
 Key files:
 
-- `/Users/liux17/Documents/Playground/snapgene_like.py`
+- `/Users/liux17/Documents/Playground/genomeforge_toolkit.py`
 - `/Users/liux17/Documents/Playground/web_ui.py`
 - `/Users/liux17/Documents/Playground/webui/index.html`
 - `/Users/liux17/Documents/Playground/README.md`
-- `/Users/liux17/Documents/Playground/SNAPGENE_FEATURE_COVERAGE.md`
+- `/Users/liux17/Documents/Playground/FEATURE_COVERAGE.md`
 - `/Users/liux17/Documents/Playground/smoke_test.py`
 
 Git:
@@ -80,7 +80,7 @@ Expected regression output shape:
   - EMBL
   - raw sequence
 
-### 4.2 Core Sequence Engine (`snapgene_like.py`)
+### 4.2 Core Sequence Engine (`genomeforge_toolkit.py`)
 
 - Sequence parsing/sanitization
 - restriction digest
@@ -245,7 +245,7 @@ Star activity:
 ### 8.1 Fast sanity checks
 
 ```bash
-python3 -m py_compile web_ui.py snapgene_like.py
+python3 -m py_compile web_ui.py genomeforge_toolkit.py
 python3 smoke_test.py
 ```
 
@@ -290,7 +290,7 @@ Potential high-value follow-ups:
 When resuming later:
 
 1. `git pull`
-2. `python3 -m py_compile web_ui.py snapgene_like.py`
+2. `python3 -m py_compile web_ui.py genomeforge_toolkit.py`
 3. `python3 smoke_test.py`
 4. `python3 web_ui.py --port 8080`
 5. Open UI and validate:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-A SnapGene-inspired DNA utility CLI.
+A Genome Forge DNA utility CLI.
 
 Implemented feature set:
 - Parse FASTA and a subset of GenBank (LOCUS/FEATURES/ORIGIN)
@@ -842,7 +842,7 @@ def cmd_features(record: SequenceRecord) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description="SnapGene-inspired DNA sequence toolkit")
+    p = argparse.ArgumentParser(description="Genome Forge DNA sequence toolkit")
     p.add_argument("input", help="Input sequence file (.fasta/.fa/.gb/.gbk)")
 
     sp = p.add_subparsers(dest="command", required=True)
