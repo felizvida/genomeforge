@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import shutil
 import subprocess
@@ -134,6 +135,33 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
         assert p["target_format"] == "payload" and isinstance(p["payload"], dict)
 
     r.check("api_convert_record_roundtrip", _convert_record_roundtrip)
+
+    def _dna_export_import() -> None:
+        ex = r.post("/api/export-dna", base_payload)[1]
+        blob = ex["dna_base64"]
+        imp = r.post("/api/import-dna", {"dna_base64": blob})[1]
+        assert imp["length"] == len(seq)
+        assert imp["topology"] == "circular"
+        canonical = imp["canonical_record"]
+        jblob = base64.b64encode(json.dumps({"canonical_record": canonical}).encode("utf-8")).decode("ascii")
+        imp2 = r.post("/api/import-dna", {"dna_base64": jblob})[1]
+        assert imp2["length"] == len(seq)
+
+    r.check("api_dna_export_import", _dna_export_import)
+
+    def _trace_suite() -> None:
+        t = r.post("/api/import-ab1", {"sequence": seq})[1]["trace_record"]
+        tid = t["trace_id"]
+        s = r.post("/api/trace-summary", {"trace_id": tid})[1]["summary"]
+        assert s["length"] == len(seq)
+        a = r.post("/api/trace-align", {"trace_id": tid, "reference_sequence": seq})[1]
+        assert "identity_pct" in a
+        e = r.post("/api/trace-edit-base", {"trace_id": tid, "position_1based": 1, "new_base": "T", "quality": 40})[1]
+        assert e["trace_record"]["sequence"].startswith("T")
+        c = r.post("/api/trace-consensus", {"trace_id": tid, "min_quality": 20})[1]
+        assert c["length"] == len(seq)
+
+    r.check("api_trace_suite", _trace_suite)
 
     def _primers() -> None:
         d = r.post("/api/primers", {**base_payload, "target_start": 12, "target_end": 48, "window": 80})[1]

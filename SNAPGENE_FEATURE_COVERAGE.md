@@ -35,7 +35,7 @@ Legend:
 - Star activity analysis: `Implemented` (off-target star-cut scan + optional star-inclusive digest fragments + risk visualization)
 
 ## Convert File Formats
-- Multiple proprietary formats: `Implemented` (portable local share-bundle format with viewer pages)
+- Multiple proprietary formats: `Partial` (Genome Forge DNA container export/import implemented; native proprietary SnapGene binary `.dna` parsing remains limited)
 - FASTA + GenBank import/export: `Implemented`
 
 ## Agarose Gel Simulation

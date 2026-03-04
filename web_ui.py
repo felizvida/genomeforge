@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 from datetime import datetime, timezone
 from http import HTTPStatus
@@ -19,6 +20,9 @@ from canonical_schema import (
     infer_source_format,
     record_to_canonical,
 )
+from bio.trace_tools import align_trace_to_reference, edit_trace_base, trace_consensus, trace_summary
+from compat.ab1_format import parse_ab1_bytes, synthetic_trace_from_sequence
+from compat.dna_format import export_dna_container, import_dna_container
 from snapgene_like import (
     CODON_TABLE,
     ENZYMES,
@@ -46,6 +50,7 @@ ANNOT_DB_DIR = ROOT / "annotation_db"
 ENZYME_SET_DIR = ROOT / "enzyme_sets"
 COLLECTIONS_DIR = ROOT / "collections"
 SHARES_DIR = ROOT / "shares"
+TRACE_CACHE: Dict[str, Dict[str, Any]] = {}
 
 
 AA_TO_CODONS: Dict[str, List[str]] = {}
@@ -199,6 +204,41 @@ def parse_record(payload: Dict[str, Any]) -> SequenceRecord:
             )
         record.features = feats
     return record
+
+
+def _decode_b64_field(value: str, label: str) -> bytes:
+    if not value:
+        raise ValueError(f"{label} is required")
+    try:
+        return base64.b64decode(value.encode("ascii"), validate=True)
+    except Exception as e:  # noqa: BLE001
+        raise ValueError(f"{label} must be valid base64: {e}") from e
+
+
+def _encode_b64(data: bytes) -> str:
+    return base64.b64encode(data).decode("ascii")
+
+
+def _cache_trace(trace_record: Dict[str, Any]) -> Dict[str, Any]:
+    tid = str(trace_record.get("trace_id", "")).strip()
+    if not tid:
+        tid = "trace_" + uuid.uuid4().hex[:12]
+        trace_record["trace_id"] = tid
+    TRACE_CACHE[tid] = trace_record
+    # Keep cache bounded for local runtime.
+    if len(TRACE_CACHE) > 32:
+        for old in list(TRACE_CACHE.keys())[: len(TRACE_CACHE) - 32]:
+            TRACE_CACHE.pop(old, None)
+    return trace_record
+
+
+def _resolve_trace(payload: Dict[str, Any]) -> Dict[str, Any]:
+    if isinstance(payload.get("trace_record"), dict):
+        return dict(payload["trace_record"])
+    trace_id = str(payload.get("trace_id", "")).strip()
+    if trace_id and trace_id in TRACE_CACHE:
+        return dict(TRACE_CACHE[trace_id])
+    raise ValueError("trace_record or known trace_id is required")
 
 
 def parse_plain_sequence(seq: str) -> str:
@@ -2505,6 +2545,102 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json({"target_format": "canonical", "canonical_record": canon})
                 else:
                     raise ValueError("Unsupported target_format. Use fasta|genbank|payload|canonical")
+            elif self.path == "/api/import-dna":
+                raw = _decode_b64_field(str(payload.get("dna_base64", "")).strip(), "dna_base64")
+                imported = import_dna_container(raw)
+                if isinstance(imported.get("canonical_record"), dict):
+                    canon = imported["canonical_record"]
+                    rec = canonical_to_record(canon)
+                    doc_payload = canonical_to_payload(canon)
+                elif isinstance(imported.get("payload"), dict):
+                    doc_payload = imported["payload"]
+                    rec = parse_record(doc_payload)
+                    canon = record_to_canonical(
+                        rec,
+                        source_format=infer_source_format(str(doc_payload.get("content", ""))),
+                        source_id=str(doc_payload.get("record_id", "")).strip(),
+                    )
+                else:
+                    raise ValueError("DNA import did not produce canonical or payload record")
+                self._send_json(
+                    {
+                        "source": imported.get("source", "unknown"),
+                        "name": rec.name,
+                        "length": rec.length,
+                        "topology": rec.topology,
+                        "payload": doc_payload,
+                        "canonical_record": canon,
+                    }
+                )
+            elif self.path == "/api/export-dna":
+                if isinstance(payload.get("canonical_record"), dict):
+                    rec = canonical_to_record(payload["canonical_record"])
+                    canon = payload["canonical_record"]
+                else:
+                    rec = get_record()
+                    canon = record_to_canonical(
+                        rec,
+                        source_format=infer_source_format(str(payload.get("content", ""))),
+                        source_id=str(payload.get("record_id", "")).strip(),
+                    )
+                blob = export_dna_container(
+                    canon,
+                    metadata={
+                        "name": rec.name,
+                        "topology": rec.topology,
+                        "created_by": "genomeforge",
+                    },
+                )
+                self._send_json(
+                    {
+                        "format": "genomeforge.dna/1",
+                        "name": rec.name,
+                        "length": rec.length,
+                        "dna_base64": _encode_b64(blob),
+                        "bytes": len(blob),
+                    }
+                )
+            elif self.path == "/api/import-ab1":
+                if str(payload.get("ab1_base64", "")).strip():
+                    raw = _decode_b64_field(str(payload.get("ab1_base64", "")).strip(), "ab1_base64")
+                    tr = parse_ab1_bytes(raw)
+                elif str(payload.get("sequence", "")).strip():
+                    tr = synthetic_trace_from_sequence(str(payload.get("sequence", "")))
+                else:
+                    raise ValueError("ab1_base64 or sequence is required")
+                tr = _cache_trace(tr)
+                self._send_json({"trace_record": tr, "summary": trace_summary(tr)})
+            elif self.path == "/api/trace-summary":
+                tr = _resolve_trace(payload)
+                tr = _cache_trace(tr)
+                self._send_json({"trace_record": tr, "summary": trace_summary(tr)})
+            elif self.path == "/api/trace-align":
+                tr = _resolve_trace(payload)
+                ref = str(payload.get("reference_sequence", payload.get("reference", "")))
+                if not ref.strip():
+                    raise ValueError("reference_sequence is required")
+                out = align_trace_to_reference(tr, ref)
+                tr = _cache_trace(tr)
+                self._send_json({"trace_id": tr.get("trace_id"), **out})
+            elif self.path == "/api/trace-edit-base":
+                tr = _resolve_trace(payload)
+                edited = edit_trace_base(
+                    tr,
+                    position_1based=int(payload.get("position_1based", 1)),
+                    new_base=str(payload.get("new_base", "N")),
+                    quality=(int(payload["quality"]) if "quality" in payload and payload.get("quality") is not None else None),
+                )
+                edited = _cache_trace(edited)
+                self._send_json({"trace_record": edited, "summary": trace_summary(edited)})
+            elif self.path == "/api/trace-consensus":
+                tr = _resolve_trace(payload)
+                tr = _cache_trace(tr)
+                self._send_json(
+                    {
+                        "trace_id": tr.get("trace_id"),
+                        **trace_consensus(tr, min_quality=int(payload.get("min_quality", 20))),
+                    }
+                )
             elif self.path == "/api/info":
                 rec = get_record()
                 self._send_json(

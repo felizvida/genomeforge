@@ -253,6 +253,31 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
 
     r.check("convert_record_roundtrip", "Roundtrip canonical -> FASTA/GenBank/payload", _convert_record)
     r.check(
+        "dna_export_import",
+        "Export and import Genome Forge DNA container",
+        lambda: r.post(
+            "/api/import-dna",
+            {"dna_base64": r.post("/api/export-dna", egfp_payload)["dna_base64"]},
+        ),
+    )
+    r.check(
+        "trace_import_align_consensus",
+        "Synthetic trace import + align + consensus pipeline",
+        lambda: (
+            lambda imp: (
+                r.post("/api/trace-summary", {"trace_id": imp["trace_record"]["trace_id"]}),
+                r.post(
+                    "/api/trace-align",
+                    {
+                        "trace_id": imp["trace_record"]["trace_id"],
+                        "reference_sequence": EGFP_CDS,
+                    },
+                ),
+                r.post("/api/trace-consensus", {"trace_id": imp["trace_record"]["trace_id"], "min_quality": 20}),
+            )[-1]
+        )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
+    )
+    r.check(
         "search_entities",
         "Search across features, enzymes, and primer hits",
         lambda: r.post("/api/search-entities", {**egfp_payload, "query": "gfp", "primers": f"{r.ctx['fwd']},{r.ctx['rev']}"}),

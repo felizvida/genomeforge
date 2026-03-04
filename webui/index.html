@@ -497,6 +497,7 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
         <button class="tab" data-tab="tab-primers">Primers/PCR</button>
         <button class="tab" data-tab="tab-search">ORF/Motif</button>
         <button class="tab" data-tab="tab-edit">Edit</button>
+        <button class="tab" data-tab="tab-trace">Trace/Interop</button>
         <button class="tab" data-tab="tab-advanced">Advanced</button>
       </div>
 
@@ -590,6 +591,35 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
         <div class="row">
           <button onclick="previewEdit()">Preview Edit</button>
           <button class="hot" onclick="applyEditToBuffer()">Apply Edit</button>
+        </div>
+      </div>
+
+      <div id="tab-trace" class="tabpane">
+        <label>AB1 Base64 Input</label>
+        <textarea id="ab1Base64" placeholder="Paste base64 AB1 payload"></textarea>
+        <div class="row">
+          <button onclick="runImportAb1()">Import AB1</button>
+          <button onclick="runTraceSummary()">Trace Summary</button>
+        </div>
+        <label>Trace ID</label>
+        <input id="traceId" value="" placeholder="trace id from import" />
+        <label>Reference Sequence For Trace Alignment</label>
+        <textarea id="traceReference">ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTGGTCGAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGC</textarea>
+        <div class="row">
+          <button onclick="runTraceAlign()">Trace Align</button>
+          <button onclick="runTraceConsensus()">Trace Consensus</button>
+        </div>
+        <div class="row3">
+          <input id="traceEditPos" type="number" value="1" />
+          <input id="traceEditBase" value="A" />
+          <input id="traceEditQual" type="number" value="35" />
+        </div>
+        <button onclick="runTraceEditBase()">Edit Trace Base</button>
+        <label>DNA Container (base64)</label>
+        <textarea id="dnaBlob" placeholder="DNA container base64"></textarea>
+        <div class="row">
+          <button onclick="runImportDna()">Import DNA Container</button>
+          <button onclick="runExportDna()">Export DNA Container</button>
         </div>
       </div>
 
@@ -1589,6 +1619,80 @@ TTTCCCGGGAAATTT</textarea>
         show(await callApi('/api/convert-record', payload({
           target_format: document.getElementById('canonicalTargetFormat').value,
         })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runImportDna() {
+      try {
+        const r = await callApi('/api/import-dna', {
+          dna_base64: document.getElementById('dnaBlob').value.trim(),
+        });
+        if (r.payload) {
+          document.getElementById('name').value = r.payload.name || document.getElementById('name').value;
+          document.getElementById('topology').value = r.payload.topology || document.getElementById('topology').value;
+          document.getElementById('content').value = r.payload.content || document.getElementById('content').value;
+          featureState = Array.isArray(r.payload.features) ? r.payload.features : featureState;
+          pushHistory(getContentValue());
+          runInfo();
+        }
+        show({ source: r.source, name: r.name, length: r.length, topology: r.topology, imported: true });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runExportDna() {
+      try {
+        const r = await callApi('/api/export-dna', payload({}));
+        document.getElementById('dnaBlob').value = r.dna_base64 || '';
+        show({ format: r.format, name: r.name, length: r.length, bytes: r.bytes, exported: true });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runImportAb1() {
+      try {
+        const ab1b64 = document.getElementById('ab1Base64').value.trim();
+        const r = await callApi('/api/import-ab1', ab1b64 ? { ab1_base64: ab1b64 } : {
+          sequence: plainSeq(document.getElementById('traceReference').value),
+        });
+        document.getElementById('traceId').value = r.trace_record?.trace_id || '';
+        setInspectorText(
+          `Trace imported\nTrace ID: ${r.trace_record?.trace_id || '-'}\n` +
+          `Length: ${r.summary?.length || 0}\nQmean: ${r.summary?.quality_mean || 0}`
+        );
+        show(r.summary || r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTraceSummary() {
+      try {
+        const trace_id = document.getElementById('traceId').value.trim();
+        show(await callApi('/api/trace-summary', { trace_id }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTraceAlign() {
+      try {
+        const trace_id = document.getElementById('traceId').value.trim();
+        const reference_sequence = document.getElementById('traceReference').value;
+        show(await callApi('/api/trace-align', { trace_id, reference_sequence }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTraceEditBase() {
+      try {
+        const trace_id = document.getElementById('traceId').value.trim();
+        show(await callApi('/api/trace-edit-base', {
+          trace_id,
+          position_1based: Number(document.getElementById('traceEditPos').value),
+          new_base: document.getElementById('traceEditBase').value,
+          quality: Number(document.getElementById('traceEditQual').value),
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTraceConsensus() {
+      try {
+        const trace_id = document.getElementById('traceId').value.trim();
+        show(await callApi('/api/trace-consensus', { trace_id, min_quality: 20 }));
       } catch (e) { show(String(e)); }
     }
 

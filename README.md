@@ -50,6 +50,7 @@ Training materials:
 - HTML tutorial: `docs/tutorial/user_training_tutorial.html`
 - PDF tutorial: `docs/tutorial/user_training_tutorial.pdf`
 - 12-sprint implementation plan: `docs/SPRINT_PLAN_12W.md`
+- P0 implementation notes: `docs/P0_IMPLEMENTATION_NOTES.md`
 
 The UI supports:
 - Sequence info and translation
@@ -104,6 +105,8 @@ The UI supports:
 - Interactive ligation pathway graph (substrate-to-product flow with probability-weighted edges and clickable product diagnostics)
 - Interactive star-activity risk visualization (enzyme burden ranking + off-target summary cards)
 - Canonical schema normalization and converter endpoints (`/api/canonicalize-record`, `/api/convert-record`)
+- Genome Forge DNA container export/import (`/api/export-dna`, `/api/import-dna`)
+- AB1 trace workflow foundation: import/summarize/align/edit/consensus (`/api/import-ab1`, `/api/trace-summary`, `/api/trace-align`, `/api/trace-edit-base`, `/api/trace-consensus`)
 - Project persistence (save/load/list/delete)
 - Project collections (save/load/list/delete + add project)
 - Local share bundles (create/load portable JSON snapshots)
