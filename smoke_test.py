@@ -83,6 +83,7 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r.created["collection"] = f"t_col_{suffix}"
     r.created["annot_db"] = f"t_db_{suffix}"
     r.created["enzyme_set"] = f"t_set_{suffix}"
+    r.created["reference_db"] = f"t_ref_{suffix}"
 
     seq = "GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA"
     base_payload = {
@@ -208,8 +209,29 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
         assert e["trace_record"]["sequence"].startswith("T")
         c = r.post("/api/trace-consensus", {"trace_id": tid, "min_quality": 20})[1]
         assert c["length"] == len(seq)
+        v = r.post("/api/trace-chromatogram-svg", {"trace_id": tid, "start": 1, "end": 50})[1]
+        assert "<svg" in v["svg"]
+        z = r.post(
+            "/api/trace-verify",
+            {
+                "trace_id": tid,
+                "reference_sequence": seq,
+                "genotype_positions": [1, 10, 20],
+                "expected_bases": {"1": "T", "10": seq[9], "20": seq[19]},
+            },
+        )[1]
+        assert z["verdict"] in {"PASS", "FAIL"}
+        assert z["genotype_call_count"] >= 1
 
     r.check("api_trace_suite", _trace_suite)
+    r.check(
+        "api_blast_search",
+        lambda: "hits"
+        in r.post(
+            "/api/blast-search",
+            {"query_sequence": seq[:60], "database_sequences": [{"name": "self", "sequence": seq}, {"name": "other", "sequence": seq[::-1]}]},
+        )[1],
+    )
 
     def _primers() -> None:
         d = r.post("/api/primers", {**base_payload, "target_start": 12, "target_end": 48, "window": 80})[1]
@@ -306,6 +328,31 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r.check(
         "api_annot_db_apply",
         lambda: "annotations" in r.post("/api/annot-db-apply", {**base_payload, "db_name": r.created["annot_db"]})[1],
+    )
+    r.check(
+        "api_reference_db_save",
+        lambda: r.post(
+            "/api/reference-db-save",
+            {
+                "db_name": r.created["reference_db"],
+                "elements": [{"label": "demo", "type": "gene", "sequence": "ATGGCCATTGTAATGGG"}],
+            },
+        )[1].get("saved")
+        is True,
+    )
+    r.check("api_reference_db_list", lambda: "databases" in r.post("/api/reference-db-list", {})[1])
+    r.check("api_reference_db_load", lambda: "elements" in r.post("/api/reference-db-load", {"db_name": r.created["reference_db"]})[1])
+    r.check(
+        "api_reference_scan",
+        lambda: "hits" in r.post("/api/reference-scan", {**base_payload, "db_name": r.created["reference_db"], "add_features": True})[1],
+    )
+    r.check(
+        "api_sirna_design",
+        lambda: "candidates" in r.post("/api/sirna-design", {**base_payload, "min_len": 19, "max_len": 21, "top_n": 10})[1],
+    )
+    r.check(
+        "api_sirna_map",
+        lambda: "hits" in r.post("/api/sirna-map", {**base_payload, "sirna_sequence": "AUGGCCAUUGUAAUGGGCC"})[1],
     )
     r.check("api_features_list", lambda: "features" in r.post("/api/features-list", base_payload)[1])
     r.check(
@@ -558,7 +605,7 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
 
 
 def cleanup_artifacts() -> None:
-    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "collab_data"]:
+    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "collab_data", "reference_db"]:
         p = ROOT / d
         if p.exists():
             shutil.rmtree(p)

@@ -1,7 +1,7 @@
 {
   "summary": {
-    "total_steps": 86,
-    "passed": 86,
+    "total_steps": 97,
+    "passed": 97,
     "failed": 0,
     "failures": []
   },
@@ -24,7 +24,7 @@
       "name": "info_mcherry",
       "objective": "Compute basic stats for mCherry CDS",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "name": "mCherry_CDS",
         "length": 711,
@@ -217,10 +217,68 @@
       "error": ""
     },
     {
+      "name": "sequence_analytics_svg",
+      "objective": "Render multi-track sequence analytics lens (GC/skew/complexity/stop-density)",
+      "status": "PASS",
+      "duration_ms": 1,
+      "details": {
+        "start_1based": 1,
+        "end_1based": 720,
+        "window": 120,
+        "step": 20,
+        "point_count": 31,
+        "gc_mean": 61.263,
+        "gc_min": 51.667,
+        "gc_max": 66.667,
+        "...": "+1 keys"
+      },
+      "error": ""
+    },
+    {
+      "name": "comparison_lens_svg",
+      "objective": "Render comparison lens for divergence hotspots between EGFP and mCherry segments",
+      "status": "PASS",
+      "duration_ms": 134,
+      "details": {
+        "alignment_length": 749,
+        "identity_pct": 58.61,
+        "window": 60,
+        "hotspots": [
+          {
+            "start_aln_1based": "<int>",
+            "end_aln_1based": "<int>",
+            "divergence": "<float>"
+          },
+          {
+            "start_aln_1based": "<int>",
+            "end_aln_1based": "<int>",
+            "divergence": "<float>"
+          },
+          {
+            "start_aln_1based": "<int>",
+            "end_aln_1based": "<int>",
+            "divergence": "<float>"
+          },
+          {
+            "start_aln_1based": "<int>",
+            "end_aln_1based": "<int>",
+            "divergence": "<float>"
+          },
+          {
+            "start_aln_1based": "<int>",
+            "end_aln_1based": "<int>",
+            "divergence": "<float>"
+          }
+        ],
+        "svg": "<2642 chars>"
+      },
+      "error": ""
+    },
+    {
       "name": "motif_search",
       "objective": "Find canonical EcoRI motif in pUC19 MCS",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "motif": "GAATTC",
         "count": 1,
@@ -234,7 +292,7 @@
       "name": "orf_scan",
       "objective": "Find ORFs in EGFP sequence",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "count": 1,
         "orfs": [
@@ -253,7 +311,7 @@
       "name": "primer_design",
       "objective": "Design primers for EGFP internal region",
       "status": "PASS",
-      "duration_ms": 156,
+      "duration_ms": 148,
       "details": {
         "forward_len": 25,
         "reverse_len": 25
@@ -449,7 +507,7 @@
       "details": {
         "canonical_record": {
           "schema": "1.0.0",
-          "created_at": "2026-03-04T17:20:20.323928+00:00",
+          "created_at": "2026-03-04T21:43:39.651185+00:00",
           "source_format": "fasta",
           "record_id": "8f16e92af26c6f40",
           "name": "EGFP_CDS",
@@ -463,12 +521,15 @@
     },
     {
       "name": "convert_record_roundtrip",
-      "objective": "Roundtrip canonical -> FASTA/GenBank/payload",
+      "objective": "Roundtrip canonical -> FASTA/GenBank/EMBL/JSON/DNA container/payload",
       "status": "PASS",
-      "duration_ms": 3,
+      "duration_ms": 5,
       "details": {
         "fasta_len": 741,
-        "genbank_len": 1185
+        "genbank_len": 1185,
+        "embl_len": 1127,
+        "json_len": 4635,
+        "dna_bytes": 693
       },
       "error": ""
     },
@@ -504,7 +565,7 @@
         },
         "canonical_record": {
           "schema": "1.0.0",
-          "created_at": "2026-03-04T17:20:20.327905+00:00",
+          "created_at": "2026-03-04T21:43:39.656902+00:00",
           "source_format": "fasta",
           "record_id": "8f16e92af26c6f40",
           "name": "EGFP_CDS",
@@ -520,13 +581,84 @@
       "name": "trace_import_align_consensus",
       "objective": "Synthetic trace import + align + consensus pipeline",
       "status": "PASS",
-      "duration_ms": 258,
+      "duration_ms": 241,
       "details": {
-        "trace_id": "trace_5af4fab25a90",
+        "trace_id": "trace_0624dcbb0663",
         "length": 720,
         "min_quality": 20,
         "low_quality_bases": 0,
         "consensus": "ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTGGTCGAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGCGAGGGCGATGCCACCTAC... <720 chars total>"
+      },
+      "error": ""
+    },
+    {
+      "name": "trace_chromatogram_svg",
+      "objective": "Render Sanger chromatogram SVG from synthetic trace",
+      "status": "PASS",
+      "duration_ms": 2,
+      "details": {
+        "trace_id": "trace_4648ebe2885b",
+        "start_1based": 1,
+        "end_1based": 240,
+        "points": 240,
+        "max_signal": 1200,
+        "svg": "<15358 chars>"
+      },
+      "error": ""
+    },
+    {
+      "name": "trace_verify_genotyping",
+      "objective": "Verify trace against reference and genotype selected loci",
+      "status": "PASS",
+      "duration_ms": 238,
+      "details": {
+        "trace_id": "trace_72315eca4c60",
+        "reference_length": 720,
+        "identity_pct": 100.0,
+        "mismatch_count": 0,
+        "min_quality": 20,
+        "consensus_low_quality_bases": 0,
+        "identity_threshold_pct": 97.0,
+        "max_mismatches": 10,
+        "...": "+3 keys"
+      },
+      "error": ""
+    },
+    {
+      "name": "blast_like_search",
+      "objective": "Run BLAST-like local similarity search across real sequence panel",
+      "status": "PASS",
+      "duration_ms": 81,
+      "details": {
+        "mode": "local_blast_like",
+        "query_length": 240,
+        "database_count": 3,
+        "kmer": 8,
+        "hit_count": 2,
+        "hits": [
+          {
+            "subject_name": "<str>",
+            "subject_length": "<int>",
+            "score": "<int>",
+            "bitscore_proxy": "<float>",
+            "evalue_proxy": "<float>",
+            "seed_jaccard": "<float>",
+            "identity_pct": "<float>",
+            "query_coverage_pct": "<float>",
+            "...": "+2 keys"
+          },
+          {
+            "subject_name": "<str>",
+            "subject_length": "<int>",
+            "score": "<int>",
+            "bitscore_proxy": "<float>",
+            "evalue_proxy": "<float>",
+            "seed_jaccard": "<float>",
+            "identity_pct": "<float>",
+            "query_coverage_pct": "<float>",
+            "...": "+2 keys"
+          }
+        ]
       },
       "error": ""
     },
@@ -633,7 +765,7 @@
       "name": "mutagenesis",
       "objective": "Apply mutagenesis edit in EGFP region",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "start": 40,
         "end": 45,
@@ -648,7 +780,7 @@
       "name": "pairwise_dna",
       "objective": "Run pairwise DNA alignment between EGFP and mCherry",
       "status": "PASS",
-      "duration_ms": 131,
+      "duration_ms": 126,
       "details": {
         "score": 62,
         "identity_pct": 58.61,
@@ -662,7 +794,7 @@
       "name": "pairwise_protein",
       "objective": "Run protein alignment between EGFP and mCherry",
       "status": "PASS",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "details": {
         "mode": "protein",
         "score": -52,
@@ -780,7 +912,7 @@
       "name": "multi_align_ref",
       "objective": "Reference-based multiple alignment of real CDS inputs",
       "status": "PASS",
-      "duration_ms": 184,
+      "duration_ms": 178,
       "details": {
         "reference_length": 720,
         "sequence_count": 3,
@@ -792,7 +924,7 @@
       "name": "msa_progressive",
       "objective": "Progressive MSA on real coding sequences",
       "status": "PASS",
-      "duration_ms": 220,
+      "duration_ms": 213,
       "details": {
         "rows": 3,
         "columns": 749
@@ -861,7 +993,7 @@
       "name": "phylo_tree",
       "objective": "Generate UPGMA phylogenetic tree from real sequences",
       "status": "PASS",
-      "duration_ms": 311,
+      "duration_ms": 299,
       "details": {
         "sequence_count": 3,
         "merges": [
@@ -1023,9 +1155,9 @@
       "duration_ms": 1,
       "details": {
         "saved": true,
-        "name": "real_db_2fc8f125",
+        "name": "real_db_85afc7fe",
         "count": 2,
-        "path": "/Users/liux17/Documents/Playground/annotation_db/real_db_2fc8f125.json"
+        "path": "/Users/liux17/Documents/Playground/annotation_db/real_db_85afc7fe.json"
       },
       "error": ""
     },
@@ -1053,8 +1185,8 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "name": "real_db_2fc8f125",
-        "updated_at": "2026-03-04T17:20:21.471907+00:00",
+        "name": "real_db_85afc7fe",
+        "updated_at": "2026-03-04T21:43:41.072778+00:00",
         "signatures": [
           {
             "label": "<str>",
@@ -1074,9 +1206,9 @@
       "name": "annotation_db_apply",
       "objective": "Apply saved annotation DB to EGFP",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
-        "db_name": "real_db_2fc8f125",
+        "db_name": "real_db_85afc7fe",
         "count": 2,
         "annotations": [
           {
@@ -1092,6 +1224,162 @@
             "motif": "<str>",
             "start_1based": "<int>",
             "end_1based": "<int>"
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "name": "reference_db_save",
+      "objective": "Save reusable reference element library for auto-flagging",
+      "status": "PASS",
+      "duration_ms": 1,
+      "details": {
+        "saved": true,
+        "db_name": "real_ref_85afc7fe",
+        "count": 3
+      },
+      "error": ""
+    },
+    {
+      "name": "reference_db_list",
+      "objective": "List reference libraries",
+      "status": "PASS",
+      "duration_ms": 1,
+      "details": {
+        "count": 1,
+        "databases": [
+          {
+            "db_name": "<str>",
+            "path": "<str>",
+            "updated_at": "<str>",
+            "count": "<int>"
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "name": "reference_db_load",
+      "objective": "Load reference library",
+      "status": "PASS",
+      "duration_ms": 0,
+      "details": {
+        "db_name": "real_ref_85afc7fe",
+        "updated_at": "2026-03-04T21:43:41.077854+00:00",
+        "elements": [
+          {
+            "label": "<str>",
+            "type": "<str>",
+            "sequence": "<18 chars>",
+            "max_mismatch": "<int>"
+          },
+          {
+            "label": "<str>",
+            "type": "<str>",
+            "sequence": "<18 chars>",
+            "max_mismatch": "<int>"
+          },
+          {
+            "label": "<str>",
+            "type": "<str>",
+            "sequence": "<13 chars>",
+            "max_mismatch": "<int>"
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "name": "reference_scan_autoflag",
+      "objective": "Scan sequence against reference library and add feature flags",
+      "status": "PASS",
+      "duration_ms": 5,
+      "details": {
+        "db_name": "real_ref_85afc7fe",
+        "hit_count": 2,
+        "hits": [
+          {
+            "element_index": "<int>",
+            "label": "<str>",
+            "type": "<str>",
+            "start_1based": "<int>",
+            "end_1based": "<int>",
+            "strand": "<str>",
+            "mismatch_count": "<int>"
+          },
+          {
+            "element_index": "<int>",
+            "label": "<str>",
+            "type": "<str>",
+            "start_1based": "<int>",
+            "end_1based": "<int>",
+            "strand": "<str>",
+            "mismatch_count": "<int>"
+          }
+        ],
+        "features_added": 2
+      },
+      "error": ""
+    },
+    {
+      "name": "sirna_design",
+      "objective": "Design siRNA candidates on EGFP coding region",
+      "status": "PASS",
+      "duration_ms": 7,
+      "details": {
+        "sequence_length": 720,
+        "candidate_count": 2103,
+        "candidates": [
+          {
+            "start_1based": "<int>",
+            "end_1based": "<int>",
+            "length": "<int>",
+            "target_dna": "<str>",
+            "sense_rna": "<str>",
+            "antisense_rna": "<str>",
+            "gc_pct": "<float>",
+            "score": "<float>"
+          },
+          {
+            "start_1based": "<int>",
+            "end_1based": "<int>",
+            "length": "<int>",
+            "target_dna": "<str>",
+            "sense_rna": "<str>",
+            "antisense_rna": "<str>",
+            "gc_pct": "<float>",
+            "score": "<float>"
+          },
+          {
+            "start_1based": "<int>",
+            "end_1based": "<int>",
+            "length": "<int>",
+            "target_dna": "<str>",
+            "sense_rna": "<str>",
+            "antisense_rna": "<str>",
+            "gc_pct": "<float>",
+            "score": "<float>"
+          },
+          "... (27 more)"
+        ]
+      },
+      "error": ""
+    },
+    {
+      "name": "sirna_map",
+      "objective": "Map an siRNA candidate onto EGFP sequence",
+      "status": "PASS",
+      "duration_ms": 0,
+      "details": {
+        "sirna_sequence": "ATGGTGAGCAAGGGCGAGG",
+        "hit_count": 1,
+        "hits": [
+          {
+            "start_1based": "<int>",
+            "end_1based": "<int>",
+            "strand": "<str>",
+            "match": "<str>"
           }
         ]
       },
@@ -1140,7 +1428,7 @@
       "name": "enzyme_scan",
       "objective": "Scan built-in enzymes against real sequence",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "hit_count": 0,
         "enzymes": []
@@ -1216,12 +1504,12 @@
       "name": "enzyme_set_save",
       "objective": "Save custom enzyme panel",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "saved": true,
-        "name": "real_set_2fc8f125",
+        "name": "real_set_85afc7fe",
         "count": 3,
-        "path": "/Users/liux17/Documents/Playground/enzyme_sets/real_set_2fc8f125.json"
+        "path": "/Users/liux17/Documents/Playground/enzyme_sets/real_set_85afc7fe.json"
       },
       "error": ""
     },
@@ -1277,8 +1565,8 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "name": "real_set_2fc8f125",
-        "updated_at": "2026-03-04T17:20:21.480323+00:00",
+        "name": "real_set_85afc7fe",
+        "updated_at": "2026-03-04T21:43:41.098432+00:00",
         "enzymes": [
           "BamHI",
           "EcoRI",
@@ -1295,7 +1583,7 @@
       "duration_ms": 0,
       "details": {
         "deleted": true,
-        "name": "real_set_2fc8f125"
+        "name": "real_set_85afc7fe"
       },
       "error": ""
     },
@@ -1303,7 +1591,7 @@
       "name": "batch_digest",
       "objective": "Run batch digest across multiple real records",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "count": 3,
         "results": [
@@ -1608,8 +1896,8 @@
       "duration_ms": 1,
       "details": {
         "saved": true,
-        "project_name": "real_proj_2fc8f125",
-        "path": "/Users/liux17/Documents/Playground/projects/real_proj_2fc8f125.json"
+        "project_name": "real_proj_85afc7fe",
+        "path": "/Users/liux17/Documents/Playground/projects/real_proj_85afc7fe.json"
       },
       "error": ""
     },
@@ -1619,8 +1907,8 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "project_name": "real_proj_2fc8f125",
-        "updated_at": "2026-03-04T17:20:21.490499+00:00",
+        "project_name": "real_proj_85afc7fe",
+        "updated_at": "2026-03-04T21:43:41.108139+00:00",
         "name": "EGFP_CDS",
         "topology": "linear",
         "content": ">EGFP_CDS\nATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTGGTCGAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGCGAGGGCGA... <730 chars total>",
@@ -1649,7 +1937,7 @@
       "name": "project_list",
       "objective": "List project catalog",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "count": 1,
         "projects": [
@@ -1668,7 +1956,7 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "project_name": "real_proj_2fc8f125",
+        "project_name": "real_proj_85afc7fe",
         "node_count": 2,
         "nodes": [
           {
@@ -1697,7 +1985,7 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "project_name": "real_proj_2fc8f125",
+        "project_name": "real_proj_85afc7fe",
         "svg": "<521 chars>",
         "node_count": 2,
         "nodes": [
@@ -1725,7 +2013,7 @@
       "name": "workspace_create",
       "objective": "Create collaboration workspace",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "created": true,
         "workspace": {
@@ -1736,8 +2024,8 @@
             "<str>",
             "<str>"
           ],
-          "created_at": "2026-03-04T17:20:21.495831+00:00",
-          "updated_at": "2026-03-04T17:20:21.495834+00:00"
+          "created_at": "2026-03-04T21:43:41.112353+00:00",
+          "updated_at": "2026-03-04T21:43:41.112355+00:00"
         },
         "path": "/Users/liux17/Documents/Playground/collab_data/workspaces/rw_workspace.json"
       },
@@ -1751,13 +2039,13 @@
       "details": {
         "saved": true,
         "permissions": {
-          "project_name": "real_proj_2fc8f125",
+          "project_name": "real_proj_85afc7fe",
           "roles": {
             "reviewer_user": "<str>"
           },
-          "updated_at": "2026-03-04T17:20:21.497304+00:00"
+          "updated_at": "2026-03-04T21:43:41.113243+00:00"
         },
-        "path": "/Users/liux17/Documents/Playground/collab_data/permissions/real_proj_2fc8f125.json"
+        "path": "/Users/liux17/Documents/Playground/collab_data/permissions/real_proj_85afc7fe.json"
       },
       "error": ""
     },
@@ -1767,11 +2055,11 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "project_name": "real_proj_2fc8f125",
+        "project_name": "real_proj_85afc7fe",
         "roles": {
           "reviewer_user": "reviewer"
         },
-        "updated_at": "2026-03-04T17:20:21.497304+00:00"
+        "updated_at": "2026-03-04T21:43:41.113243+00:00"
       },
       "error": ""
     },
@@ -1781,7 +2069,7 @@
       "status": "PASS",
       "duration_ms": 0,
       "details": {
-        "project_name": "real_proj_2fc8f125",
+        "project_name": "real_proj_85afc7fe",
         "count": 1,
         "events": [
           {
@@ -1826,9 +2114,9 @@
       "name": "review_submit_approve",
       "objective": "Submit and approve review workflow",
       "status": "PASS",
-      "duration_ms": 7,
+      "duration_ms": 3,
       "details": {
-        "review_id": "rev_571e23a160",
+        "review_id": "rev_8cb553564d",
         "status": "approved"
       },
       "error": ""
@@ -1840,9 +2128,9 @@
       "duration_ms": 0,
       "details": {
         "saved": true,
-        "collection_name": "real_col_2fc8f125",
+        "collection_name": "real_col_85afc7fe",
         "count": 1,
-        "path": "/Users/liux17/Documents/Playground/collections/real_col_2fc8f125.json"
+        "path": "/Users/liux17/Documents/Playground/collections/real_col_85afc7fe.json"
       },
       "error": ""
     },
@@ -1850,12 +2138,12 @@
       "name": "collection_load",
       "objective": "Load collection",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
-        "collection_name": "real_col_2fc8f125",
-        "updated_at": "2026-03-04T17:20:21.507853+00:00",
+        "collection_name": "real_col_85afc7fe",
+        "updated_at": "2026-03-04T21:43:41.119417+00:00",
         "projects": [
-          "real_proj_2fc8f125"
+          "real_proj_85afc7fe"
         ],
         "notes": ""
       },
@@ -1865,7 +2153,7 @@
       "name": "collection_list",
       "objective": "List collections",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "count": 1,
         "collections": [
@@ -1883,12 +2171,12 @@
       "name": "collection_add_project",
       "objective": "Add project to collection",
       "status": "PASS",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "details": {
         "saved": true,
-        "collection_name": "real_col_2fc8f125",
+        "collection_name": "real_col_85afc7fe",
         "count": 1,
-        "path": "/Users/liux17/Documents/Playground/collections/real_col_2fc8f125.json"
+        "path": "/Users/liux17/Documents/Playground/collections/real_col_85afc7fe.json"
       },
       "error": ""
     },
@@ -1896,9 +2184,9 @@
       "name": "share_create_load_get",
       "objective": "Create/load/share bundle over HTTP",
       "status": "PASS",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "details": {
-        "share_id": "63d1b10473cf",
+        "share_id": "8a00f39194c7",
         "html_bytes": 1577
       },
       "error": ""
@@ -1910,7 +2198,7 @@
       "duration_ms": 0,
       "details": {
         "deleted": true,
-        "collection_name": "real_col_2fc8f125"
+        "collection_name": "real_col_85afc7fe"
       },
       "error": ""
     },
@@ -1921,7 +2209,7 @@
       "duration_ms": 1,
       "details": {
         "deleted": true,
-        "project_name": "real_proj_2fc8f125"
+        "project_name": "real_proj_85afc7fe"
       },
       "error": ""
     },
@@ -1929,7 +2217,7 @@
       "name": "root_page",
       "objective": "Ensure UI root page loads",
       "status": "PASS",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "details": {
         "contains_genome_forge": true
       },

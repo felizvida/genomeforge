@@ -329,7 +329,7 @@
       overflow: auto;
       margin-top: 8px;
     }
-    #seqAnalyticsViz, #compareLensViz {
+    #seqAnalyticsViz, #compareLensViz, #traceChromViz {
       border: 1px solid #2a475f;
       border-radius: 12px;
       min-height: 220px;
@@ -619,12 +619,20 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
           <button onclick="runTraceAlign()">Trace Align</button>
           <button onclick="runTraceConsensus()">Trace Consensus</button>
         </div>
+        <div class="row">
+          <button onclick="runTraceChromatogram()">Trace Chromatogram</button>
+          <button onclick="runTraceVerify()">Trace Verify/Genotype</button>
+        </div>
         <div class="row3">
           <input id="traceEditPos" type="number" value="1" />
           <input id="traceEditBase" value="A" />
           <input id="traceEditQual" type="number" value="35" />
         </div>
         <button onclick="runTraceEditBase()">Edit Trace Base</button>
+        <label>Genotype Positions (comma-separated)</label>
+        <input id="traceGenotypePositions" value="10,25,50" />
+        <label>Expected Bases (JSON)</label>
+        <input id="traceExpectedBases" value='{"10":"A"}' />
         <label>DNA Container (base64)</label>
         <textarea id="dnaBlob" placeholder="DNA container base64"></textarea>
         <div class="row">
@@ -726,6 +734,44 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
           </select>
         </div>
         <button onclick="runConvertRecord()">Convert Record</button>
+        <label>BLAST-like Local Search</label>
+        <label>BLAST Query Sequence (optional)</label>
+        <input id="blastQuery" placeholder="ATG..." />
+        <label>BLAST Database (one sequence per line)</label>
+        <textarea id="blastDb">ATGGTGAGCAAGGGCGAGGAGCTG
+ATGGTGAGCAAGGGCGAGGAGGAT
+GAATTCCGGATCCATGGCCATTGTAA</textarea>
+        <div class="row3">
+          <input id="blastKmer" type="number" value="8" />
+          <input id="blastTopHits" type="number" value="10" />
+          <button onclick="runBlastSearch()">Run BLAST-like Search</button>
+        </div>
+        <label>Reference Element Library (auto-flag known motifs)</label>
+        <input id="referenceDbName" value="core_refs" />
+        <textarea id="referenceDbElements">[
+  {"label":"EGFP start","type":"gene","sequence":"ATGGTGAGCAAGGGCGAG"},
+  {"label":"T7 promoter","type":"promoter","sequence":"TAATACGACTCACTATAGGG"},
+  {"label":"AmpR motif","type":"CDS","sequence":"ATGAGTATTCAACATTTCCG"}
+]</textarea>
+        <div class="row">
+          <button onclick="runReferenceDbSave()">Save Reference DB</button>
+          <button onclick="runReferenceDbList()">List Reference DBs</button>
+        </div>
+        <div class="row">
+          <button onclick="runReferenceDbLoad()">Load Reference DB</button>
+          <button onclick="runReferenceScan()">Reference Scan + Flag Features</button>
+        </div>
+        <label>siRNA Design and Mapping</label>
+        <div class="row3">
+          <input id="sirnaMinLen" type="number" value="19" />
+          <input id="sirnaMaxLen" type="number" value="21" />
+          <input id="sirnaTopN" type="number" value="30" />
+        </div>
+        <div class="row">
+          <button onclick="runSirnaDesign()">Design siRNA</button>
+          <button onclick="runSirnaMap()">Map siRNA Site</button>
+        </div>
+        <input id="sirnaSequence" value="AUGGUGAGCAAGGGCGAGG" />
         <label>Cutting-Edge Visualization: Sequence Analytics</label>
         <div class="row3">
           <input id="analyticsStart" type="number" value="1" />
@@ -1065,6 +1111,14 @@ TTTCCCGGGAAATTT</textarea>
         <button onclick="zoomPanel('compareLensViz', 0.84)">Compare Zoom Out</button>
         <button onclick="resetPanelView('compareLensViz')">Compare Reset</button>
         <button onclick="runComparisonLensViz()">Re-render Compare</button>
+      </div>
+      <label class="panel-title">Sanger Chromatogram</label>
+      <div id="traceChromViz" class="interactive-viz">Import AB1 and run "Trace Chromatogram".</div>
+      <div class="viz-controls">
+        <button onclick="zoomPanel('traceChromViz', 1.2)">Trace Zoom In</button>
+        <button onclick="zoomPanel('traceChromViz', 0.84)">Trace Zoom Out</button>
+        <button onclick="resetPanelView('traceChromViz')">Trace Reset</button>
+        <button onclick="runTraceChromatogram()">Re-render Trace</button>
       </div>
       <label class="panel-title">History Graph</label>
       <div id="historyGraph">Load a project and click "Project History Graph".</div>
@@ -1742,6 +1796,81 @@ TTTCCCGGGAAATTT</textarea>
       } catch (e) { show(String(e)); }
     }
 
+    async function runBlastSearch() {
+      try {
+        const dbRows = splitSeqLines('blastDb').map((sequence, i) => ({ name: `subject_${i+1}`, sequence }));
+        show(await callApi('/api/blast-search', payload({
+          query_sequence: document.getElementById('blastQuery').value,
+          database_sequences: dbRows,
+          kmer: Number(document.getElementById('blastKmer').value),
+          top_hits: Number(document.getElementById('blastTopHits').value),
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runReferenceDbSave() {
+      try {
+        const elements = JSON.parse(document.getElementById('referenceDbElements').value);
+        show(await callApi('/api/reference-db-save', {
+          db_name: document.getElementById('referenceDbName').value,
+          elements,
+        }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runReferenceDbList() {
+      try {
+        show(await callApi('/api/reference-db-list', {}));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runReferenceDbLoad() {
+      try {
+        const r = await callApi('/api/reference-db-load', {
+          db_name: document.getElementById('referenceDbName').value,
+        });
+        if (Array.isArray(r.elements)) {
+          document.getElementById('referenceDbElements').value = JSON.stringify(r.elements, null, 2);
+        }
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runReferenceScan() {
+      try {
+        const r = await callApi('/api/reference-scan', payload({
+          db_name: document.getElementById('referenceDbName').value,
+          add_features: true,
+        }));
+        if (r.features_added && r.features_added > 0) await runFeatureList();
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runSirnaDesign() {
+      try {
+        const r = await callApi('/api/sirna-design', payload({
+          sequence: plainSeq(document.getElementById('content').value),
+          min_len: Number(document.getElementById('sirnaMinLen').value),
+          max_len: Number(document.getElementById('sirnaMaxLen').value),
+          top_n: Number(document.getElementById('sirnaTopN').value),
+        }));
+        if (Array.isArray(r.candidates) && r.candidates.length) {
+          document.getElementById('sirnaSequence').value = r.candidates[0].antisense_rna || r.candidates[0].target_dna || '';
+        }
+        show(r);
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runSirnaMap() {
+      try {
+        show(await callApi('/api/sirna-map', payload({
+          sequence: plainSeq(document.getElementById('content').value),
+          sirna_sequence: document.getElementById('sirnaSequence').value,
+        })));
+      } catch (e) { show(String(e)); }
+    }
+
     async function runSequenceAnalyticsViz() {
       try {
         const r = await callApi('/api/sequence-analytics-svg', payload({
@@ -1853,6 +1982,39 @@ TTTCCCGGGAAATTT</textarea>
       try {
         const trace_id = document.getElementById('traceId').value.trim();
         show(await callApi('/api/trace-consensus', { trace_id, min_quality: 20 }));
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTraceChromatogram() {
+      try {
+        const trace_id = document.getElementById('traceId').value.trim();
+        const r = await callApi('/api/trace-chromatogram-svg', { trace_id, start: 1, end: 0, max_points: 400 });
+        document.getElementById('traceChromViz').innerHTML = r.svg || '';
+        enhancePanel('traceChromViz');
+        show({ trace_id: r.trace_id, range: [r.start_1based, r.end_1based], points: r.points, max_signal: r.max_signal });
+      } catch (e) { show(String(e)); }
+    }
+
+    async function runTraceVerify() {
+      try {
+        const trace_id = document.getElementById('traceId').value.trim();
+        const reference_sequence = document.getElementById('traceReference').value;
+        const genotype_positions = document.getElementById('traceGenotypePositions').value
+          .split(',')
+          .map((x) => Number(x.trim()))
+          .filter((x) => Number.isFinite(x) && x > 0);
+        let expected_bases = {};
+        const raw = document.getElementById('traceExpectedBases').value.trim();
+        if (raw) expected_bases = JSON.parse(raw);
+        show(await callApi('/api/trace-verify', {
+          trace_id,
+          reference_sequence,
+          min_quality: 20,
+          genotype_positions,
+          expected_bases,
+          identity_threshold_pct: 98.0,
+          max_mismatches: 5,
+        }));
       } catch (e) { show(String(e)); }
     }
 

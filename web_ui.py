@@ -65,6 +65,7 @@ ENZYME_SET_DIR = ROOT / "enzyme_sets"
 COLLECTIONS_DIR = ROOT / "collections"
 SHARES_DIR = ROOT / "shares"
 COLLAB_ROOT = ROOT / "collab_data"
+REFERENCE_DB_DIR = ROOT / "reference_db"
 TRACE_CACHE: Dict[str, Dict[str, Any]] = {}
 
 
@@ -254,6 +255,16 @@ def _resolve_trace(payload: Dict[str, Any]) -> Dict[str, Any]:
     if trace_id and trace_id in TRACE_CACHE:
         return dict(TRACE_CACHE[trace_id])
     raise ValueError("trace_record or known trace_id is required")
+
+
+def _clean_dna_string(seq: str) -> str:
+    return "".join(ch for ch in str(seq).upper() if ch in "ACGTN")
+
+
+def _hamming_equal_len(a: str, b: str) -> int:
+    if len(a) != len(b):
+        raise ValueError("Hamming distance requires equal length strings")
+    return sum(1 for x, y in zip(a, b) if x != y)
 
 
 def parse_plain_sequence(seq: str) -> str:
@@ -1864,6 +1875,424 @@ def comparison_lens_svg(seq_a: str, seq_b: str, window: int = 60) -> Dict[str, A
     }
 
 
+def _kmer_set(seq: str, k: int) -> set[str]:
+    if k <= 0 or len(seq) < k:
+        return set()
+    return {seq[i : i + k] for i in range(len(seq) - k + 1)}
+
+
+def blast_local_search(
+    query_sequence: str,
+    database_sequences: List[Dict[str, Any] | str],
+    top_hits: int = 10,
+    kmer: int = 8,
+) -> Dict[str, Any]:
+    query = _clean_dna_string(query_sequence)
+    if not query:
+        raise ValueError("query_sequence is required")
+    db_rows: List[Dict[str, str]] = []
+    for i, item in enumerate(database_sequences, start=1):
+        if isinstance(item, dict):
+            name = str(item.get("name", f"db_{i}")).strip() or f"db_{i}"
+            seq = _clean_dna_string(str(item.get("sequence", "")))
+        else:
+            name = f"db_{i}"
+            seq = _clean_dna_string(str(item))
+        if seq:
+            db_rows.append({"name": name, "sequence": seq})
+    if not db_rows:
+        raise ValueError("database_sequences must include at least one non-empty sequence")
+
+    k = max(4, min(int(kmer), len(query)))
+    qk = _kmer_set(query, k)
+    hits: List[Dict[str, Any]] = []
+    for row in db_rows:
+        target = row["sequence"]
+        tk = _kmer_set(target, k)
+        inter = len(qk & tk)
+        union = max(1, len(qk | tk))
+        seed_jaccard = inter / union
+        if inter == 0 and len(query) >= k and len(target) >= k:
+            continue
+        aln = needleman_wunsch(query, target, match=2, mismatch=-1, gap=-2)
+        aa = aln["aligned_a"]
+        bb = aln["aligned_b"]
+        aligned_columns = len(aa)
+        matches = sum(1 for x, y in zip(aa, bb) if x == y and x != "-" and y != "-")
+        aligned_query_bases = sum(1 for x in aa if x != "-")
+        aligned_target_bases = sum(1 for y in bb if y != "-")
+        query_cov = aligned_query_bases / max(1, len(query))
+        target_cov = aligned_target_bases / max(1, len(target))
+        score = int(aln.get("score", 0))
+        evalue_proxy = math.exp(-max(0, score) / 12.0)
+        hits.append(
+            {
+                "subject_name": row["name"],
+                "subject_length": len(target),
+                "score": score,
+                "bitscore_proxy": round(score / 2.0, 2),
+                "evalue_proxy": round(evalue_proxy, 8),
+                "seed_jaccard": round(seed_jaccard, 6),
+                "identity_pct": round(100.0 * matches / max(1, aligned_columns), 3),
+                "query_coverage_pct": round(100.0 * query_cov, 3),
+                "subject_coverage_pct": round(100.0 * target_cov, 3),
+                "alignment_length": aligned_columns,
+            }
+        )
+    hits.sort(key=lambda x: (x["score"], x["identity_pct"], x["query_coverage_pct"]), reverse=True)
+    return {
+        "mode": "local_blast_like",
+        "query_length": len(query),
+        "database_count": len(db_rows),
+        "kmer": k,
+        "hit_count": len(hits),
+        "hits": hits[: max(1, int(top_hits))],
+    }
+
+
+def trace_chromatogram_svg(
+    trace_record: Dict[str, Any],
+    start_1based: int = 1,
+    end_1based: int = 0,
+    max_points: int = 400,
+) -> Dict[str, Any]:
+    seq = _clean_dna_string(trace_record.get("sequence", ""))
+    if not seq:
+        raise ValueError("trace sequence is empty")
+    n = len(seq)
+    start_1based = max(1, int(start_1based))
+    end_1based = n if int(end_1based) <= 0 else min(n, int(end_1based))
+    if start_1based > end_1based:
+        raise ValueError("Invalid trace range")
+    width = 1240
+    height = 280
+    margin_l = 70
+    margin_r = 20
+    margin_t = 26
+    margin_b = 32
+    plot_w = width - margin_l - margin_r
+    plot_h = height - margin_t - margin_b
+
+    traces = trace_record.get("traces", {})
+    if not isinstance(traces, dict):
+        traces = {}
+    ch = {b: [int(v) for v in traces.get(b, []) if isinstance(v, (int, float))] for b in "ACGT"}
+    for b in "ACGT":
+        if len(ch[b]) < n:
+            ch[b] = ch[b] + [0] * (n - len(ch[b]))
+    window_len = end_1based - start_1based + 1
+    step = max(1, int(math.ceil(window_len / max(50, int(max_points)))))
+    idxs = list(range(start_1based - 1, end_1based, step))
+    max_signal = 1
+    for b in "ACGT":
+        for i in idxs:
+            if i < len(ch[b]):
+                max_signal = max(max_signal, ch[b][i])
+
+    def x_for(idx0: int) -> float:
+        return margin_l + (idx0 - (start_1based - 1)) * plot_w / max(1, window_len - 1)
+
+    def y_for(v: int) -> float:
+        return margin_t + plot_h - (v / max_signal) * plot_h
+
+    colors = {"A": "#22c55e", "C": "#2563eb", "G": "#111827", "T": "#ef4444"}
+    lines = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">']
+    lines.append('<rect width="100%" height="100%" fill="#f8fafc"/>')
+    lines.append(
+        f'<text x="{margin_l}" y="18" font-size="13" font-family="Menlo, monospace" fill="#0f172a">'
+        f'Trace chromatogram: {trace_record.get("trace_id", "trace")}  {start_1based}..{end_1based} (step={step})</text>'
+    )
+    lines.append(f'<rect x="{margin_l}" y="{margin_t}" width="{plot_w}" height="{plot_h}" fill="#ffffff" stroke="#dbe5f3"/>')
+    for b in "ACGT":
+        pts = []
+        for i in idxs:
+            pts.append(f"{x_for(i):.2f},{y_for(ch[b][i]):.2f}")
+        lines.append(
+            f'<polyline points="{" ".join(pts)}" fill="none" stroke="{colors[b]}" stroke-width="1.8">'
+            f"<title>{b} signal</title></polyline>"
+        )
+    for t in range(6):
+        p = int(round(start_1based + t * (end_1based - start_1based) / 5))
+        x = x_for(p - 1)
+        lines.append(f'<line x1="{x:.2f}" y1="{margin_t + plot_h}" x2="{x:.2f}" y2="{margin_t + plot_h + 6}" stroke="#334155"/>')
+        lines.append(f'<text x="{x:.2f}" y="{margin_t + plot_h + 20}" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">{p}</text>')
+    lines.append(
+        f'<text x="{margin_l}" y="{height-6}" font-size="10" font-family="Menlo, monospace" fill="#334155">A=green C=blue G=black T=red</text>'
+    )
+    lines.append("</svg>")
+    return {
+        "trace_id": str(trace_record.get("trace_id", "")),
+        "start_1based": start_1based,
+        "end_1based": end_1based,
+        "points": len(idxs),
+        "max_signal": max_signal,
+        "svg": "\n".join(lines),
+    }
+
+
+def trace_verify_genotype(
+    trace_record: Dict[str, Any],
+    reference_sequence: str,
+    min_quality: int = 20,
+    genotype_positions: List[int] | None = None,
+    expected_bases: Dict[str, str] | None = None,
+    identity_threshold_pct: float = 98.0,
+    max_mismatches: int = 5,
+) -> Dict[str, Any]:
+    ref = _clean_dna_string(reference_sequence)
+    if not ref:
+        raise ValueError("reference_sequence is required")
+    tr = dict(trace_record)
+    align = align_trace_to_reference(tr, ref)
+    cons = trace_consensus(tr, min_quality=min_quality)
+    cseq = cons["consensus"]
+    mapping: Dict[int, Dict[str, Any]] = {}
+    tpos = 0
+    rpos = 0
+    aligned_t = align["aligned_trace"]
+    aligned_r = align["aligned_reference"]
+    for tb, rb in zip(aligned_t, aligned_r):
+        if tb != "-":
+            tpos += 1
+        if rb != "-":
+            rpos += 1
+        if tb != "-" and rb != "-":
+            cb = cseq[tpos - 1] if tpos - 1 < len(cseq) else "N"
+            mapping[rpos] = {
+                "trace_pos_1based": tpos,
+                "trace_base": tb,
+                "consensus_base": cb,
+                "reference_base": rb,
+            }
+
+    expected_bases = expected_bases or {}
+    calls = []
+    for p in genotype_positions or []:
+        pos = int(p)
+        if pos < 1 or pos > len(ref):
+            continue
+        m = mapping.get(pos)
+        exp = _clean_dna_string(str(expected_bases.get(str(pos), "")))[:1]
+        if not m:
+            calls.append({"position_1based": pos, "reference_base": ref[pos - 1], "call": "NO_COVERAGE", "matches_expected": False})
+            continue
+        call = m["consensus_base"]
+        calls.append(
+            {
+                "position_1based": pos,
+                "reference_base": ref[pos - 1],
+                "trace_base": m["trace_base"],
+                "consensus_base": call,
+                "expected_base": exp or None,
+                "matches_expected": (call == exp) if exp else None,
+                "trace_pos_1based": m["trace_pos_1based"],
+            }
+        )
+
+    mismatch_count = int(align.get("mismatch_count", 0))
+    call_failures = sum(1 for c in calls if c.get("matches_expected") is False)
+    verdict_pass = (
+        float(align.get("identity_pct", 0.0)) >= float(identity_threshold_pct)
+        and mismatch_count <= int(max_mismatches)
+        and call_failures == 0
+    )
+    return {
+        "trace_id": str(tr.get("trace_id", "")),
+        "reference_length": len(ref),
+        "identity_pct": align.get("identity_pct", 0.0),
+        "mismatch_count": mismatch_count,
+        "min_quality": int(min_quality),
+        "consensus_low_quality_bases": cons.get("low_quality_bases", 0),
+        "identity_threshold_pct": float(identity_threshold_pct),
+        "max_mismatches": int(max_mismatches),
+        "genotype_call_count": len(calls),
+        "genotype_calls": calls,
+        "verdict": "PASS" if verdict_pass else "FAIL",
+    }
+
+
+def _seq_with_mismatches(seq: str, motif: str, max_mismatch: int) -> List[Tuple[int, int]]:
+    if not motif:
+        return []
+    out: List[Tuple[int, int]] = []
+    m = len(motif)
+    if len(seq) < m:
+        return out
+    for i in range(len(seq) - m + 1):
+        mm = _hamming_equal_len(seq[i : i + m], motif)
+        if mm <= max_mismatch:
+            out.append((i, mm))
+    return out
+
+
+def reference_db_path(name: str) -> Path:
+    safe = "".join(ch for ch in name if ch.isalnum() or ch in ("-", "_")).strip("_-")
+    if not safe:
+        raise ValueError("Invalid reference db name")
+    REFERENCE_DB_DIR.mkdir(parents=True, exist_ok=True)
+    return REFERENCE_DB_DIR / f"{safe}.json"
+
+
+def save_reference_db(name: str, elements: List[Dict[str, Any]]) -> Dict[str, Any]:
+    p = reference_db_path(name)
+    cleaned = []
+    for e in elements:
+        if not isinstance(e, dict):
+            continue
+        seq = _clean_dna_string(str(e.get("sequence", "")))
+        if not seq:
+            continue
+        cleaned.append(
+            {
+                "label": str(e.get("label", "element")).strip() or "element",
+                "type": str(e.get("type", "misc_feature")).strip() or "misc_feature",
+                "sequence": seq,
+                "max_mismatch": max(0, min(3, int(e.get("max_mismatch", 0)))),
+            }
+        )
+    doc = {"name": name, "updated_at": datetime.now(timezone.utc).isoformat(), "elements": cleaned}
+    p.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    return {"saved": True, "db_name": name, "count": len(cleaned)}
+
+
+def list_reference_dbs() -> Dict[str, Any]:
+    REFERENCE_DB_DIR.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for p in sorted(REFERENCE_DB_DIR.glob("*.json")):
+        try:
+            doc = json.loads(p.read_text(encoding="utf-8"))
+            rows.append(
+                {
+                    "db_name": p.stem,
+                    "path": str(p),
+                    "updated_at": str(doc.get("updated_at", "")),
+                    "count": len(doc.get("elements", [])),
+                }
+            )
+        except Exception:
+            continue
+    return {"count": len(rows), "databases": rows}
+
+
+def load_reference_db(name: str) -> Dict[str, Any]:
+    p = reference_db_path(name)
+    if not p.exists():
+        raise ValueError("Reference DB not found")
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    return {"db_name": name, "updated_at": doc.get("updated_at", ""), "elements": doc.get("elements", [])}
+
+
+def reference_scan(record: SequenceRecord, db_name: str, add_features: bool = False) -> Dict[str, Any]:
+    doc = load_reference_db(db_name)
+    seq = record.sequence
+    hits: List[Dict[str, Any]] = []
+    for i, el in enumerate(doc.get("elements", [])):
+        motif = _clean_dna_string(str(el.get("sequence", "")))
+        if not motif:
+            continue
+        mm = max(0, min(3, int(el.get("max_mismatch", 0))))
+        direct = _seq_with_mismatches(seq, motif, mm)
+        rc = revcomp(motif)
+        rev_hits = _seq_with_mismatches(seq, rc, mm) if rc != motif else []
+        for pos0, mism in direct:
+            hits.append(
+                {
+                    "element_index": i,
+                    "label": str(el.get("label", "element")),
+                    "type": str(el.get("type", "misc_feature")),
+                    "start_1based": pos0 + 1,
+                    "end_1based": pos0 + len(motif),
+                    "strand": "+",
+                    "mismatch_count": mism,
+                }
+            )
+        for pos0, mism in rev_hits:
+            hits.append(
+                {
+                    "element_index": i,
+                    "label": str(el.get("label", "element")),
+                    "type": str(el.get("type", "misc_feature")),
+                    "start_1based": pos0 + 1,
+                    "end_1based": pos0 + len(motif),
+                    "strand": "-",
+                    "mismatch_count": mism,
+                }
+            )
+    hits.sort(key=lambda x: (x["mismatch_count"], x["start_1based"]))
+    added = 0
+    if add_features and hits:
+        for h in hits:
+            key = str(h["type"] or "misc_feature")
+            if key == "rbs":
+                key = "RBS"
+            loc = f"{h['start_1based']}..{h['end_1based']}"
+            if h["strand"] == "-":
+                loc = f"complement({loc})"
+            record.features.append(
+                Feature(
+                    key=key,
+                    location=loc,
+                    qualifiers={"label": h["label"], "source": f"reference_db:{db_name}", "mismatch": str(h["mismatch_count"])},
+                )
+            )
+            added += 1
+    return {"db_name": db_name, "hit_count": len(hits), "hits": hits[:2000], "features_added": added}
+
+
+def design_sirna_candidates(sequence: str, min_len: int = 19, max_len: int = 21, top_n: int = 40) -> Dict[str, Any]:
+    seq = _clean_dna_string(sequence)
+    if not seq:
+        raise ValueError("sequence is required")
+    min_len = max(17, int(min_len))
+    max_len = max(min_len, min(24, int(max_len)))
+    candidates: List[Dict[str, Any]] = []
+    for k in range(min_len, max_len + 1):
+        for i in range(0, len(seq) - k + 1):
+            target = seq[i : i + k]
+            gc = 100.0 * (target.count("G") + target.count("C")) / max(1, k)
+            score = 100.0
+            score -= abs(gc - 45.0) * 1.2
+            if target[0] == "G":
+                score -= 4.0
+            if "AAAA" in target or "TTTT" in target or "CCCC" in target or "GGGG" in target:
+                score -= 15.0
+            if target.count("N") > 0:
+                score -= 30.0
+            antisense = revcomp(target).replace("T", "U")
+            sense_rna = target.replace("T", "U")
+            candidates.append(
+                {
+                    "start_1based": i + 1,
+                    "end_1based": i + k,
+                    "length": k,
+                    "target_dna": target,
+                    "sense_rna": sense_rna,
+                    "antisense_rna": antisense,
+                    "gc_pct": round(gc, 2),
+                    "score": round(max(0.0, min(100.0, score)), 2),
+                }
+            )
+    candidates.sort(key=lambda x: (x["score"], -abs(x["gc_pct"] - 45.0)), reverse=True)
+    return {"sequence_length": len(seq), "candidate_count": len(candidates), "candidates": candidates[: max(1, int(top_n))]}
+
+
+def map_sirna_sites(sequence: str, sirna_sequence: str) -> Dict[str, Any]:
+    seq = _clean_dna_string(sequence)
+    target = _clean_dna_string(str(sirna_sequence).upper().replace("U", "T"))
+    if not seq or not target:
+        raise ValueError("sequence and sirna_sequence are required")
+    rc = revcomp(target)
+    plus = find_all_occurrences(seq, target, circular=False)
+    minus = find_all_occurrences(seq, rc, circular=False)
+    hits = []
+    for p in plus:
+        hits.append({"start_1based": p + 1, "end_1based": p + len(target), "strand": "+", "match": target})
+    for p in minus:
+        hits.append({"start_1based": p + 1, "end_1based": p + len(target), "strand": "-", "match": rc})
+    hits.sort(key=lambda x: (x["start_1based"], x["strand"]))
+    return {"sirna_sequence": target, "hit_count": len(hits), "hits": hits}
+
+
 def project_path(name: str) -> Path:
     safe = "".join(ch for ch in name if ch.isalnum() or ch in ("-", "_")).strip("_-")
     if not safe:
@@ -2917,6 +3346,59 @@ class Handler(BaseHTTPRequestHandler):
                         **trace_consensus(tr, min_quality=int(payload.get("min_quality", 20))),
                     }
                 )
+            elif self.path == "/api/trace-chromatogram-svg":
+                tr = _resolve_trace(payload)
+                tr = _cache_trace(tr)
+                self._send_json(
+                    trace_chromatogram_svg(
+                        tr,
+                        start_1based=int(payload.get("start", 1)),
+                        end_1based=int(payload.get("end", 0)),
+                        max_points=int(payload.get("max_points", 400)),
+                    )
+                )
+            elif self.path == "/api/trace-verify":
+                tr = _resolve_trace(payload)
+                tr = _cache_trace(tr)
+                ref = str(payload.get("reference_sequence", payload.get("reference", "")))
+                if not ref.strip():
+                    raise ValueError("reference_sequence is required")
+                genotype_positions = payload.get("genotype_positions", [])
+                if isinstance(genotype_positions, str):
+                    genotype_positions = [int(x.strip()) for x in genotype_positions.split(",") if x.strip()]
+                expected_bases = payload.get("expected_bases", {})
+                if isinstance(expected_bases, str):
+                    expected_bases = json.loads(expected_bases)
+                self._send_json(
+                    trace_verify_genotype(
+                        tr,
+                        reference_sequence=ref,
+                        min_quality=int(payload.get("min_quality", 20)),
+                        genotype_positions=[int(x) for x in genotype_positions if isinstance(x, (int, float, str))],
+                        expected_bases={str(k): str(v) for k, v in dict(expected_bases).items()} if isinstance(expected_bases, dict) else {},
+                        identity_threshold_pct=float(payload.get("identity_threshold_pct", 98.0)),
+                        max_mismatches=int(payload.get("max_mismatches", 5)),
+                    )
+                )
+            elif self.path == "/api/blast-search":
+                query = str(payload.get("query_sequence", payload.get("query", "")))
+                if not query.strip():
+                    rec = get_record()
+                    query = rec.sequence
+                db = payload.get("database_sequences", [])
+                if isinstance(db, str):
+                    db = [{"name": f"db_{i+1}", "sequence": line.strip()} for i, line in enumerate(db.splitlines()) if line.strip()]
+                if not db:
+                    rec = get_record()
+                    db = [{"name": rec.name, "sequence": rec.sequence}]
+                self._send_json(
+                    blast_local_search(
+                        query_sequence=query,
+                        database_sequences=list(db),
+                        top_hits=int(payload.get("top_hits", 10)),
+                        kmer=int(payload.get("kmer", 8)),
+                    )
+                )
             elif self.path == "/api/primer-specificity":
                 backgrounds = payload.get("background_sequences", [])
                 if isinstance(backgrounds, str):
@@ -3139,6 +3621,25 @@ class Handler(BaseHTTPRequestHandler):
             elif self.path == "/api/annot-db-apply":
                 rec = get_record()
                 self._send_json(annotate_with_db(rec, str(payload.get("db_name", "")).strip()))
+            elif self.path == "/api/reference-db-save":
+                name = str(payload.get("db_name", "")).strip()
+                elements = payload.get("elements", [])
+                if isinstance(elements, str):
+                    elements = json.loads(elements)
+                self._send_json(save_reference_db(name, [dict(x) for x in elements if isinstance(x, dict)]))
+            elif self.path == "/api/reference-db-list":
+                self._send_json(list_reference_dbs())
+            elif self.path == "/api/reference-db-load":
+                self._send_json(load_reference_db(str(payload.get("db_name", "")).strip()))
+            elif self.path == "/api/reference-scan":
+                rec = get_record()
+                self._send_json(
+                    reference_scan(
+                        rec,
+                        db_name=str(payload.get("db_name", "")).strip(),
+                        add_features=bool(payload.get("add_features", False)),
+                    )
+                )
             elif self.path == "/api/features-list":
                 rec = get_record()
                 self._send_json({"count": len(rec.features), "features": features_to_dict(rec.features)})
@@ -3190,6 +3691,23 @@ class Handler(BaseHTTPRequestHandler):
                         "positions_1based": [p + 1 for p in positions],
                     }
                 )
+            elif self.path == "/api/sirna-design":
+                sequence = str(payload.get("sequence", ""))
+                if not sequence.strip():
+                    sequence = get_record().sequence
+                self._send_json(
+                    design_sirna_candidates(
+                        sequence=sequence,
+                        min_len=int(payload.get("min_len", 19)),
+                        max_len=int(payload.get("max_len", 21)),
+                        top_n=int(payload.get("top_n", 40)),
+                    )
+                )
+            elif self.path == "/api/sirna-map":
+                sequence = str(payload.get("sequence", ""))
+                if not sequence.strip():
+                    sequence = get_record().sequence
+                self._send_json(map_sirna_sites(sequence=sequence, sirna_sequence=str(payload.get("sirna_sequence", ""))))
             elif self.path == "/api/enzyme-scan":
                 rec = get_record()
                 names = resolve_enzymes(payload)

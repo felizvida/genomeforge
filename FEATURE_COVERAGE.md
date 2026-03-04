@@ -65,6 +65,7 @@ Legend:
 ## Alignment
 - Align DNA to reference: `Implemented` (global pairwise)
 - Verify cloning/mutagenesis: `Implemented` (compatibility checks + pairwise diagnostics + junction integrity diagnostics)
+- Trace-based plasmid verification/genotyping: `Implemented` (trace-to-reference verification with genotype calls)
 - cDNA to chromosome: `Implemented` (heuristic exon/intron cDNA-to-genome mapping endpoint)
 - Pairwise DNA/protein: `Implemented` (global pairwise for DNA and protein modes)
 - Multiple alignment: `Implemented` (progressive MSA + external aligner adapters)
@@ -73,6 +74,7 @@ Legend:
 
 ## Visualizing
 - Multiple sequence views: `Implemented` (sequence tracks + MSA identity heatmap + star-activity risk panel + interactive map/track inspector with zoom/pan + minimap brush navigation + sequence analytics lens + comparison lens hotspot view)
+- Raw Sanger trace visualization: `Implemented` (chromatogram SVG panel with zoom/pan)
 - Large sequence support: `Implemented` (windowed sequence track + minimap navigation for long sequences)
 - Edit DNA/protein sequences: `Implemented` (DNA edit + protein-level codon edit)
 - Color coding: `Implemented` (map, sequence track, and UI color themes)
@@ -91,10 +93,16 @@ Legend:
 - Batch operations: `Implemented` (batch digest)
 - Project persistence: `Implemented` (save/load/list/delete local project JSON)
 - Team collaboration core: `Implemented` (workspace creation + per-project role map + review submit/approve workflow + project diff endpoint)
+- Reference element libraries: `Implemented` (save/list/load + auto-flag scan against loaded records)
 
 ## Search
 - Search DNA/protein: `Implemented` (DNA motif search)
 - Search enzymes/features/primers: `Implemented` (unified entity search endpoint for motif/features/primer hits)
+- BLAST-like nucleotide database search: `Implemented` (local seed-and-align ranking with identity/coverage reporting)
+- siRNA target site mapping: `Implemented` (strand-aware mapping of siRNA binding sites)
+
+## RNA Interference
+- siRNA candidate design: `Implemented` (GC-aware scoring, repeat penalties, ranked candidates)
 
 ## General
 - Cross platform (Windows/macOS/Linux): `Implemented` (Python runtime-based)

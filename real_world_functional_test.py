@@ -149,6 +149,7 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.created["collection"] = f"real_col_{suffix}"
     r.created["annot_db"] = f"real_db_{suffix}"
     r.created["enzyme_set"] = f"real_set_{suffix}"
+    r.created["reference_db"] = f"real_ref_{suffix}"
 
     egfp_payload = {
         "name": "EGFP_CDS",
@@ -337,6 +338,50 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
     )
     r.check(
+        "trace_chromatogram_svg",
+        "Render Sanger chromatogram SVG from synthetic trace",
+        lambda: (
+            lambda imp: r.post(
+                "/api/trace-chromatogram-svg",
+                {"trace_id": imp["trace_record"]["trace_id"], "start": 1, "end": 240, "max_points": 300},
+            )
+        )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
+    )
+    r.check(
+        "trace_verify_genotyping",
+        "Verify trace against reference and genotype selected loci",
+        lambda: (
+            lambda imp: r.post(
+                "/api/trace-verify",
+                {
+                    "trace_id": imp["trace_record"]["trace_id"],
+                    "reference_sequence": EGFP_CDS,
+                    "genotype_positions": [10, 20, 30, 40],
+                    "expected_bases": {"10": EGFP_CDS[9], "20": EGFP_CDS[19], "30": EGFP_CDS[29]},
+                    "identity_threshold_pct": 97.0,
+                    "max_mismatches": 10,
+                },
+            )
+        )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
+    )
+    r.check(
+        "blast_like_search",
+        "Run BLAST-like local similarity search across real sequence panel",
+        lambda: r.post(
+            "/api/blast-search",
+            {
+                "query_sequence": EGFP_CDS[:240],
+                "database_sequences": [
+                    {"name": "EGFP", "sequence": EGFP_CDS},
+                    {"name": "mCherry", "sequence": MCHERRY_CDS},
+                    {"name": "pUC19_MCS", "sequence": PUC19_MCS},
+                ],
+                "kmer": 8,
+                "top_hits": 5,
+            },
+        ),
+    )
+    r.check(
         "search_entities",
         "Search across features, enzymes, and primer hits",
         lambda: r.post("/api/search-entities", {**egfp_payload, "query": "gfp", "primers": f"{r.ctx['fwd']},{r.ctx['rev']}"}),
@@ -440,6 +485,38 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.check("annotation_db_list", "List annotation DB libraries", lambda: r.post("/api/annot-db-list", {}))
     r.check("annotation_db_load", "Load saved annotation DB", lambda: r.post("/api/annot-db-load", {"db_name": r.created["annot_db"]}))
     r.check("annotation_db_apply", "Apply saved annotation DB to EGFP", lambda: r.post("/api/annot-db-apply", {**egfp_payload, "db_name": r.created["annot_db"]}))
+    r.check(
+        "reference_db_save",
+        "Save reusable reference element library for auto-flagging",
+        lambda: r.post(
+            "/api/reference-db-save",
+            {
+                "db_name": r.created["reference_db"],
+                "elements": [
+                    {"label": "EGFP start", "type": "gene", "sequence": EGFP_CDS[:18]},
+                    {"label": "mCherry start", "type": "gene", "sequence": MCHERRY_CDS[:18]},
+                    {"label": "MCS EcoRI-BamHI", "type": "misc_feature", "sequence": "GAATTCCGGATCC"},
+                ],
+            },
+        ),
+    )
+    r.check("reference_db_list", "List reference libraries", lambda: r.post("/api/reference-db-list", {}))
+    r.check("reference_db_load", "Load reference library", lambda: r.post("/api/reference-db-load", {"db_name": r.created["reference_db"]}))
+    r.check(
+        "reference_scan_autoflag",
+        "Scan sequence against reference library and add feature flags",
+        lambda: r.post("/api/reference-scan", {**egfp_payload, "db_name": r.created["reference_db"], "add_features": True}),
+    )
+    r.check(
+        "sirna_design",
+        "Design siRNA candidates on EGFP coding region",
+        lambda: r.post("/api/sirna-design", {"sequence": EGFP_CDS, "min_len": 19, "max_len": 21, "top_n": 30}),
+    )
+    r.check(
+        "sirna_map",
+        "Map an siRNA candidate onto EGFP sequence",
+        lambda: r.post("/api/sirna-map", {"sequence": EGFP_CDS, "sirna_sequence": "AUGGUGAGCAAGGGCGAGG"}),
+    )
     r.check("features_list", "List feature entries on EGFP record", lambda: r.post("/api/features-list", egfp_payload))
     r.check(
         "features_add_update_delete",
@@ -646,7 +723,7 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
 
 
 def cleanup_artifacts() -> None:
-    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "collab_data"]:
+    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "collab_data", "reference_db"]:
         p = ROOT / d
         if p.exists():
             shutil.rmtree(p)
