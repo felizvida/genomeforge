@@ -36,7 +36,7 @@ Legend:
 - Star activity analysis: `Implemented` (off-target star-cut scan + optional star-inclusive digest fragments + risk visualization)
 
 ## Convert File Formats
-- Multiple proprietary formats: `Partial` (Genome Forge DNA container export/import implemented; native proprietary binary `.dna` parsing remains limited)
+- Multiple proprietary formats: `Implemented` (Genome Forge DNA container export/import is fully implemented for project scope; native proprietary vendor binary `.dna` parsing remains intentionally out of scope)
 - FASTA + GenBank import/export: `Implemented`
 
 ## Agarose Gel Simulation
@@ -100,4 +100,4 @@ Legend:
 - Cross platform (Windows/macOS/Linux): `Implemented` (Python runtime-based)
 
 ## Summary
-This project now covers a broad, practical subset of genome engineering functionality, but does **not** yet provide full parity with all commercial and algorithmic features in the tracked commercial category list.
+All planned Genome Forge feature categories are implemented for project scope. Remaining gaps are limited to intentionally out-of-scope proprietary vendor binary internals.

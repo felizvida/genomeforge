@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile check
+        run: |
+          python -m py_compile web_ui.py genomeforge_toolkit.py canonical_schema.py compat/dna_format.py
+
+      - name: Smoke test suite
+        run: |
+          python smoke_test.py
+
+      - name: Real-world functional suite
+        run: |
+          python real_world_functional_test.py

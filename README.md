@@ -49,10 +49,7 @@ http://127.0.0.1:8080
 Training materials:
 - HTML tutorial: `docs/tutorial/user_training_tutorial.html`
 - PDF tutorial: `docs/tutorial/user_training_tutorial.pdf`
-- 12-sprint implementation plan: `docs/SPRINT_PLAN_12W.md`
-- P0 implementation notes: `docs/P0_IMPLEMENTATION_NOTES.md`
-- P1 implementation notes: `docs/P1_IMPLEMENTATION_NOTES.md`
-- P2 implementation notes: `docs/P2_IMPLEMENTATION_NOTES.md`
+- Feature listing: `FEATURE_COVERAGE.md`
 
 The UI supports:
 - Sequence info and translation
