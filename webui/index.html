@@ -1842,7 +1842,9 @@ TTTCCCGGGAAATTT</textarea>
           db_name: document.getElementById('referenceDbName').value,
           add_features: true,
         }));
-        if (r.features_added && r.features_added > 0) await runFeatureList();
+        if (Array.isArray(r.features)) {
+          featureState = r.features;
+        }
         show(r);
       } catch (e) { show(String(e)); }
     }

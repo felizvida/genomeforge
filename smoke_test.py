@@ -76,6 +76,11 @@ def wait_until_ready(base_url: str, timeout_s: float = 10.0) -> None:
     raise RuntimeError(f"Server did not become ready in {timeout_s}s: {last_err}")
 
 
+def assert_condition(condition: bool, message: str) -> None:
+    if not condition:
+        raise AssertionError(message)
+
+
 def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r = SmokeRunner(base_url=base_url, verbose=verbose)
     suffix = uuid.uuid4().hex[:8]
@@ -223,14 +228,36 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
         assert z["verdict"] in {"PASS", "FAIL"}
         assert z["genotype_call_count"] >= 1
 
+        positions = [5 * (i + 1) for i in range(len(seq))]
+        wide = {
+            **t,
+            "positions": positions,
+            "traces": {b: [0] * (positions[-1] + 5) for b in "ACGT"},
+        }
+        for idx, pos in enumerate(positions):
+            base = seq[idx]
+            wide["traces"][base][pos - 1] = 1200
+        w = r.post("/api/trace-chromatogram-svg", {"trace_record": wide, "start": 1, "end": len(seq), "max_points": 120})[1]
+        assert int(w["sample_end_index_0based"]) > len(seq)
+        assert "<svg" in w["svg"]
+
     r.check("api_trace_suite", _trace_suite)
     r.check(
         "api_blast_search",
-        lambda: "hits"
-        in r.post(
-            "/api/blast-search",
-            {"query_sequence": seq[:60], "database_sequences": [{"name": "self", "sequence": seq}, {"name": "other", "sequence": seq[::-1]}]},
-        )[1],
+        lambda: (
+            lambda out: (
+                assert_condition("hits" in out and len(out["hits"]) >= 1, "missing hits"),
+                assert_condition(float(out["hits"][0]["subject_coverage_pct"]) < 100.0, "partial hit should not report 100% subject coverage"),
+            )[-1]
+        )(
+            r.post(
+                "/api/blast-search",
+                {
+                    "query_sequence": seq[:24],
+                    "database_sequences": [{"name": "partial", "sequence": "TTTTTTTT" + seq[:24] + "GGGGGGGG"}],
+                },
+            )[1]
+        ),
     )
 
     def _primers() -> None:
@@ -344,7 +371,13 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r.check("api_reference_db_load", lambda: "elements" in r.post("/api/reference-db-load", {"db_name": r.created["reference_db"]})[1])
     r.check(
         "api_reference_scan",
-        lambda: "hits" in r.post("/api/reference-scan", {**base_payload, "db_name": r.created["reference_db"], "add_features": True})[1],
+        lambda: (
+            lambda out: (
+                assert_condition("hits" in out, "missing hits"),
+                assert_condition(int(out.get("features_added", 0)) >= 1, "expected added features"),
+                assert_condition(len(out.get("features", [])) >= len(base_payload["features"]) + 1, "expected returned feature state"),
+            )[-1]
+        )(r.post("/api/reference-scan", {**base_payload, "db_name": r.created["reference_db"], "add_features": True})[1]),
     )
     r.check(
         "api_sirna_design",

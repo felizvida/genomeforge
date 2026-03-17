@@ -1,0 +1,2 @@
+30bf1fe0a2ff8ce8bbba510435685c45ad2b053585998ed9f31f8ff9504c3db6  dist/genomeforge-v0.1.3-source.tar.gz
+2a2e4dbce48893bdadd80ec611532e936c81975145a5e6710d6ef32f4240e729  dist/genomeforge-v0.1.3-source.zip

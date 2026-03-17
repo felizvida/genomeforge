@@ -492,6 +492,88 @@ def needleman_wunsch(
     }
 
 
+def smith_waterman_dna(
+    seq_a: str,
+    seq_b: str,
+    match: int = 2,
+    mismatch: int = -1,
+    gap: int = -2,
+) -> Dict[str, Any]:
+    a = parse_plain_sequence(seq_a)
+    b = parse_plain_sequence(seq_b)
+    if not a or not b:
+        raise ValueError("Both sequences are required")
+    m, n = len(a), len(b)
+    score = [[0] * (n + 1) for _ in range(m + 1)]
+    trace = [[0] * (n + 1) for _ in range(m + 1)]  # 0 stop, 1 diag, 2 up, 3 left
+    best = 0
+    best_i = 0
+    best_j = 0
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            s_diag = score[i - 1][j - 1] + (match if a[i - 1] == b[j - 1] else mismatch)
+            s_up = score[i - 1][j] + gap
+            s_left = score[i][j - 1] + gap
+            cell = max(0, s_diag, s_up, s_left)
+            score[i][j] = cell
+            if cell == 0:
+                trace[i][j] = 0
+            elif cell == s_diag:
+                trace[i][j] = 1
+            elif cell == s_up:
+                trace[i][j] = 2
+            else:
+                trace[i][j] = 3
+            if cell > best:
+                best = cell
+                best_i = i
+                best_j = j
+
+    i, j = best_i, best_j
+    end_a = i
+    end_b = j
+    aa: List[str] = []
+    bb: List[str] = []
+    while i > 0 and j > 0 and score[i][j] > 0:
+        t = trace[i][j]
+        if t == 1:
+            aa.append(a[i - 1])
+            bb.append(b[j - 1])
+            i -= 1
+            j -= 1
+        elif t == 2:
+            aa.append(a[i - 1])
+            bb.append("-")
+            i -= 1
+        elif t == 3:
+            aa.append("-")
+            bb.append(b[j - 1])
+            j -= 1
+        else:
+            break
+    start_a = i + 1
+    start_b = j + 1
+    aln_a = "".join(reversed(aa))
+    aln_b = "".join(reversed(bb))
+    aligned_columns = len(aln_a)
+    matches = sum(1 for x, y in zip(aln_a, aln_b) if x == y and x != "-" and y != "-")
+    aligned_a_bases = sum(1 for x in aln_a if x != "-")
+    aligned_b_bases = sum(1 for y in aln_b if y != "-")
+    return {
+        "score": best,
+        "identity_pct": round(matches / max(1, aligned_columns) * 100.0, 2),
+        "aligned_a": aln_a,
+        "aligned_b": aln_b,
+        "alignment_length": aligned_columns,
+        "aligned_a_bases": aligned_a_bases,
+        "aligned_b_bases": aligned_b_bases,
+        "start_a_1based": start_a,
+        "end_a_1based": end_a,
+        "start_b_1based": start_b,
+        "end_b_1based": end_b,
+    }
+
+
 def needleman_wunsch_protein(
     seq_a: str,
     seq_b: str,
@@ -1914,13 +1996,15 @@ def blast_local_search(
         seed_jaccard = inter / union
         if inter == 0 and len(query) >= k and len(target) >= k:
             continue
-        aln = needleman_wunsch(query, target, match=2, mismatch=-1, gap=-2)
+        aln = smith_waterman_dna(query, target, match=2, mismatch=-1, gap=-2)
+        if int(aln.get("score", 0)) <= 0:
+            continue
         aa = aln["aligned_a"]
         bb = aln["aligned_b"]
-        aligned_columns = len(aa)
+        aligned_columns = int(aln.get("alignment_length", len(aa)))
         matches = sum(1 for x, y in zip(aa, bb) if x == y and x != "-" and y != "-")
-        aligned_query_bases = sum(1 for x in aa if x != "-")
-        aligned_target_bases = sum(1 for y in bb if y != "-")
+        aligned_query_bases = int(aln.get("aligned_a_bases", sum(1 for x in aa if x != "-")))
+        aligned_target_bases = int(aln.get("aligned_b_bases", sum(1 for y in bb if y != "-")))
         query_cov = aligned_query_bases / max(1, len(query))
         target_cov = aligned_target_bases / max(1, len(target))
         score = int(aln.get("score", 0))
@@ -1937,6 +2021,10 @@ def blast_local_search(
                 "query_coverage_pct": round(100.0 * query_cov, 3),
                 "subject_coverage_pct": round(100.0 * target_cov, 3),
                 "alignment_length": aligned_columns,
+                "query_start_1based": int(aln.get("start_a_1based", 1)),
+                "query_end_1based": int(aln.get("end_a_1based", len(query))),
+                "subject_start_1based": int(aln.get("start_b_1based", 1)),
+                "subject_end_1based": int(aln.get("end_b_1based", len(target))),
             }
         )
     hits.sort(key=lambda x: (x["score"], x["identity_pct"], x["query_coverage_pct"]), reverse=True)
@@ -1977,20 +2065,34 @@ def trace_chromatogram_svg(
     if not isinstance(traces, dict):
         traces = {}
     ch = {b: [int(v) for v in traces.get(b, []) if isinstance(v, (int, float))] for b in "ACGT"}
-    for b in "ACGT":
-        if len(ch[b]) < n:
-            ch[b] = ch[b] + [0] * (n - len(ch[b]))
-    window_len = end_1based - start_1based + 1
-    step = max(1, int(math.ceil(window_len / max(50, int(max_points)))))
-    idxs = list(range(start_1based - 1, end_1based, step))
+    max_trace_len = max([len(ch[b]) for b in "ACGT"] + [n])
+    positions_raw = trace_record.get("positions", [])
+    if isinstance(positions_raw, list):
+        positions = [int(v) for v in positions_raw[:n] if isinstance(v, (int, float))]
+    else:
+        positions = []
+    if len(positions) < n:
+        positions = list(range(1, n + 1))
+
+    # Keep the API window in base-call coordinates, but render using raw sample positions when available.
+    base_start_idx = start_1based - 1
+    base_end_idx = end_1based - 1
+    left_sample = max(0, positions[base_start_idx] - 1)
+    right_sample = max(0, positions[base_end_idx] - 1)
+    pad = 8
+    sample_start = max(0, min(left_sample, max_trace_len - 1) - pad)
+    sample_end = min(max_trace_len - 1, max(right_sample, 0) + pad)
+    sample_span = max(1, sample_end - sample_start + 1)
+    step = max(1, int(math.ceil(sample_span / max(50, int(max_points)))))
+    idxs = list(range(sample_start, sample_end + 1, step))
     max_signal = 1
     for b in "ACGT":
         for i in idxs:
             if i < len(ch[b]):
                 max_signal = max(max_signal, ch[b][i])
 
-    def x_for(idx0: int) -> float:
-        return margin_l + (idx0 - (start_1based - 1)) * plot_w / max(1, window_len - 1)
+    def x_for(sample_idx0: int) -> float:
+        return margin_l + (sample_idx0 - sample_start) * plot_w / max(1, sample_span - 1)
 
     def y_for(v: int) -> float:
         return margin_t + plot_h - (v / max_signal) * plot_h
@@ -2006,14 +2108,22 @@ def trace_chromatogram_svg(
     for b in "ACGT":
         pts = []
         for i in idxs:
-            pts.append(f"{x_for(i):.2f},{y_for(ch[b][i]):.2f}")
+            signal = ch[b][i] if i < len(ch[b]) else 0
+            pts.append(f"{x_for(i):.2f},{y_for(signal):.2f}")
         lines.append(
             f'<polyline points="{" ".join(pts)}" fill="none" stroke="{colors[b]}" stroke-width="1.8">'
             f"<title>{b} signal</title></polyline>"
         )
+    if (end_1based - start_1based + 1) <= 120:
+        for base_idx in range(start_1based, end_1based + 1):
+            peak_x = x_for(max(0, positions[base_idx - 1] - 1))
+            lines.append(
+                f'<text x="{peak_x:.2f}" y="{margin_t + 12}" text-anchor="middle" font-size="9" '
+                f'font-family="Menlo, monospace" fill="{colors.get(seq[base_idx - 1], "#334155")}">{seq[base_idx - 1]}</text>'
+            )
     for t in range(6):
         p = int(round(start_1based + t * (end_1based - start_1based) / 5))
-        x = x_for(p - 1)
+        x = x_for(max(0, positions[p - 1] - 1))
         lines.append(f'<line x1="{x:.2f}" y1="{margin_t + plot_h}" x2="{x:.2f}" y2="{margin_t + plot_h + 6}" stroke="#334155"/>')
         lines.append(f'<text x="{x:.2f}" y="{margin_t + plot_h + 20}" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#334155">{p}</text>')
     lines.append(
@@ -2026,6 +2136,8 @@ def trace_chromatogram_svg(
         "end_1based": end_1based,
         "points": len(idxs),
         "max_signal": max_signal,
+        "sample_start_index_0based": sample_start,
+        "sample_end_index_0based": sample_end,
         "svg": "\n".join(lines),
     }
 
@@ -2236,7 +2348,14 @@ def reference_scan(record: SequenceRecord, db_name: str, add_features: bool = Fa
                 )
             )
             added += 1
-    return {"db_name": db_name, "hit_count": len(hits), "hits": hits[:2000], "features_added": added}
+    return {
+        "db_name": db_name,
+        "hit_count": len(hits),
+        "hits": hits[:2000],
+        "features_added": added,
+        "feature_count": len(record.features),
+        "features": features_to_dict(record.features),
+    }
 
 
 def design_sirna_candidates(sequence: str, min_len: int = 19, max_len: int = 21, top_n: int = 40) -> Dict[str, Any]:

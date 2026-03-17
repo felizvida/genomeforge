@@ -112,6 +112,11 @@ def wait_until_ready(base_url: str, timeout_s: float = 12.0) -> None:
     raise RuntimeError(f"Server did not become ready in {timeout_s}s")
 
 
+def assert_condition(condition: bool, message: str) -> None:
+    if not condition:
+        raise AssertionError(message)
+
+
 def summarize_object(value: Any, depth: int = 0) -> Any:
     if depth >= 3:
         return f"<{type(value).__name__}>"
@@ -337,15 +342,23 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
             )[-1]
         )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
     )
+
+    def _trace_chromatogram_svg() -> dict[str, Any]:
+        imp = r.post("/api/import-ab1", {"sequence": EGFP_CDS})
+        tr = imp["trace_record"]
+        positions = [6 * (i + 1) for i in range(len(tr["sequence"]))]
+        traces = {base: [0] * (positions[-1] + 6) for base in "ACGT"}
+        for idx, pos in enumerate(positions):
+            traces[tr["sequence"][idx]][pos - 1] = 1200
+        wide = {**tr, "positions": positions, "traces": traces}
+        out = r.post("/api/trace-chromatogram-svg", {"trace_record": wide, "start": 1, "end": 120, "max_points": 160})
+        assert_condition(int(out["sample_end_index_0based"]) > 120, "expected raw-signal sample coordinates")
+        return out
+
     r.check(
         "trace_chromatogram_svg",
         "Render Sanger chromatogram SVG from synthetic trace",
-        lambda: (
-            lambda imp: r.post(
-                "/api/trace-chromatogram-svg",
-                {"trace_id": imp["trace_record"]["trace_id"], "start": 1, "end": 240, "max_points": 300},
-            )
-        )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
+        _trace_chromatogram_svg,
     )
     r.check(
         "trace_verify_genotyping",
@@ -367,18 +380,26 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.check(
         "blast_like_search",
         "Run BLAST-like local similarity search across real sequence panel",
-        lambda: r.post(
-            "/api/blast-search",
-            {
-                "query_sequence": EGFP_CDS[:240],
-                "database_sequences": [
-                    {"name": "EGFP", "sequence": EGFP_CDS},
-                    {"name": "mCherry", "sequence": MCHERRY_CDS},
-                    {"name": "pUC19_MCS", "sequence": PUC19_MCS},
-                ],
-                "kmer": 8,
-                "top_hits": 5,
-            },
+        lambda: (
+            lambda out: (
+                assert_condition(len(out.get("hits", [])) >= 1, "expected at least one hit"),
+                assert_condition(float(out["hits"][0]["subject_coverage_pct"]) < 100.0, "local hit should not cover full subject"),
+                out,
+            )[-1]
+        )(
+            r.post(
+                "/api/blast-search",
+                {
+                    "query_sequence": EGFP_CDS[:240],
+                    "database_sequences": [
+                        {"name": "EGFP", "sequence": EGFP_CDS},
+                        {"name": "mCherry", "sequence": MCHERRY_CDS},
+                        {"name": "pUC19_MCS", "sequence": PUC19_MCS},
+                    ],
+                    "kmer": 8,
+                    "top_hits": 5,
+                },
+            )
         ),
     )
     r.check(
@@ -505,7 +526,13 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.check(
         "reference_scan_autoflag",
         "Scan sequence against reference library and add feature flags",
-        lambda: r.post("/api/reference-scan", {**egfp_payload, "db_name": r.created["reference_db"], "add_features": True}),
+        lambda: (
+            lambda out: (
+                assert_condition(int(out.get("features_added", 0)) >= 1, "expected flagged features"),
+                assert_condition(len(out.get("features", [])) >= len(egfp_payload["features"]) + 1, "expected returned feature state"),
+                out,
+            )[-1]
+        )(r.post("/api/reference-scan", {**egfp_payload, "db_name": r.created["reference_db"], "add_features": True})),
     )
     r.check(
         "sirna_design",
