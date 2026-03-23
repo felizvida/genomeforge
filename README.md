@@ -1,19 +1,30 @@
 # Genome Forge
 
-Genome Forge is a local-first DNA design, cloning, validation, and visualization workbench for molecular biology teams.
+<p align="center">
+  <img alt="Release" src="https://img.shields.io/github/v/release/felizvida/genomeforge?display_name=tag">
+  <img alt="License" src="https://img.shields.io/github/license/felizvida/genomeforge">
+  <img alt="Tutorial" src="https://img.shields.io/badge/tutorial-37%20real--world%20cases-0ea5e9">
+  <img alt="Web UI" src="https://img.shields.io/badge/interface-modern%20web%20UI-14b8a6">
+</p>
+
+Genome Forge is a local-first DNA design, cloning, validation, and bioinformatics workbench with a modern web UI, reproducible workflows, and real-world training materials.
 
 It combines:
 
-- a Python sequence engine
-- a browser-based web UI
-- reproducible regression suites
-- training materials and workflow examples
+- interactive plasmid and sequence visualization
+- cloning and assembly planning
+- primer, PCR, trace, and verification workflows
+- CRISPR/design-assist tooling
+- project history, sharing, and lightweight review
+- a 37-case self-study tutorial built on real biological examples
 
-![Genome Forge map view](docs/tutorial/assets/01_map.png)
+Latest release:
 
-## What It Covers
+- [Genome Forge v0.1.4](https://github.com/felizvida/genomeforge/releases/tag/v0.1.4)
 
-Genome Forge is built for practical sequence work across:
+## Why Genome Forge
+
+Genome Forge is built for practical sequence work across the full “design -> validate -> explain -> hand off” loop:
 
 - plasmid mapping and feature annotation
 - restriction digest planning and cloning simulation
@@ -24,6 +35,39 @@ Genome Forge is built for practical sequence work across:
 - project persistence, sharing, audit, and lightweight review workflows
 
 For the full capability and maturity matrix, see [FEATURE_COVERAGE.md](FEATURE_COVERAGE.md).
+
+## Visual Tour
+
+<table>
+  <tr>
+    <td><img alt="Map workflow" src="docs/tutorial/assets/screenshots/flagship_case_a_map.png"></td>
+    <td><img alt="Sequence track workflow" src="docs/tutorial/assets/screenshots/flagship_case_d_track.png"></td>
+  </tr>
+  <tr>
+    <td><img alt="Ligation workflow" src="docs/tutorial/assets/screenshots/flagship_case_g_ligation.png"></td>
+    <td><img alt="Trace workflow" src="docs/tutorial/assets/screenshots/flagship_case_ah_trace.png"></td>
+  </tr>
+</table>
+
+More UI examples are embedded in the training tutorial, including comparison, MSA heatmap, BLAST-like search, and project-history workflows.
+
+## Learn With Real Data
+
+The tutorial package is meant to teach both the software and the biology behind the workflows.
+
+Included training records and case bundles cover examples built around:
+
+- `EGFP` and `mCherry` reporter CDS records
+- `pUC19` multiple-cloning-site and `lacZ alpha` cloning logic
+- a medically meaningful `BRAF exon 15` hotspot fragment
+- clearly labeled derived training variants for comparison and interpretation exercises
+
+Start here:
+
+- [Tutorial HTML](docs/tutorial/user_training_tutorial.html)
+- [Tutorial PDF](docs/tutorial/user_training_tutorial.pdf)
+- [Training Case Playbook](docs/tutorial/datasets/case_playbook.md)
+- [Tutorial Dataset Guide](docs/tutorial/datasets/README.md)
 
 ## Quickstart
 
@@ -55,6 +99,15 @@ CLI entry point after install:
 genomeforge input.fasta info
 ```
 
+## Validation Snapshot
+
+Current shipped baseline:
+
+- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `19/19` passed
+- `python3 smoke_test.py` -> `108/108` passed
+- `python3 real_world_functional_test.py` -> `97/97` passed
+- `npm run test:e2e` -> `11/11` passed
+
 ## Documentation
 
 Start with:
@@ -67,17 +120,6 @@ Start with:
 - [API Reference](docs/API.md)
 - [Modernization Plan](docs/MODERNIZATION_PLAN.md)
 - [Changelog](CHANGELOG.md)
-
-Training materials:
-
-- [Tutorial HTML](docs/tutorial/user_training_tutorial.html)
-- [Tutorial PDF](docs/tutorial/user_training_tutorial.pdf)
-- [Training Case Playbook](docs/tutorial/datasets/case_playbook.md)
-- [Tutorial Dataset Guide](docs/tutorial/datasets/README.md)
-
-UI preview:
-
-![Genome Forge map workflow](docs/tutorial/assets/screenshots/flagship_case_a_map.png)
 
 ## Common Commands
 
