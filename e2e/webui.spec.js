@@ -116,3 +116,59 @@ test('creates a share bundle and opens the share page', async ({ page }) => {
   await expect(page.locator('h1')).toContainText(`Shared Bundle ${shareId}`);
   await expect(page.locator('body')).toContainText(projectName);
 });
+
+test('manages collection workflows from the browser UI', async ({ page }) => {
+  const projectName = `e2e_collection_project_${Date.now()}`;
+  const collectionName = `e2e_collection_${Date.now()}`;
+
+  await activateTab(page, 'tab-advanced');
+  await page.locator('#projectName').fill(projectName);
+  await page.locator('#name').fill(projectName);
+  await page.locator('#content').fill(`>${projectName}\nGAATTCCGGATCCATGGCCATTGTAATGGGCC`);
+  await page.locator('#tab-advanced [data-action="runProjectSave"]').click();
+  await expect(page.locator('#out')).toContainText('"saved": true');
+
+  await page.locator('#collectionName').fill(collectionName);
+  await page.locator('#collectionProjects').fill(projectName);
+  await page.locator('#tab-advanced [data-action="runCollectionSave"]').click();
+  await expect(page.locator('#out')).toContainText('"saved": true');
+
+  await page.locator('#collectionProjects').fill('');
+  await page.locator('#tab-advanced [data-action="runCollectionLoad"]').click();
+  await expect(page.locator('#collectionProjects')).toHaveValue(projectName);
+
+  await page.locator('#tab-advanced [data-action="runCollectionAddProject"]').click();
+  await expect(page.locator('#out')).toContainText('"saved": true');
+});
+
+test('runs review and permission workflows from the browser UI', async ({ page }) => {
+  const projectName = `e2e_review_project_${Date.now()}`;
+  const workspaceName = `e2e_workspace_${Date.now()}`;
+
+  await activateTab(page, 'tab-advanced');
+  await page.locator('#projectName').fill(projectName);
+  await page.locator('#name').fill(projectName);
+  await page.locator('#content').fill(`>${projectName}\nGAATTCCGGATCCATGGCCATTGTAATGGGCC`);
+  await page.locator('#tab-advanced [data-action="runProjectSave"]').click();
+  await expect(page.locator('#out')).toContainText('"saved": true');
+
+  await page.locator('#workspaceName').fill(workspaceName);
+  await page.locator('#workspaceOwner').fill('owner_user');
+  await page.locator('#workspaceMembers').fill('reviewer_user,editor_user');
+  await page.locator('#tab-advanced [data-action="runWorkspaceCreate"]').click();
+  await expect(page.locator('#out')).toContainText('"created": true');
+
+  await page.locator('#permProjectName').fill(projectName);
+  await page.locator('#reviewProjectName').fill(projectName);
+  await page.locator('#permRole').selectOption('reviewer');
+  await page.locator('#tab-advanced [data-action="runProjectPermissionsSet"]').click();
+  await expect(page.locator('#out')).toContainText('"saved": true');
+
+  await page.locator('#tab-advanced [data-action="runReviewSubmit"]').click();
+  await expect(page.locator('#reviewId')).not.toHaveValue('');
+  await expect(page.locator('#out')).toContainText('"submitted": true');
+
+  await page.locator('#tab-advanced [data-action="runReviewApprove"]').click();
+  await expect(page.locator('#out')).toContainText('"approved": true');
+  await expect(page.locator('#out')).toContainText('"status": "approved"');
+});
