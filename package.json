@@ -1,0 +1,12 @@
+{
+  "name": "genomeforge-web-tests",
+  "private": true,
+  "version": "0.1.3",
+  "description": "Browser regression tests for Genome Forge",
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2"
+  }
+}

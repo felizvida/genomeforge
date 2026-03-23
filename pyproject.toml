@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "genomeforge"
+version = "0.1.3"
+description = "Local-first DNA design, cloning, validation, and visualization workbench."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Genome Forge contributors" }
+]
+keywords = ["bioinformatics", "molecular-biology", "dna", "plasmid", "cloning", "visualization"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = []
+
+[project.optional-dependencies]
+bio = [
+  "biopython>=1.84",
+]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.11",
+]
+docs = [
+  "weasyprint>=62",
+]
+
+[project.urls]
+Homepage = "https://github.com/felizvida/genomeforge"
+Repository = "https://github.com/felizvida/genomeforge"
+Issues = "https://github.com/felizvida/genomeforge/issues"
+
+[project.scripts]
+genomeforge = "genomeforge_toolkit:main"
+genomeforge-web = "web_ui:main"
+
+[tool.setuptools]
+py-modules = ["canonical_schema", "genomeforge_toolkit", "web_ui"]
+packages = ["backend", "bio", "collab", "compat"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"

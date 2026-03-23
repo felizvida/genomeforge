@@ -1,111 +1,144 @@
-# Feature Coverage (Current Project)
+# Feature Coverage
 
-Source list: feature categories tracked from major commercial DNA workbench products.
+This document tracks what Genome Forge can do today and how much confidence to place in each area.
+
+Interpret the columns as follows:
+
+- `Availability`: whether the workflow is present in the product today.
+- `Maturity`: how close the implementation is to something we would trust for regular lab use.
+- `Validation`: how strongly the workflow is exercised by automated checks.
 
 Legend:
-- `Implemented`: available now in CLI or Web UI
-- `Partial`: available as simplified approximation
-- `Not yet`: not implemented in this project yet
+
+- `Availability`: `Available`, `Out of scope`
+- `Maturity`: `Production-ready`, `Validated heuristic`, `Experimental`
+- `Validation`: `Suite` (broad smoke or real-world coverage), `Focused` (targeted unit/integration tests), `Basic` (light automated coverage only)
 
 ## Molecular Cloning
-- Restriction Cloning: `Implemented` (digest simulation + map + compatibility checks + ligation workflows)
-- Gateway Cloning: `Implemented` (simplified recombination workflow endpoint)
-- Gibson Assembly: `Implemented` (overlap-based assembly workflow)
-- NEBuilder HiFi Assembly: `Implemented` (covered by overlap-assembly workflow)
-- In-Fusion Cloning: `Implemented` (homology-arm assembly simulation)
-- TA & GC Cloning: `Implemented` (TA/GC cloning simulation endpoint)
-- TOPO Cloning: `Implemented` (TA/BLUNT cloning simulation endpoint)
-- Sticky-end ligation products: `Implemented` (enzyme-end object model + sequence-derived ends + byproduct ranking/probability scoring + star/phosphatase model + junction/scar/frame diagnostics + interactive pathway graph)
 
-## Primers
-- Design primers: `Implemented`
-- Primer diagnostics: `Implemented` (TmNN + dimer/hairpin heuristics)
-- Primer specificity / off-target ranking: `Implemented` (local background scan + pair risk score + candidate ranking)
-- Anneal two oligos: `Implemented` (heuristic overlap anneal)
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| Restriction cloning | Available | Validated heuristic | Suite | Digest simulation, compatibility checks, ligation ranking, and map rendering are all present. |
+| Gibson assembly | Available | Validated heuristic | Suite | Overlap-based assembly workflow is implemented and regression-tested. |
+| NEBuilder HiFi-style assembly | Available | Experimental | Basic | Covered through the same overlap assembly model rather than a vendor-specific formulation. |
+| In-Fusion cloning | Available | Experimental | Focused | Homology-arm assembly workflow is present, but still adapter-style rather than full commercial fidelity. |
+| Gateway cloning | Available | Experimental | Focused | Simplified recombination workflow intended for planning, not full proprietary rule parity. |
+| TOPO cloning | Available | Experimental | Focused | Simplified TOPO/TA-style planning workflow. |
+| TA and GC cloning | Available | Experimental | Focused | Available through dedicated simulation endpoints. |
+| Sticky-end ligation product ranking | Available | Validated heuristic | Suite | Includes end matching, byproduct ranking, junction diagnostics, and pathway graphing. |
 
-## PCR and Mutagenesis
-- Simulate PCR: `Implemented`
-- Overlap extension PCR: `Implemented` (overlap-extension PCR simulator)
-- Primer-directed mutagenesis: `Implemented` (sequence replacement workflow)
+## Primers, PCR, and Mutagenesis
 
-## Enzyme Sets
-- Predefined enzyme sets: `Implemented` (built-in predefined sets + custom sets)
-- Create custom enzyme sets: `Implemented` (save/list/load/delete + digest-by-set)
-- Detailed enzyme information: `Implemented` (metadata endpoint)
-- Methylation sensitivity: `Implemented` (methylation-aware digest filtering)
-- Star activity analysis: `Implemented` (off-target star-cut scan + optional star-inclusive digest fragments + risk visualization)
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| Primer design | Available | Validated heuristic | Suite | Core design workflow is broadly exercised. |
+| Primer diagnostics | Available | Validated heuristic | Focused | Includes Tm, dimer, and hairpin heuristics. |
+| Primer specificity and off-target ranking | Available | Experimental | Focused | Local background scan and ranking are useful, but not a substitute for a full genomic specificity engine. |
+| Virtual PCR | Available | Validated heuristic | Suite | PCR prediction is covered in the broad regression suites. |
+| Overlap-extension PCR | Available | Experimental | Focused | Workflow exists and is test-backed, but still heuristic. |
+| Primer-directed mutagenesis | Available | Validated heuristic | Suite | Sequence replacement and verification flows are implemented. |
+| Oligo annealing | Available | Validated heuristic | Focused | Two-oligo annealing uses overlap heuristics. |
 
-## Convert File Formats
-- Multiple proprietary formats: `Implemented` (Genome Forge DNA container export/import implemented; native proprietary `.dna` import supported via optional Biopython parser)
-- FASTA + GenBank import/export: `Implemented`
+## Enzymes, Digests, and Gels
 
-## Agarose Gel Simulation
-- Simulate agarose gel: `Implemented` (approximate migration)
-- Simulate restriction digest lanes: `Implemented`
-- Simulate PCR amplification lanes: `Implemented` (PCR product lane simulation + marker ladders)
-- Large marker collections: `Implemented` (multiple marker-set presets: 1kb+, 100bp, ultra-low, high-range)
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| Restriction digest simulation | Available | Validated heuristic | Suite | Core digest workflows are part of the main smoke path. |
+| Predefined enzyme sets | Available | Validated heuristic | Focused | Built-in collections plus custom set support. |
+| Custom enzyme sets | Available | Validated heuristic | Focused | Save, load, list, and delete are implemented. |
+| Enzyme metadata lookup | Available | Validated heuristic | Focused | Detailed enzyme info endpoint is present. |
+| Methylation-sensitive digest filtering | Available | Experimental | Focused | Useful planning aid, but still simplified. |
+| Star activity analysis | Available | Experimental | Focused | Risk scoring and visualization are available. |
+| Agarose gel simulation | Available | Validated heuristic | Suite | Approximate migration model with digest and PCR lanes. |
+| Marker-set presets | Available | Validated heuristic | Focused | Includes multiple ladder collections. |
 
-## Features / Annotations
-- Create/edit features: `Implemented` (feature list/add/update/delete APIs + UI controls)
-- Automatic annotation: `Implemented` (motif + ORF heuristics + curated signature DB application)
-- Manual novel features: `Implemented` (feature add/update/delete workflows for arbitrary feature keys/locations)
-- Choose alternative codons: `Implemented` (codon optimize)
-- Sophisticated translated numbering: `Implemented` (translated-feature report with codon/genomic coordinate numbering)
-- Ribosomal slippage: `Implemented` (optional +/-1 slippage model in translated-feature report)
-- CRISPR helper workflows: `Implemented` (gRNA candidate design + off-target scan + HDR donor template generator)
+## Annotations, Features, and Translation
 
-## Translations
-- View/edit translated features: `Implemented` (translated feature report + codon-level translated feature edit API/UI)
-- ORFs: `Implemented`
-- Whole-sequence translations: `Implemented`
-- Reading frame checks: `Implemented` (frame-aware translation lanes + translated-feature codon numbering/slippage checks)
-- Make Protein (from DNA): `Implemented`
-- Reverse Translate (from Protein): `Implemented`
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| Feature create, edit, and delete | Available | Production-ready | Suite | CRUD operations are stable and broadly exercised. |
+| Automatic annotation | Available | Validated heuristic | Suite | Motif, ORF, and curated-signature approaches are available. |
+| Manual novel feature annotation | Available | Production-ready | Suite | Arbitrary feature entry and editing workflows are stable. |
+| Reference element libraries and auto-flagging | Available | Validated heuristic | Suite | Save, load, scan, and feature-flag flows are implemented. |
+| Whole-sequence translation | Available | Validated heuristic | Suite | Standard translation views are available. |
+| ORF detection | Available | Validated heuristic | Suite | Included in both info and annotation workflows. |
+| Translated feature view and edit | Available | Experimental | Focused | Codon-level translated editing exists, but is still a higher-risk workflow. |
+| Reverse translation | Available | Experimental | Focused | Available for planning, not codon-context-perfect recreation. |
+| Reading frame checks | Available | Validated heuristic | Focused | Exposed through translated lanes and translated-feature reporting. |
+| Alternative codon choice and codon optimization | Available | Validated heuristic | Suite | Host-aware codon optimization is implemented. |
+| Sophisticated translated numbering | Available | Experimental | Focused | Codon and genomic coordinate reporting exists with useful, but simplified, numbering support. |
+| Ribosomal slippage modeling | Available | Experimental | Basic | Optional slippage handling exists, but should be treated as exploratory. |
 
-## Alignment
-- Align DNA to reference: `Implemented` (global pairwise)
-- Verify cloning/mutagenesis: `Implemented` (compatibility checks + pairwise diagnostics + junction integrity diagnostics)
-- Trace-based plasmid verification/genotyping: `Implemented` (trace-to-reference verification with genotype calls)
-- cDNA to chromosome: `Implemented` (heuristic exon/intron cDNA-to-genome mapping endpoint)
-- Pairwise DNA/protein: `Implemented` (global pairwise for DNA and protein modes)
-- Multiple alignment: `Implemented` (progressive MSA + external aligner adapters)
-- Choice of algorithms (Clustal/MAFFT/MUSCLE/T-Coffee): `Implemented` (adapters for Clustal/MAFFT/MUSCLE/T-Coffee with fallback)
-- Contig assembly: `Implemented` (greedy overlap contig assembler)
+## Alignment, Verification, and Search
 
-## Visualizing
-- Multiple sequence views: `Implemented` (sequence tracks + MSA identity heatmap + star-activity risk panel + interactive map/track inspector with zoom/pan + minimap brush navigation + sequence analytics lens + comparison lens hotspot view)
-- Raw Sanger trace visualization: `Implemented` (chromatogram SVG panel with zoom/pan)
-- Large sequence support: `Implemented` (windowed sequence track + minimap navigation for long sequences)
-- Edit DNA/protein sequences: `Implemented` (DNA edit + protein-level codon edit)
-- Color coding: `Implemented` (map, sequence track, and UI color themes)
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| Pairwise DNA alignment | Available | Validated heuristic | Suite | Core pairwise workflows are broadly exercised. |
+| Pairwise protein alignment | Available | Validated heuristic | Focused | Supported in the same analysis layer. |
+| Multiple sequence alignment | Available | Validated heuristic | Suite | Progressive MSA plus optional external adapters. |
+| Choice of aligners (Clustal, MAFFT, MUSCLE, T-Coffee) | Available | Experimental | Basic | Adapter-backed and dependent on external tools being installed. |
+| Contig assembly | Available | Experimental | Focused | Greedy overlap assembly is available for lightweight use. |
+| Clone and mutagenesis verification | Available | Validated heuristic | Suite | Pairwise diagnostics and junction integrity checks are implemented. |
+| Trace-based plasmid verification and genotyping | Available | Validated heuristic | Suite | Trace comparison, genotype calling, and chromatogram workflows are present. |
+| Raw Sanger chromatogram visualization | Available | Validated heuristic | Suite | AB1-aware chromatogram rendering now respects sample positions. |
+| cDNA-to-genome mapping | Available | Experimental | Focused | Heuristic exon-intron mapping exists and is useful for teaching or quick inspection. |
+| BLAST-like nucleotide database search | Available | Experimental | Suite | Local seed-and-align search helps rank related sequences, but is not a true BLAST replacement. |
+| DNA and protein motif/entity search | Available | Validated heuristic | Focused | Unified search covers motifs, features, primers, and related objects. |
 
-## History Tracking
-- Comprehensive undo: `Implemented` (UI undo/redo with persisted local history state)
-- Graphical history: `Implemented` (project history graph data + SVG rendering)
-- Change coloring by recency: `Implemented` (project history graph node coloring by version recency)
-- Audit trail: `Implemented` (project audit-log endpoint with mutation event capture for save/delete + manual event append)
+## CRISPR and RNAi Design
 
-## Data Management
-- Import common formats with annotations: `Implemented` (FASTA/GenBank/EMBL parsing with feature import)
-- Export standard formats: `Implemented` (FASTA/GenBank)
-- Collections and sharing workflows: `Implemented` (local collection save/load/list/delete + add-project workflow)
-- Viewer sharing: `Implemented` (local share-bundle create/load + `/share/<id>` HTML viewer pages)
-- Batch operations: `Implemented` (batch digest)
-- Project persistence: `Implemented` (save/load/list/delete local project JSON)
-- Team collaboration core: `Implemented` (workspace creation + per-project role map + review submit/approve workflow + project diff endpoint)
-- Reference element libraries: `Implemented` (save/list/load + auto-flag scan against loaded records)
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| gRNA candidate design | Available | Experimental | Focused | Good for early planning, not a full genomic design stack. |
+| CRISPR off-target scan | Available | Experimental | Focused | Local off-target scan exists, but should be interpreted conservatively. |
+| HDR donor template design | Available | Experimental | Focused | Template-generation workflow is implemented. |
+| siRNA candidate design | Available | Experimental | Suite | GC-aware scoring and repeat penalties are implemented. |
+| siRNA target-site mapping | Available | Experimental | Suite | Strand-aware mapping workflows are present. |
 
-## Search
-- Search DNA/protein: `Implemented` (DNA motif search)
-- Search enzymes/features/primers: `Implemented` (unified entity search endpoint for motif/features/primer hits)
-- BLAST-like nucleotide database search: `Implemented` (local seed-and-align ranking with identity/coverage reporting)
-- siRNA target site mapping: `Implemented` (strand-aware mapping of siRNA binding sites)
+## Visualization and Editing
 
-## RNA Interference
-- siRNA candidate design: `Implemented` (GC-aware scoring, repeat penalties, ranked candidates)
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| Circular map view | Available | Validated heuristic | Suite | Interactive plasmid-style map with zoom and pan. |
+| Sequence track view | Available | Validated heuristic | Suite | Windowed track rendering supports long sequences. |
+| Track minimap navigation | Available | Validated heuristic | Suite | Supports fast navigation across large records. |
+| MSA identity heatmap | Available | Validated heuristic | Focused | Available after multiple alignment. |
+| Sequence analytics lens | Available | Experimental | Focused | GC, skew, complexity, and stop-density lens. |
+| Comparison lens hotspot view | Available | Experimental | Focused | Variant density and confidence view for side-by-side comparison. |
+| DNA sequence editing | Available | Production-ready | Suite | Core edit and history flows are stable. |
+| Protein-level codon editing | Available | Experimental | Focused | Useful but more specialized and less mature than direct DNA editing. |
+| Color-coded visualization themes | Available | Production-ready | Basic | Stable UI capability, though mostly a presentation concern. |
 
-## General
-- Cross platform (Windows/macOS/Linux): `Implemented` (Python runtime-based)
+## History, Collaboration, and Data Management
+
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| Undo and redo history | Available | Production-ready | Suite | Local history persistence is stable and broadly exercised. |
+| Graphical project history | Available | Validated heuristic | Focused | History graph data and SVG rendering are implemented. |
+| Audit trail | Available | Validated heuristic | Focused | Save, delete, and manual event capture are supported. |
+| Project save, load, list, delete | Available | Production-ready | Suite | Local project persistence is one of the more stable platform features. |
+| Collections | Available | Validated heuristic | Focused | Save, load, list, delete, and add-project flows are present. |
+| Share bundles and viewer pages | Available | Validated heuristic | Focused | Local sharing workflow is implemented through bundle generation and `/share/<id>` pages. |
+| Lightweight review and approval workflow | Available | Experimental | Focused | Useful for small local teams, but not a full collaboration platform. |
+| Workspace and role mapping | Available | Experimental | Focused | Present for lightweight project coordination. |
+| Batch digest operations | Available | Validated heuristic | Focused | Bulk digest workflow is available. |
+| Import FASTA, GenBank, and EMBL with annotations | Available | Validated heuristic | Suite | Core annotated import flows are well covered. |
+| Export FASTA and GenBank | Available | Production-ready | Suite | Standard export flows are stable. |
+| Proprietary `.dna` import | Available | Experimental | Basic | Depends on optional Biopython-backed parsing; fidelity varies by source file. |
+
+## Platform and Scope
+
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| Local-first web UI | Available | Validated heuristic | Suite | Stable for normal usage, but still built on a custom lightweight HTTP entrypoint. |
+| Python CLI | Available | Production-ready | Focused | Stable command-line entrypoint for core record operations. |
+| Cross-platform runtime (Windows, macOS, Linux) | Available | Production-ready | Basic | Python-based runtime model supports all major desktop platforms. |
+| Full vendor-specific binary fidelity for proprietary formats | Out of scope | N/A | N/A | Genome Forge intentionally avoids claiming full parity with commercial vendor binary internals. |
 
 ## Summary
-All planned Genome Forge feature categories are implemented for project scope. Remaining gaps are limited to intentionally out-of-scope proprietary vendor binary internals.
+
+Genome Forge now covers the planned workflow surface, but it does not claim that every workflow is equally mature.
+
+- Core record handling, feature editing, local persistence, sequence editing, import/export, and the main digest/map/PCR/verification paths are the strongest areas.
+- Many design-assist and analysis-heavy workflows are best described as validated heuristics rather than drop-in replacements for proprietary commercial engines.
+- The right way to read the project today is: broad capability, strong momentum, improving architecture, and explicit maturity labeling instead of blanket “implemented” claims.

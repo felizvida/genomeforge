@@ -16,6 +16,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,16 +27,57 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,bio]"
 
       - name: Compile check
         run: |
-          python -m py_compile web_ui.py genomeforge_toolkit.py canonical_schema.py compat/dna_format.py
+          python -m py_compile web_ui.py genomeforge_toolkit.py canonical_schema.py backend/__init__.py backend/core_api.py backend/design_api.py backend/trace_api.py backend/search_reference_api.py backend/project_api.py backend/assembly_api.py backend/analysis_api.py backend/biology_api.py compat/dna_format.py compat/ab1_format.py docs/build_tutorial_pdf.py docs/validate_docs.py smoke_test.py real_world_functional_test.py
+
+      - name: Frontend syntax check
+        run: |
+          for f in webui/js/*.js; do
+            node --check "$f"
+          done
+
+      - name: Install browser test dependencies
+        if: matrix.python-version == '3.11'
+        run: |
+          npm ci
+
+      - name: Install Playwright Chromium
+        if: matrix.python-version == '3.11'
+        run: |
+          npx playwright install --with-deps chromium
+
+      - name: Documentation validation
+        run: |
+          python docs/validate_docs.py
+
+      - name: Unit tests
+        run: |
+          python -m pytest
 
       - name: Smoke test suite
+        if: matrix.python-version == '3.11'
         run: |
           python smoke_test.py
 
+      - name: Browser end-to-end suite
+        if: matrix.python-version == '3.11'
+        run: |
+          npm run test:e2e
+
       - name: Real-world functional suite
+        if: matrix.python-version == '3.11'
         run: |
           python real_world_functional_test.py

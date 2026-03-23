@@ -633,6 +633,16 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
         lambda: r.post("/api/overlap-extension-pcr", {"fragment_a": "AAACCCGGGTTTATGCATGC", "fragment_b": "ATGCATGCGGGAAATTTCCC", "min_overlap": 8})[1].get("product_length", 0) > 0,
     )
     r.check("get_root", lambda: "Genome Forge" in r.get("/")[1])
+    r.check("get_styles_asset", lambda: "--ink:" in r.get("/styles.css")[1])
+    r.check("get_api_asset", lambda: "window.callApi" in r.get("/js/api.js")[1])
+    r.check("get_ui_core_asset", lambda: "function payload" in r.get("/js/ui-core.js")[1])
+    r.check("get_workflows_core_asset", lambda: "async function runInfo" in r.get("/js/workflows-core.js")[1])
+    r.check("get_workflows_search_asset", lambda: "async function runBlastSearch" in r.get("/js/workflows-search.js")[1])
+    r.check("get_workflows_analysis_asset", lambda: "async function runProteinEdit" in r.get("/js/workflows-analysis.js")[1])
+    r.check("get_workflows_projects_asset", lambda: "async function runProjectSave" in r.get("/js/workflows-projects.js")[1])
+    r.check("get_workflows_cloning_asset", lambda: "async function runGibsonAssemble" in r.get("/js/workflows-cloning.js")[1])
+    r.check("get_workflows_editing_asset", lambda: "async function previewEdit" in r.get("/js/workflows-editing.js")[1])
+    r.check("get_app_asset", lambda: "parseActionArgs" in r.get("/js/app.js")[1])
 
     return r.summary()
 
