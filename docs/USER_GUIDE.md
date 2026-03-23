@@ -179,3 +179,4 @@ For structured training:
 - [Tutorial HTML](tutorial/user_training_tutorial.html)
 - [Tutorial PDF](tutorial/user_training_tutorial.pdf)
 - [Training Case Playbook](tutorial/datasets/case_playbook.md)
+- [Tutorial Dataset Guide](tutorial/datasets/README.md)

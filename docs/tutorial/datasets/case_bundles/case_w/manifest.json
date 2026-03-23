@@ -1,0 +1,32 @@
+{
+  "case": {
+    "case_id": "W",
+    "title": "Protein Property Inference from Translation",
+    "cluster": "B",
+    "tab": "Advanced",
+    "workflow": "Translate two real reporter proteins and compare what the sequence suggests about size, composition, and practical use.",
+    "apis": [
+      "/api/translate"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "mCherry_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Monomeric red fluorescent protein from the mFruit engineering lineage.",
+      "why_it_matters": "mCherry is a real-world counterexample to GFP: same broad job as a reporter, different sequence history, color, and engineering constraints.",
+      "source_label": "PubMed: A monomeric red fluorescent protein",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/12060735/"
+    }
+  ]
+}

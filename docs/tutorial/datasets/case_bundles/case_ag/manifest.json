@@ -1,0 +1,34 @@
+{
+  "case": {
+    "case_id": "AG",
+    "title": "Native .dna Import and Multi-Format Conversion Workflow",
+    "cluster": "G",
+    "tab": "Advanced",
+    "workflow": "Demonstrate that a real record can move through multiple formats and come back interpretable.",
+    "apis": [
+      "/api/import-dna",
+      "/api/convert",
+      "/api/canonicalize-record"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "pUC19_MCS",
+      "type": "public-source",
+      "topology": "circular",
+      "origin": "The pUC19 multiple-cloning site from one of the most widely used teaching and cloning vectors in molecular biology.",
+      "why_it_matters": "A dense multiple-cloning site is a perfect example of engineered sequence architecture: every base exists to make cloning more flexible.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    }
+  ]
+}

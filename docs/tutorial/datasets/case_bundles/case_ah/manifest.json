@@ -1,0 +1,24 @@
+{
+  "case": {
+    "case_id": "AH",
+    "title": "Chromatogram-First Sanger Review and Confidence Gating",
+    "cluster": "G",
+    "tab": "Trace",
+    "workflow": "Start with the chromatogram itself before trusting the base calls.",
+    "apis": [
+      "/api/import-ab1",
+      "/api/trace-chromatogram-svg"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    }
+  ]
+}

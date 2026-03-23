@@ -1,0 +1,32 @@
+{
+  "case": {
+    "case_id": "C",
+    "title": "Star Activity Risk Review",
+    "cluster": "A",
+    "tab": "Advanced",
+    "workflow": "Scan relaxed-matching cut risk to understand how star activity can create off-target restriction events.",
+    "apis": [
+      "/api/star-activity-scan"
+    ]
+  },
+  "records": [
+    {
+      "name": "pUC19_MCS",
+      "type": "public-source",
+      "topology": "circular",
+      "origin": "The pUC19 multiple-cloning site from one of the most widely used teaching and cloning vectors in molecular biology.",
+      "why_it_matters": "A dense multiple-cloning site is a perfect example of engineered sequence architecture: every base exists to make cloning more flexible.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    },
+    {
+      "name": "lacZ_alpha_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.",
+      "why_it_matters": "This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    }
+  ]
+}

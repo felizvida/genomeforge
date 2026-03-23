@@ -10,6 +10,9 @@ ROOT = Path(__file__).resolve().parents[1]
 API_DOC = ROOT / "docs" / "API.md"
 TUTORIAL = ROOT / "docs" / "tutorial" / "user_training_tutorial.html"
 PLAYBOOK = ROOT / "docs" / "tutorial" / "datasets" / "case_playbook.md"
+DATASET_README = ROOT / "docs" / "tutorial" / "datasets" / "README.md"
+CASE_BUNDLES_DIR = ROOT / "docs" / "tutorial" / "datasets" / "case_bundles"
+SCREENSHOT_DIR = ROOT / "docs" / "tutorial" / "assets" / "screenshots"
 README = ROOT / "README.md"
 HANDOFF = ROOT / "HANDOFF_ZERO_MEMORY.md"
 WEB_UI = ROOT / "web_ui.py"
@@ -63,6 +66,7 @@ def main() -> int:
         HANDOFF,
         TUTORIAL,
         PLAYBOOK,
+        DATASET_README,
     ]
     for path in required_files:
         if not path.exists():
@@ -91,6 +95,24 @@ def main() -> int:
         if extra:
             errors.append(f"Case playbook contains unknown cases: {', '.join(extra)}")
 
+    if not CASE_BUNDLES_DIR.exists():
+        errors.append(f"Missing generated tutorial case bundles directory: {CASE_BUNDLES_DIR}")
+    else:
+        bundle_dirs = sorted(path for path in CASE_BUNDLES_DIR.glob("case_*") if path.is_dir())
+        if len(bundle_dirs) != EXPECTED_CASE_COUNT:
+            errors.append(f"Tutorial case bundle count is {len(bundle_dirs)}, expected {EXPECTED_CASE_COUNT}")
+        sample_bundle = CASE_BUNDLES_DIR / "case_a"
+        for required in [sample_bundle / "records.fasta", sample_bundle / "manifest.json"]:
+            if not required.exists():
+                errors.append(f"Tutorial sample bundle is missing required file: {required}")
+
+    if not SCREENSHOT_DIR.exists():
+        errors.append(f"Missing tutorial screenshot directory: {SCREENSHOT_DIR}")
+    else:
+        pngs = sorted(SCREENSHOT_DIR.glob("*.png"))
+        if len(pngs) < 8:
+            errors.append(f"Tutorial screenshot count is {len(pngs)}, expected at least 8 flagship screenshots")
+
     api_doc_text = API_DOC.read_text(encoding="utf-8")
     code_api: set[str] = set()
     code_api |= extract_code_api_inventory(WEB_UI.read_text(encoding="utf-8"))
@@ -112,7 +134,7 @@ def main() -> int:
             errors.append(f"README.md does not reference {needle}")
 
     handoff_text = HANDOFF.read_text(encoding="utf-8")
-    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "108", "97", "102"]:
+    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "108", "97", "102", "generate_tutorial.py", "case_bundles"]:
         if needle not in handoff_text:
             errors.append(f"HANDOFF_ZERO_MEMORY.md does not include expected marker '{needle}'")
 

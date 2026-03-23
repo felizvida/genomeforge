@@ -1,0 +1,23 @@
+{
+  "case": {
+    "case_id": "D",
+    "title": "Sequence Track and Translation Context",
+    "cluster": "B",
+    "tab": "Map",
+    "workflow": "Inspect EGFP with sequence tracks so base coordinates, codons, amino acids, and features can be read together.",
+    "apis": [
+      "/api/sequence-tracks"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    }
+  ]
+}

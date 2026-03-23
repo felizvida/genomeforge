@@ -1,0 +1,23 @@
+{
+  "case": {
+    "case_id": "E",
+    "title": "Primer Design and Thermodynamic Screening",
+    "cluster": "C",
+    "tab": "Primer/PCR",
+    "workflow": "Design primers around the BRAF hotspot region and screen them for temperature and composition sanity.",
+    "apis": [
+      "/api/primer-design"
+    ]
+  },
+  "records": [
+    {
+      "name": "BRAF_exon15_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "A hotspot-rich fragment centered on human BRAF exon 15, the region associated with the famous V600 oncogenic mutation family.",
+      "why_it_matters": "This is the most medically consequential sequence in the training set. It is ideal for primer design, genotyping logic, CRISPR planning, and explaining why genomic DNA is not the same thing as a CDS.",
+      "source_label": "NCBI Gene: BRAF (human)",
+      "source_url": "https://www.ncbi.nlm.nih.gov/gene/673"
+    }
+  ]
+}

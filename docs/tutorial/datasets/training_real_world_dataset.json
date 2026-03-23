@@ -1,61 +1,888 @@
 {
-  "dataset_name": "genomeforge_training_real_world_v1",
-  "created_at": "2026-03-04T00:00:00Z",
+  "dataset_name": "genomeforge_training_real_world_v2",
+  "created_at": "2026-03-23",
+  "overview": "Real-world teaching bundle for the Genome Forge tutorial, including public-source records and clearly labeled training derivatives.",
+  "usage_tips": [
+    "Use extract_case_bundle.py to materialize the exact records for one case.",
+    "Base public-source sequences live in training_real_world_sequences.fasta.",
+    "Derived training records are generated from public-source parents using explicit edit lists stored in this JSON."
+  ],
+  "record_sets": {
+    "fluorescent_panel": [
+      "EGFP_CDS",
+      "EGFP_Y67H_training_variant",
+      "EGFP_S204Y_training_variant",
+      "mCherry_CDS"
+    ],
+    "cloning_panel": [
+      "pUC19_MCS",
+      "lacZ_alpha_fragment",
+      "EGFP_CDS"
+    ],
+    "oncology_panel": [
+      "BRAF_exon15_fragment"
+    ],
+    "roundtrip_panel": [
+      "EGFP_CDS",
+      "mCherry_CDS",
+      "pUC19_MCS"
+    ]
+  },
   "records": [
     {
       "name": "EGFP_CDS",
+      "type": "public-source",
       "topology": "linear",
       "sequence_ref": "training_real_world_sequences.fasta:EGFP_CDS",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "input_details": "This is a protein-coding DNA sequence (CDS). The sequence is meant to be translated from the first base, so codon boundaries and reading frame matter immediately.",
+      "fun_fact": "A fluorescent protein is basically a self-reporting molecule: the sequence encodes the protein, and the folded protein creates its own chromophore.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/",
       "suggested_features": [
-        {"key": "CDS", "location": "1..720", "qualifiers": {"label": "EGFP", "codon_start": "1"}},
-        {"key": "gene", "location": "1..720", "qualifiers": {"label": "gfp"}}
+        {
+          "key": "CDS",
+          "location": "1..720",
+          "qualifiers": {
+            "label": "EGFP",
+            "codon_start": "1"
+          }
+        },
+        {
+          "key": "gene",
+          "location": "1..720",
+          "qualifiers": {
+            "label": "gfp"
+          }
+        }
       ]
     },
     {
       "name": "mCherry_CDS",
+      "type": "public-source",
       "topology": "linear",
       "sequence_ref": "training_real_world_sequences.fasta:mCherry_CDS",
+      "origin": "Monomeric red fluorescent protein from the mFruit engineering lineage.",
+      "why_it_matters": "mCherry is a real-world counterexample to GFP: same broad job as a reporter, different sequence history, color, and engineering constraints.",
+      "input_details": "This is also a CDS, but it encodes a coral-derived red fluorescent protein rather than a GFP-family green reporter. That makes it useful for pairwise comparison and identity search.",
+      "fun_fact": "The reason mCherry mattered so much in cell biology is that it was engineered to behave as a monomer, which made protein fusions far easier to interpret.",
+      "source_label": "PubMed: A monomeric red fluorescent protein",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/12060735/",
       "suggested_features": [
-        {"key": "CDS", "location": "1..711", "qualifiers": {"label": "mCherry", "codon_start": "1"}}
+        {
+          "key": "CDS",
+          "location": "1..711",
+          "qualifiers": {
+            "label": "mCherry",
+            "codon_start": "1"
+          }
+        }
       ]
     },
     {
       "name": "pUC19_MCS",
+      "type": "public-source",
       "topology": "circular",
       "sequence_ref": "training_real_world_sequences.fasta:pUC19_MCS",
+      "origin": "The pUC19 multiple-cloning site from one of the most widely used teaching and cloning vectors in molecular biology.",
+      "why_it_matters": "A dense multiple-cloning site is a perfect example of engineered sequence architecture: every base exists to make cloning more flexible.",
+      "input_details": "This sequence is short, circularly interpreted, and packed with restriction motifs. It is intentionally synthetic and engineered for manipulation rather than natural gene expression.",
+      "fun_fact": "The pUC19 MCS is tiny, but it changed day-to-day cloning because it made many enzyme choices available in one compact region.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2",
       "suggested_features": [
-        {"key": "misc_feature", "location": "1..63", "qualifiers": {"label": "MCS"}}
+        {
+          "key": "misc_feature",
+          "location": "1..57",
+          "qualifiers": {
+            "label": "MCS"
+          }
+        }
+      ]
+    },
+    {
+      "name": "lacZ_alpha_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "sequence_ref": "training_real_world_sequences.fasta:lacZ_alpha_fragment",
+      "origin": "lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.",
+      "why_it_matters": "This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.",
+      "input_details": "The sequence is a cloning-era workhorse. It contains coding material, but many workflows care more about its role as a reporter module than as a standalone protein-coding fragment.",
+      "fun_fact": "Blue-white screening is a molecular biology hack built on protein complementation: the colony color is a proxy for whether the vector was disrupted.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2",
+      "suggested_features": [
+        {
+          "key": "CDS",
+          "location": "1..277",
+          "qualifiers": {
+            "label": "lacZ-alpha fragment",
+            "codon_start": "1"
+          }
+        }
       ]
     },
     {
       "name": "BRAF_exon15_fragment",
+      "type": "public-source",
       "topology": "linear",
       "sequence_ref": "training_real_world_sequences.fasta:BRAF_exon15_fragment",
-      "notes": "Use for CRISPR and HDR training case."
+      "origin": "A hotspot-rich fragment centered on human BRAF exon 15, the region associated with the famous V600 oncogenic mutation family.",
+      "why_it_matters": "This is the most medically consequential sequence in the training set. It is ideal for primer design, genotyping logic, CRISPR planning, and explaining why genomic DNA is not the same thing as a CDS.",
+      "input_details": "This is a genomic fragment, not a clean coding-sequence input. If you translate it naively, you hit stop codons because intron/exon context and strand assumptions matter.",
+      "fun_fact": "BRAF V600E became a textbook hotspot because one amino-acid change in a signaling kinase can rewire cell behavior so strongly that it becomes clinically actionable.",
+      "source_label": "NCBI Gene: BRAF (human)",
+      "source_url": "https://www.ncbi.nlm.nih.gov/gene/673",
+      "suggested_features": [
+        {
+          "key": "gene",
+          "location": "1..196",
+          "qualifiers": {
+            "label": "BRAF exon 15 training fragment"
+          }
+        }
+      ]
+    },
+    {
+      "name": "EGFP_Y67H_training_variant",
+      "type": "derived-training",
+      "topology": "linear",
+      "derived_from": "EGFP_CDS",
+      "edits": [
+        {
+          "start_1based": 199,
+          "end_1based": 201,
+          "replacement": "CAC",
+          "label": "Y67H-like chromophore edit"
+        }
+      ],
+      "origin": "Training derivative of EGFP that changes the aromatic residue in the chromophore-forming motif.",
+      "why_it_matters": "This is not a random mutation. It models the idea that one codon change near a chromophore can produce a large optical shift, which is a powerful lesson for variant interpretation.",
+      "input_details": "Because this record is derived from EGFP by a single codon change, it is excellent for pairwise alignment, amino-acid consequence analysis, and demonstrating how \u201csmall diff, big phenotype\u201d problems happen in biology.",
+      "fun_fact": "Some of the most useful fluorescent protein families differ by only a handful of amino acids, yet those few edits can visibly change the color you see under the microscope.",
+      "source_label": "Derived from EGFP mutant logic described in GFP engineering literature",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/",
+      "suggested_features": [
+        {
+          "key": "CDS",
+          "location": "1..720",
+          "qualifiers": {
+            "label": "EGFP Y67H-like variant",
+            "codon_start": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "EGFP_S204Y_training_variant",
+      "type": "derived-training",
+      "topology": "linear",
+      "derived_from": "EGFP_CDS",
+      "edits": [
+        {
+          "start_1based": 610,
+          "end_1based": 612,
+          "replacement": "TAC",
+          "label": "S204Y-like aromatic packing edit"
+        }
+      ],
+      "origin": "Training derivative of EGFP that alters an aromatic-packing site near the chromophore environment.",
+      "why_it_matters": "It gives the tutorial a second closely related variant, which makes alignment, consensus, and comparison-lens examples far more realistic than comparing unrelated proteins only.",
+      "input_details": "Like the Y67H-like variant, this record is generated from a public-source EGFP backbone. The point is not to claim a specific commercial reagent but to give you a realistic engineering-style mutation to reason about.",
+      "fun_fact": "Spectral tuning in fluorescent proteins often happens because the local protein environment changes how the chromophore sees electrons, not because the whole protein is redesigned.",
+      "source_label": "Derived from EGFP engineering principles",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/",
+      "suggested_features": [
+        {
+          "key": "CDS",
+          "location": "1..720",
+          "qualifiers": {
+            "label": "EGFP S204Y-like variant",
+            "codon_start": "1"
+          }
+        }
+      ]
+    }
+  ],
+  "case_inputs": [
+    {
+      "case_id": "A",
+      "title": "Restriction Map for Cloning Entry Design",
+      "cluster": "A",
+      "records": [
+        "pUC19_MCS",
+        "lacZ_alpha_fragment"
+      ],
+      "tab": "Map",
+      "workflow": "Render the pUC19 map and compare unique restriction choices before adding a reporter insert.",
+      "apis": [
+        "/api/map",
+        "/api/digest"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case A --out ./tmp/genomeforge_case_a",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_a"
+    },
+    {
+      "case_id": "B",
+      "title": "Methylation-Aware Digest Interpretation",
+      "cluster": "A",
+      "records": [
+        "pUC19_MCS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Compare standard digest output with methylation-aware digest logic on a real cloning vector motif set.",
+      "apis": [
+        "/api/digest-advanced"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case B --out ./tmp/genomeforge_case_b",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_b"
+    },
+    {
+      "case_id": "C",
+      "title": "Star Activity Risk Review",
+      "cluster": "A",
+      "records": [
+        "pUC19_MCS",
+        "lacZ_alpha_fragment"
+      ],
+      "tab": "Advanced",
+      "workflow": "Scan relaxed-matching cut risk to understand how star activity can create off-target restriction events.",
+      "apis": [
+        "/api/star-activity-scan"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case C --out ./tmp/genomeforge_case_c",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_c"
+    },
+    {
+      "case_id": "U",
+      "title": "k-mer Profile for Contamination Suspicion",
+      "cluster": "A",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS",
+        "pUC19_MCS"
+      ],
+      "tab": "Search",
+      "workflow": "Use motif/entity search patterns to ask whether a supposed single-template sample smells like a mixed cloning population.",
+      "apis": [
+        "/api/motif",
+        "/api/search-entities"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case U --out ./tmp/genomeforge_case_u",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_u"
+    },
+    {
+      "case_id": "D",
+      "title": "Sequence Track and Translation Context",
+      "cluster": "B",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Map",
+      "workflow": "Inspect EGFP with sequence tracks so base coordinates, codons, amino acids, and features can be read together.",
+      "apis": [
+        "/api/sequence-tracks"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case D --out ./tmp/genomeforge_case_d",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_d"
+    },
+    {
+      "case_id": "M",
+      "title": "ORF Scan and Coding Potential Triage",
+      "cluster": "B",
+      "records": [
+        "BRAF_exon15_fragment",
+        "EGFP_CDS"
+      ],
+      "tab": "ORF/Motif",
+      "workflow": "Compare a clean coding sequence and a genomic fragment to learn what ORF scanning can and cannot tell you.",
+      "apis": [
+        "/api/orfs"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case M --out ./tmp/genomeforge_case_m",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_m"
+    },
+    {
+      "case_id": "P",
+      "title": "Variant Annotation from Reference-Aligned Edits",
+      "cluster": "B",
+      "records": [
+        "EGFP_CDS",
+        "EGFP_Y67H_training_variant"
+      ],
+      "tab": "Advanced",
+      "workflow": "Align a public reporter CDS to a derived chromophore variant and explain the difference in protein terms.",
+      "apis": [
+        "/api/pairwise-align",
+        "/api/translated-features"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case P --out ./tmp/genomeforge_case_p",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_p"
+    },
+    {
+      "case_id": "W",
+      "title": "Protein Property Inference from Translation",
+      "cluster": "B",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Translate two real reporter proteins and compare what the sequence suggests about size, composition, and practical use.",
+      "apis": [
+        "/api/translate"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case W --out ./tmp/genomeforge_case_w",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_w"
+    },
+    {
+      "case_id": "E",
+      "title": "Primer Design and Thermodynamic Screening",
+      "cluster": "C",
+      "records": [
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Primer/PCR",
+      "workflow": "Design primers around the BRAF hotspot region and screen them for temperature and composition sanity.",
+      "apis": [
+        "/api/primer-design"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case E --out ./tmp/genomeforge_case_e",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_e"
+    },
+    {
+      "case_id": "F",
+      "title": "Specificity Ranking with Virtual PCR/Gel",
+      "cluster": "C",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS",
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Primer/PCR",
+      "workflow": "Rank candidate primer pairs against a realistic background panel and inspect the predicted gel outcome.",
+      "apis": [
+        "/api/primer-specificity",
+        "/api/pcr",
+        "/api/gel-sim"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case F --out ./tmp/genomeforge_case_f",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_f"
+    },
+    {
+      "case_id": "Q",
+      "title": "Multiplex PCR Panel Balancing",
+      "cluster": "C",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS",
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Primer/PCR",
+      "workflow": "Compare multiple assay targets and ask whether they can coexist in one panel without obvious conflict.",
+      "apis": [
+        "/api/primer-design",
+        "/api/primer-specificity",
+        "/api/pcr"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case Q --out ./tmp/genomeforge_case_q",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_q"
+    },
+    {
+      "case_id": "AA",
+      "title": "Positive and Negative Control Design",
+      "cluster": "C",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS",
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Primer/PCR",
+      "workflow": "Design an assay package that includes controls proving both signal presence and signal absence.",
+      "apis": [
+        "/api/primer-specificity",
+        "/api/pcr"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AA --out ./tmp/genomeforge_case_aa",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_aa"
+    },
+    {
+      "case_id": "G",
+      "title": "Cloning Compatibility and Ligation Product Ranking",
+      "cluster": "D",
+      "records": [
+        "pUC19_MCS",
+        "EGFP_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Check whether the vector and insert support a coherent directional cloning plan and inspect likely ligation products.",
+      "apis": [
+        "/api/cloning-check",
+        "/api/ligation-sim"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case G --out ./tmp/genomeforge_case_g",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_g"
+    },
+    {
+      "case_id": "S",
+      "title": "Circular Construct Integrity and Junction Validation",
+      "cluster": "D",
+      "records": [
+        "pUC19_MCS",
+        "EGFP_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Validate a circularized construct by focusing on junctions, scars, and reading-frame continuity.",
+      "apis": [
+        "/api/gibson-assemble",
+        "/api/project-diff"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case S --out ./tmp/genomeforge_case_s",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_s"
+    },
+    {
+      "case_id": "Z",
+      "title": "Multi-Trace Consensus for Final Construct Call",
+      "cluster": "D",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Trace",
+      "workflow": "Combine multiple trace-derived views into one final verdict about a reporter construct.",
+      "apis": [
+        "/api/import-ab1",
+        "/api/trace-align",
+        "/api/trace-consensus"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case Z --out ./tmp/genomeforge_case_z",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_z"
+    },
+    {
+      "case_id": "H",
+      "title": "MSA, Identity Heatmap, and Phylogeny",
+      "cluster": "E",
+      "records": [
+        "EGFP_CDS",
+        "EGFP_Y67H_training_variant",
+        "EGFP_S204Y_training_variant",
+        "mCherry_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Compare a small reporter family panel to see what is conserved, what is engineered, and what is genuinely distant.",
+      "apis": [
+        "/api/msa",
+        "/api/heatmap",
+        "/api/phylo"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case H --out ./tmp/genomeforge_case_h",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_h"
+    },
+    {
+      "case_id": "N",
+      "title": "GC Landscape and Repeat Fragility",
+      "cluster": "E",
+      "records": [
+        "mCherry_CDS",
+        "lacZ_alpha_fragment"
+      ],
+      "tab": "Advanced",
+      "workflow": "Use analytics tracks to identify composition features that may complicate PCR, synthesis, or sequencing.",
+      "apis": [
+        "/api/sequence-analytics"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case N --out ./tmp/genomeforge_case_n",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_n"
+    },
+    {
+      "case_id": "O",
+      "title": "Homopolymer and Low-Complexity Risk Detection",
+      "cluster": "E",
+      "records": [
+        "lacZ_alpha_fragment",
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Search",
+      "workflow": "Flag simple-sequence patches that often produce weak confidence in sequencing or synthesis workflows.",
+      "apis": [
+        "/api/search-entities",
+        "/api/sequence-analytics"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case O --out ./tmp/genomeforge_case_o",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_o"
+    },
+    {
+      "case_id": "X",
+      "title": "Motif Enrichment and Significance Framing",
+      "cluster": "E",
+      "records": [
+        "pUC19_MCS",
+        "EGFP_CDS",
+        "mCherry_CDS"
+      ],
+      "tab": "Search",
+      "workflow": "Compare motif density across engineered vector DNA and reporter CDS records to learn when motif count is meaningful.",
+      "apis": [
+        "/api/motif",
+        "/api/search-entities"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case X --out ./tmp/genomeforge_case_x",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_x"
+    },
+    {
+      "case_id": "K",
+      "title": "CRISPR Candidate and HDR Donor Design",
+      "cluster": "F",
+      "records": [
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Advanced",
+      "workflow": "Design guide RNAs and an HDR donor around a medically meaningful BRAF hotspot region.",
+      "apis": [
+        "/api/grna-design",
+        "/api/crispr-offtargets",
+        "/api/hdr-template"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case K --out ./tmp/genomeforge_case_k",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_k"
+    },
+    {
+      "case_id": "R",
+      "title": "Promoter/RBS Context for Expression Tuning",
+      "cluster": "F",
+      "records": [
+        "lacZ_alpha_fragment",
+        "EGFP_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Use annotation and translation context to discuss why expression output depends on more than the CDS alone.",
+      "apis": [
+        "/api/auto-annotate",
+        "/api/sequence-tracks"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case R --out ./tmp/genomeforge_case_r",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_r"
+    },
+    {
+      "case_id": "V",
+      "title": "Codon Usage Bias and Host Portability",
+      "cluster": "F",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Discuss how two common reporter CDS records might look to different host translation systems.",
+      "apis": [
+        "/api/codon-optimize"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case V --out ./tmp/genomeforge_case_v",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_v"
+    },
+    {
+      "case_id": "I",
+      "title": "DNA Container Roundtrip Validation",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS",
+        "pUC19_MCS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Export and re-import multiple records to verify that file conversion preserves sequence identity and annotations.",
+      "apis": [
+        "/api/export-dna",
+        "/api/import-dna",
+        "/api/canonicalize-record"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case I --out ./tmp/genomeforge_case_i",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_i"
+    },
+    {
+      "case_id": "J",
+      "title": "AB1 Trace Alignment and Consensus Editing",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Trace",
+      "workflow": "Import a Sanger-style trace, align it to EGFP, perform an edit, and recompute consensus.",
+      "apis": [
+        "/api/import-ab1",
+        "/api/trace-align",
+        "/api/trace-edit",
+        "/api/trace-consensus"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case J --out ./tmp/genomeforge_case_j",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_j"
+    },
+    {
+      "case_id": "Y",
+      "title": "Read Simulation and Coverage Planning",
+      "cluster": "G",
+      "records": [
+        "BRAF_exon15_fragment",
+        "EGFP_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Use realistic target regions to think about how much sequencing evidence is enough for a confident call.",
+      "apis": [
+        "/api/trace-consensus",
+        "/api/sequence-analytics"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case Y --out ./tmp/genomeforge_case_y",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_y"
+    },
+    {
+      "case_id": "AE",
+      "title": "Sequence Analytics Lens (GC, Skew, Complexity, Stop Density)",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS",
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Advanced",
+      "workflow": "Use the analytics lens on a clean CDS and a genomic fragment to see how sequence context changes interpretation.",
+      "apis": [
+        "/api/sequence-analytics"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AE --out ./tmp/genomeforge_case_ae",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ae"
+    },
+    {
+      "case_id": "AF",
+      "title": "Comparison Lens (Divergence + Confidence Hotspots)",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS",
+        "EGFP_Y67H_training_variant"
+      ],
+      "tab": "Advanced",
+      "workflow": "Visualize where two nearly identical sequences diverge and decide whether the divergence matters.",
+      "apis": [
+        "/api/comparison-lens"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AF --out ./tmp/genomeforge_case_af",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_af"
+    },
+    {
+      "case_id": "AG",
+      "title": "Native .dna Import and Multi-Format Conversion Workflow",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS",
+        "pUC19_MCS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Demonstrate that a real record can move through multiple formats and come back interpretable.",
+      "apis": [
+        "/api/import-dna",
+        "/api/convert",
+        "/api/canonicalize-record"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AG --out ./tmp/genomeforge_case_ag",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ag"
+    },
+    {
+      "case_id": "AH",
+      "title": "Chromatogram-First Sanger Review and Confidence Gating",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Trace",
+      "workflow": "Start with the chromatogram itself before trusting the base calls.",
+      "apis": [
+        "/api/import-ab1",
+        "/api/trace-chromatogram-svg"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AH --out ./tmp/genomeforge_case_ah",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ah"
+    },
+    {
+      "case_id": "AI",
+      "title": "Trace-Based Genotyping and Plasmid Verification",
+      "cluster": "G",
+      "records": [
+        "BRAF_exon15_fragment",
+        "EGFP_CDS"
+      ],
+      "tab": "Trace",
+      "workflow": "Use trace evidence to make either a hotspot genotype call or a plasmid verification call.",
+      "apis": [
+        "/api/trace-verify"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AI --out ./tmp/genomeforge_case_ai",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ai"
+    },
+    {
+      "case_id": "AJ",
+      "title": "BLAST-like Similarity Search for Identity, Origin, and Contamination",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS",
+        "lacZ_alpha_fragment",
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Advanced",
+      "workflow": "Run local similarity search against a small real-world panel to identify the most likely source of an unknown sequence.",
+      "apis": [
+        "/api/blast-search"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AJ --out ./tmp/genomeforge_case_aj",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_aj"
+    },
+    {
+      "case_id": "AK",
+      "title": "Reference Element Auto-Flagging and siRNA Design/Mapping",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Reuse saved element libraries to auto-flag familiar sequence elements, then design and map siRNA candidates.",
+      "apis": [
+        "/api/reference-db-save",
+        "/api/reference-scan",
+        "/api/sirna-design",
+        "/api/sirna-map"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AK --out ./tmp/genomeforge_case_ak",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ak"
+    },
+    {
+      "case_id": "L",
+      "title": "Collaboration, Audit, and Review Governance",
+      "cluster": "H",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Create a workspace, assign roles, and run a simple review flow on a saved construct project.",
+      "apis": [
+        "/api/workspace-create",
+        "/api/project-permissions",
+        "/api/review-submit",
+        "/api/review-approve"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case L --out ./tmp/genomeforge_case_l",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_l"
+    },
+    {
+      "case_id": "T",
+      "title": "Batch Reproducibility and Parameter Locking",
+      "cluster": "H",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS",
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Advanced",
+      "workflow": "Run the same logic across several records with a locked parameter set so outputs stay comparable.",
+      "apis": [
+        "/api/project-save",
+        "/api/sequence-analytics",
+        "/api/batch-digest"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case T --out ./tmp/genomeforge_case_t",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_t"
+    },
+    {
+      "case_id": "AB",
+      "title": "Reproducible Report Package",
+      "cluster": "H",
+      "records": [
+        "EGFP_CDS",
+        "pUC19_MCS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Package a saved project and a share bundle so another scientist can reopen the same analysis context.",
+      "apis": [
+        "/api/project-save",
+        "/api/share-create",
+        "/api/share-load"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AB --out ./tmp/genomeforge_case_ab",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ab"
+    },
+    {
+      "case_id": "AC",
+      "title": "Parameter Sensitivity and Robustness Check",
+      "cluster": "H",
+      "records": [
+        "BRAF_exon15_fragment",
+        "EGFP_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Rerun a workflow under a small parameter sweep to see whether the biological conclusion is robust or fragile.",
+      "apis": [
+        "/api/primer-design",
+        "/api/grna-design",
+        "/api/sequence-analytics"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AC --out ./tmp/genomeforge_case_ac",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ac"
+    },
+    {
+      "case_id": "AD",
+      "title": "End-to-End Release Checklist and Handoff",
+      "cluster": "H",
+      "records": [
+        "EGFP_CDS",
+        "mCherry_CDS",
+        "pUC19_MCS",
+        "BRAF_exon15_fragment"
+      ],
+      "tab": "Advanced",
+      "workflow": "Treat the tutorial workspace like a releasable scientific software product and verify the handoff boundary.",
+      "apis": [
+        "/api/project-save",
+        "/api/share-create",
+        "/api/project-history-svg"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AD --out ./tmp/genomeforge_case_ad",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ad"
     }
   ],
   "enzyme_panels": {
-    "mapping_panel": ["EcoRI", "BamHI", "HindIII", "XbaI", "PstI", "KpnI"],
-    "ligation_panel": {"vector_left_enzyme": "EcoRI", "vector_right_enzyme": "BamHI", "insert_left_enzyme": "BamHI", "insert_right_enzyme": "EcoRI"}
+    "mapping_panel": [
+      "EcoRI",
+      "BamHI",
+      "HindIII",
+      "XbaI",
+      "PstI",
+      "KpnI"
+    ],
+    "ligation_panel": {
+      "vector_left_enzyme": "EcoRI",
+      "vector_right_enzyme": "BamHI",
+      "insert_left_enzyme": "BamHI",
+      "insert_right_enzyme": "EcoRI"
+    }
   },
   "primer_training": {
-    "egfp_target": {"target_start": 60, "target_end": 520, "window": 140},
-    "candidate_pairs": [
-      {"forward": "ATGGCCATTGTAATGGGCCG", "reverse": "TCTAGAAGCTTCTATCGGGC"},
-      {"forward": "GAATTCCGGATCCATGGCC", "reverse": "TCTAGAAGCTTCTATCGGGC"},
-      {"forward": "ACGGCCACAAGTTCAGCGTG", "reverse": "TCCGCCGCCGGGATCACTCT"}
+    "primary_target": "BRAF_exon15_fragment",
+    "background_records": [
+      "EGFP_CDS",
+      "mCherry_CDS",
+      "BRAF_exon15_fragment"
     ],
-    "background_records": ["EGFP_CDS", "mCherry_CDS", "BRAF_exon15_fragment"]
+    "default_window": {
+      "target_start": 40,
+      "target_end": 170,
+      "window_bp": 140
+    }
   },
   "crispr_training": {
+    "primary_target": "BRAF_exon15_fragment",
     "pam": "NGG",
     "spacer_len": 20,
-    "max_candidates": 50,
-    "offtarget_background_records": ["EGFP_CDS", "mCherry_CDS", "BRAF_exon15_fragment"],
     "hdr_example": {
-      "edit_start_1based": 100,
-      "edit_end_1based": 102,
-      "edit_sequence": "GCC",
+      "edit_start_1based": 97,
+      "edit_end_1based": 99,
+      "edit_sequence": "GAG",
       "left_arm_bp": 60,
       "right_arm_bp": 60
     }
@@ -64,12 +891,6 @@
     "workspace_name": "lab_workspace_training",
     "owner": "owner_user",
     "editor": "editor_user",
-    "reviewer": "reviewer_user",
-    "permission_roles": {
-      "owner_user": "owner",
-      "editor_user": "editor",
-      "reviewer_user": "reviewer"
-    },
-    "review_summary_template": "Ready for technical review after full in-silico validation."
+    "reviewer": "reviewer_user"
   }
 }

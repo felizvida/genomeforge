@@ -1,0 +1,52 @@
+{
+  "case": {
+    "case_id": "H",
+    "title": "MSA, Identity Heatmap, and Phylogeny",
+    "cluster": "E",
+    "tab": "Advanced",
+    "workflow": "Compare a small reporter family panel to see what is conserved, what is engineered, and what is genuinely distant.",
+    "apis": [
+      "/api/msa",
+      "/api/heatmap",
+      "/api/phylo"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "EGFP_Y67H_training_variant",
+      "type": "derived-training",
+      "topology": "linear",
+      "origin": "Training derivative of EGFP that changes the aromatic residue in the chromophore-forming motif.",
+      "why_it_matters": "This is not a random mutation. It models the idea that one codon change near a chromophore can produce a large optical shift, which is a powerful lesson for variant interpretation.",
+      "source_label": "Derived from EGFP mutant logic described in GFP engineering literature",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "EGFP_S204Y_training_variant",
+      "type": "derived-training",
+      "topology": "linear",
+      "origin": "Training derivative of EGFP that alters an aromatic-packing site near the chromophore environment.",
+      "why_it_matters": "It gives the tutorial a second closely related variant, which makes alignment, consensus, and comparison-lens examples far more realistic than comparing unrelated proteins only.",
+      "source_label": "Derived from EGFP engineering principles",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "mCherry_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Monomeric red fluorescent protein from the mFruit engineering lineage.",
+      "why_it_matters": "mCherry is a real-world counterexample to GFP: same broad job as a reporter, different sequence history, color, and engineering constraints.",
+      "source_label": "PubMed: A monomeric red fluorescent protein",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/12060735/"
+    }
+  ]
+}

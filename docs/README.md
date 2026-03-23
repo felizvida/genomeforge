@@ -16,6 +16,7 @@ This directory is the structured documentation index for Genome Forge.
 - [Tutorial HTML](tutorial/user_training_tutorial.html): full self-study training manual.
 - [Tutorial PDF](tutorial/user_training_tutorial.pdf): printable version of the training manual.
 - [Training Case Playbook](tutorial/datasets/case_playbook.md): concise checklist for all tutorial cases.
+- [Tutorial Dataset Guide](tutorial/datasets/README.md): record sources, generated case bundles, and quick-use commands.
 - [Real-World Functional Test Report](test_reports/REAL_WORLD_FUNCTIONAL_TEST_REPORT.md): current end-to-end validation summary.
 
 ## Release History

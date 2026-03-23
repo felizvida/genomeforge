@@ -1,0 +1,23 @@
+{
+  "case": {
+    "case_id": "B",
+    "title": "Methylation-Aware Digest Interpretation",
+    "cluster": "A",
+    "tab": "Advanced",
+    "workflow": "Compare standard digest output with methylation-aware digest logic on a real cloning vector motif set.",
+    "apis": [
+      "/api/digest-advanced"
+    ]
+  },
+  "records": [
+    {
+      "name": "pUC19_MCS",
+      "type": "public-source",
+      "topology": "circular",
+      "origin": "The pUC19 multiple-cloning site from one of the most widely used teaching and cloning vectors in molecular biology.",
+      "why_it_matters": "A dense multiple-cloning site is a perfect example of engineered sequence architecture: every base exists to make cloning more flexible.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "case": {
+    "case_id": "R",
+    "title": "Promoter/RBS Context for Expression Tuning",
+    "cluster": "F",
+    "tab": "Advanced",
+    "workflow": "Use annotation and translation context to discuss why expression output depends on more than the CDS alone.",
+    "apis": [
+      "/api/auto-annotate",
+      "/api/sequence-tracks"
+    ]
+  },
+  "records": [
+    {
+      "name": "lacZ_alpha_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.",
+      "why_it_matters": "This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    },
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    }
+  ]
+}

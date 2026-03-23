@@ -1,0 +1,26 @@
+{
+  "case": {
+    "case_id": "L",
+    "title": "Collaboration, Audit, and Review Governance",
+    "cluster": "H",
+    "tab": "Advanced",
+    "workflow": "Create a workspace, assign roles, and run a simple review flow on a saved construct project.",
+    "apis": [
+      "/api/workspace-create",
+      "/api/project-permissions",
+      "/api/review-submit",
+      "/api/review-approve"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    }
+  ]
+}

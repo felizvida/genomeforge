@@ -1,0 +1,32 @@
+{
+  "case": {
+    "case_id": "N",
+    "title": "GC Landscape and Repeat Fragility",
+    "cluster": "E",
+    "tab": "Advanced",
+    "workflow": "Use analytics tracks to identify composition features that may complicate PCR, synthesis, or sequencing.",
+    "apis": [
+      "/api/sequence-analytics"
+    ]
+  },
+  "records": [
+    {
+      "name": "mCherry_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Monomeric red fluorescent protein from the mFruit engineering lineage.",
+      "why_it_matters": "mCherry is a real-world counterexample to GFP: same broad job as a reporter, different sequence history, color, and engineering constraints.",
+      "source_label": "PubMed: A monomeric red fluorescent protein",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/12060735/"
+    },
+    {
+      "name": "lacZ_alpha_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.",
+      "why_it_matters": "This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    }
+  ]
+}

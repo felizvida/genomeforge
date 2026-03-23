@@ -1,0 +1,32 @@
+{
+  "case": {
+    "case_id": "AI",
+    "title": "Trace-Based Genotyping and Plasmid Verification",
+    "cluster": "G",
+    "tab": "Trace",
+    "workflow": "Use trace evidence to make either a hotspot genotype call or a plasmid verification call.",
+    "apis": [
+      "/api/trace-verify"
+    ]
+  },
+  "records": [
+    {
+      "name": "BRAF_exon15_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "A hotspot-rich fragment centered on human BRAF exon 15, the region associated with the famous V600 oncogenic mutation family.",
+      "why_it_matters": "This is the most medically consequential sequence in the training set. It is ideal for primer design, genotyping logic, CRISPR planning, and explaining why genomic DNA is not the same thing as a CDS.",
+      "source_label": "NCBI Gene: BRAF (human)",
+      "source_url": "https://www.ncbi.nlm.nih.gov/gene/673"
+    },
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    }
+  ]
+}

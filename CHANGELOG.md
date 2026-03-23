@@ -4,25 +4,21 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-03-23
+
 ### Added
 
-- Added a structured documentation set:
-  - `docs/README.md`
-  - `docs/INSTALL.md`
-  - `docs/USER_GUIDE.md`
-  - `docs/DEVELOPER_GUIDE.md`
-  - `docs/ARCHITECTURE.md`
-  - `docs/API.md`
-- Added `pyproject.toml` for package metadata, optional dependency groups, and console entry points.
-- Added a `Makefile` for common local development tasks.
-- Added `docs/validate_docs.py` to catch documentation drift.
-- Added `docs/build_tutorial_pdf.py` for repeatable tutorial PDF generation.
-- Added a focused unit-test baseline in `tests/`.
+- Added a source-driven tutorial generator at `docs/tutorial/generate_tutorial.py`.
+- Added reusable tutorial screenshot capture at `docs/tutorial/capture_tutorial_screenshots.js`.
+- Added a dataset guide for the training bundle at `docs/tutorial/datasets/README.md`.
+- Added prebuilt per-case bundles for all 37 tutorial cases under `docs/tutorial/datasets/case_bundles/`.
+- Added real UI screenshots for flagship workflows directly into the tutorial and README.
 
 ### Changed
 
-- Repositioned the repo around a product-first documentation structure rather than a flat feature dump.
-- Updated CI design to support packaging-aware checks, documentation validation, and unit-test expansion.
+- Completely rebuilt the tutorial around richer biological meaning, real-world record framing, and clearer sample-data onboarding.
+- Refreshed the tutorial HTML/PDF to use included public-source records plus labeled training derivatives.
+- Tightened documentation validation so tutorial dataset outputs and screenshot assets are checked explicitly.
 
 ## [0.1.3] - 2026-03-16
 

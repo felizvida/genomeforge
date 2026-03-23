@@ -1,0 +1,32 @@
+{
+  "case": {
+    "case_id": "AE",
+    "title": "Sequence Analytics Lens (GC, Skew, Complexity, Stop Density)",
+    "cluster": "G",
+    "tab": "Advanced",
+    "workflow": "Use the analytics lens on a clean CDS and a genomic fragment to see how sequence context changes interpretation.",
+    "apis": [
+      "/api/sequence-analytics"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "BRAF_exon15_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "A hotspot-rich fragment centered on human BRAF exon 15, the region associated with the famous V600 oncogenic mutation family.",
+      "why_it_matters": "This is the most medically consequential sequence in the training set. It is ideal for primer design, genotyping logic, CRISPR planning, and explaining why genomic DNA is not the same thing as a CDS.",
+      "source_label": "NCBI Gene: BRAF (human)",
+      "source_url": "https://www.ncbi.nlm.nih.gov/gene/673"
+    }
+  ]
+}

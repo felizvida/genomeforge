@@ -73,6 +73,11 @@ Training materials:
 - [Tutorial HTML](docs/tutorial/user_training_tutorial.html)
 - [Tutorial PDF](docs/tutorial/user_training_tutorial.pdf)
 - [Training Case Playbook](docs/tutorial/datasets/case_playbook.md)
+- [Tutorial Dataset Guide](docs/tutorial/datasets/README.md)
+
+UI preview:
+
+![Genome Forge map workflow](docs/tutorial/assets/screenshots/flagship_case_a_map.png)
 
 ## Common Commands
 

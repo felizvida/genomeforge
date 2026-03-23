@@ -1,0 +1,50 @@
+{
+  "case": {
+    "case_id": "AJ",
+    "title": "BLAST-like Similarity Search for Identity, Origin, and Contamination",
+    "cluster": "G",
+    "tab": "Advanced",
+    "workflow": "Run local similarity search against a small real-world panel to identify the most likely source of an unknown sequence.",
+    "apis": [
+      "/api/blast-search"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "mCherry_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Monomeric red fluorescent protein from the mFruit engineering lineage.",
+      "why_it_matters": "mCherry is a real-world counterexample to GFP: same broad job as a reporter, different sequence history, color, and engineering constraints.",
+      "source_label": "PubMed: A monomeric red fluorescent protein",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/12060735/"
+    },
+    {
+      "name": "lacZ_alpha_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.",
+      "why_it_matters": "This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    },
+    {
+      "name": "BRAF_exon15_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "A hotspot-rich fragment centered on human BRAF exon 15, the region associated with the famous V600 oncogenic mutation family.",
+      "why_it_matters": "This is the most medically consequential sequence in the training set. It is ideal for primer design, genotyping logic, CRISPR planning, and explaining why genomic DNA is not the same thing as a CDS.",
+      "source_label": "NCBI Gene: BRAF (human)",
+      "source_url": "https://www.ncbi.nlm.nih.gov/gene/673"
+    }
+  ]
+}

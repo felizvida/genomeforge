@@ -41,6 +41,18 @@ Tutorial PDF rebuild:
 python3 docs/build_tutorial_pdf.py
 ```
 
+Tutorial source regeneration:
+
+```bash
+python3 docs/tutorial/generate_tutorial.py
+```
+
+Tutorial screenshot regeneration:
+
+```bash
+npm run tutorial:screenshots
+```
+
 Unit baseline:
 
 ```bash
@@ -80,6 +92,7 @@ This repo now includes a `Makefile`:
 - `make e2e`
 - `make docs-check`
 - `make tutorial-pdf`
+- `make tutorial-screenshots`
 
 ## Testing Strategy
 
@@ -111,6 +124,13 @@ The application creates JSON-backed runtime directories in the repo root as need
 - `collab_data/`
 
 These are data artifacts, not source code. Test suites may create and clean them.
+
+The tutorial generator also writes reproducible training assets under `docs/tutorial/datasets/`, including:
+
+- `training_real_world_dataset.json`
+- `case_playbook.md`
+- `README.md`
+- `case_bundles/` with one ready-to-load bundle per tutorial case
 
 ## Contribution Priorities
 
@@ -149,6 +169,7 @@ npm run test:e2e
 Then update:
 
 - `CHANGELOG.md`
+- tutorial HTML via `python3 docs/tutorial/generate_tutorial.py`
 - release notes in `docs/releases/`
 - tutorial PDF if tutorial HTML changed
 - any affected product docs

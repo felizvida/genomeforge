@@ -1,0 +1,33 @@
+{
+  "case": {
+    "case_id": "A",
+    "title": "Restriction Map for Cloning Entry Design",
+    "cluster": "A",
+    "tab": "Map",
+    "workflow": "Render the pUC19 map and compare unique restriction choices before adding a reporter insert.",
+    "apis": [
+      "/api/map",
+      "/api/digest"
+    ]
+  },
+  "records": [
+    {
+      "name": "pUC19_MCS",
+      "type": "public-source",
+      "topology": "circular",
+      "origin": "The pUC19 multiple-cloning site from one of the most widely used teaching and cloning vectors in molecular biology.",
+      "why_it_matters": "A dense multiple-cloning site is a perfect example of engineered sequence architecture: every base exists to make cloning more flexible.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    },
+    {
+      "name": "lacZ_alpha_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.",
+      "why_it_matters": "This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    }
+  ]
+}

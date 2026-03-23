@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: install install-dev install-docs run smoke functional unit pytest docs-check tutorial-pdf e2e
+.PHONY: install install-dev install-docs run smoke functional unit pytest docs-check tutorial-pdf tutorial-screenshots e2e
 
 install:
 	$(PYTHON) -m pip install -e .
@@ -31,6 +31,9 @@ docs-check:
 
 tutorial-pdf:
 	$(PYTHON) docs/build_tutorial_pdf.py
+
+tutorial-screenshots:
+	npm run tutorial:screenshots
 
 e2e:
 	npm run test:e2e

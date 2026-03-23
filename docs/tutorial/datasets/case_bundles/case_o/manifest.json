@@ -1,0 +1,33 @@
+{
+  "case": {
+    "case_id": "O",
+    "title": "Homopolymer and Low-Complexity Risk Detection",
+    "cluster": "E",
+    "tab": "Search",
+    "workflow": "Flag simple-sequence patches that often produce weak confidence in sequencing or synthesis workflows.",
+    "apis": [
+      "/api/search-entities",
+      "/api/sequence-analytics"
+    ]
+  },
+  "records": [
+    {
+      "name": "lacZ_alpha_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.",
+      "why_it_matters": "This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.",
+      "source_label": "NCBI Nucleotide: pUC19 complete sequence",
+      "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
+    },
+    {
+      "name": "BRAF_exon15_fragment",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "A hotspot-rich fragment centered on human BRAF exon 15, the region associated with the famous V600 oncogenic mutation family.",
+      "why_it_matters": "This is the most medically consequential sequence in the training set. It is ideal for primer design, genotyping logic, CRISPR planning, and explaining why genomic DNA is not the same thing as a CDS.",
+      "source_label": "NCBI Gene: BRAF (human)",
+      "source_url": "https://www.ncbi.nlm.nih.gov/gene/673"
+    }
+  ]
+}
