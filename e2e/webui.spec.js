@@ -9,6 +9,21 @@ async function activateTab(page, tabId) {
   await expect(page.locator(`#${tabId}`)).toHaveClass(/active/);
 }
 
+async function clickAction(page, selector, expectedText = null) {
+  await page.locator(selector).click();
+  if (expectedText) {
+    await expect(page.locator('#out')).toContainText(expectedText);
+  }
+}
+
+async function saveProjectFromUi(page, projectName, content, recordName = projectName) {
+  await activateTab(page, 'tab-advanced');
+  await page.locator('#projectName').fill(projectName);
+  await page.locator('#name').fill(recordName);
+  await page.locator('#content').fill(content);
+  await clickAction(page, '#tab-advanced [data-action="runProjectSave"]', '"saved": true');
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
   await waitForInitialStats(page);
@@ -59,16 +74,10 @@ test('saves and reloads a project from the browser UI', async ({ page }) => {
   const projectName = `e2e_project_${Date.now()}`;
   const savedContent = '>e2e_project\nGAATTCCGGATCCATGGCCATTGTAATGGGCC';
 
-  await activateTab(page, 'tab-advanced');
-  await page.locator('#projectName').fill(projectName);
-  await page.locator('#name').fill('e2e_project');
-  await page.locator('#content').fill(savedContent);
-
-  await page.locator('#tab-advanced [data-action="runProjectSave"]').click();
-  await expect(page.locator('#out')).toContainText('"saved": true');
+  await saveProjectFromUi(page, projectName, savedContent, 'e2e_project');
 
   await page.locator('#content').fill('>temporary\nTTTTTTTTTTTT');
-  await page.locator('#tab-advanced [data-action="runProjectLoad"]').click();
+  await clickAction(page, '#tab-advanced [data-action="runProjectLoad"]');
   await expect(page.locator('#content')).toHaveValue(savedContent);
 });
 
@@ -102,13 +111,12 @@ test('creates a share bundle and opens the share page', async ({ page }) => {
   await page.locator('#collectionProjects').fill(projectName);
   await page.locator('#name').fill(projectName);
 
-  await page.locator('#tab-advanced [data-action="runProjectSave"]').click();
-  await expect(page.locator('#out')).toContainText('"saved": true');
+  await clickAction(page, '#tab-advanced [data-action="runProjectSave"]', '"saved": true');
 
-  await page.locator('#tab-advanced [data-action="runProjectHistoryGraph"]').click();
+  await clickAction(page, '#tab-advanced [data-action="runProjectHistoryGraph"]');
   await expect(page.locator('#historyGraph svg')).toBeVisible();
 
-  await page.locator('#tab-advanced [data-action="runShareCreate"]').click();
+  await clickAction(page, '#tab-advanced [data-action="runShareCreate"]');
   await expect(page.locator('#shareId')).not.toHaveValue('');
   const shareId = await page.locator('#shareId').inputValue();
 
@@ -121,54 +129,69 @@ test('manages collection workflows from the browser UI', async ({ page }) => {
   const projectName = `e2e_collection_project_${Date.now()}`;
   const collectionName = `e2e_collection_${Date.now()}`;
 
-  await activateTab(page, 'tab-advanced');
-  await page.locator('#projectName').fill(projectName);
-  await page.locator('#name').fill(projectName);
-  await page.locator('#content').fill(`>${projectName}\nGAATTCCGGATCCATGGCCATTGTAATGGGCC`);
-  await page.locator('#tab-advanced [data-action="runProjectSave"]').click();
-  await expect(page.locator('#out')).toContainText('"saved": true');
+  await saveProjectFromUi(page, projectName, `>${projectName}\nGAATTCCGGATCCATGGCCATTGTAATGGGCC`);
 
   await page.locator('#collectionName').fill(collectionName);
   await page.locator('#collectionProjects').fill(projectName);
-  await page.locator('#tab-advanced [data-action="runCollectionSave"]').click();
-  await expect(page.locator('#out')).toContainText('"saved": true');
+  await clickAction(page, '#tab-advanced [data-action="runCollectionSave"]', '"saved": true');
 
   await page.locator('#collectionProjects').fill('');
-  await page.locator('#tab-advanced [data-action="runCollectionLoad"]').click();
+  await clickAction(page, '#tab-advanced [data-action="runCollectionLoad"]');
   await expect(page.locator('#collectionProjects')).toHaveValue(projectName);
 
-  await page.locator('#tab-advanced [data-action="runCollectionAddProject"]').click();
-  await expect(page.locator('#out')).toContainText('"saved": true');
+  await clickAction(page, '#tab-advanced [data-action="runCollectionAddProject"]', '"saved": true');
 });
 
 test('runs review and permission workflows from the browser UI', async ({ page }) => {
   const projectName = `e2e_review_project_${Date.now()}`;
   const workspaceName = `e2e_workspace_${Date.now()}`;
 
-  await activateTab(page, 'tab-advanced');
-  await page.locator('#projectName').fill(projectName);
-  await page.locator('#name').fill(projectName);
-  await page.locator('#content').fill(`>${projectName}\nGAATTCCGGATCCATGGCCATTGTAATGGGCC`);
-  await page.locator('#tab-advanced [data-action="runProjectSave"]').click();
-  await expect(page.locator('#out')).toContainText('"saved": true');
+  await saveProjectFromUi(page, projectName, `>${projectName}\nGAATTCCGGATCCATGGCCATTGTAATGGGCC`);
 
   await page.locator('#workspaceName').fill(workspaceName);
   await page.locator('#workspaceOwner').fill('owner_user');
   await page.locator('#workspaceMembers').fill('reviewer_user,editor_user');
-  await page.locator('#tab-advanced [data-action="runWorkspaceCreate"]').click();
-  await expect(page.locator('#out')).toContainText('"created": true');
+  await clickAction(page, '#tab-advanced [data-action="runWorkspaceCreate"]', '"created": true');
 
   await page.locator('#permProjectName').fill(projectName);
   await page.locator('#reviewProjectName').fill(projectName);
   await page.locator('#permRole').selectOption('reviewer');
-  await page.locator('#tab-advanced [data-action="runProjectPermissionsSet"]').click();
-  await expect(page.locator('#out')).toContainText('"saved": true');
+  await clickAction(page, '#tab-advanced [data-action="runProjectPermissionsSet"]', '"saved": true');
 
-  await page.locator('#tab-advanced [data-action="runReviewSubmit"]').click();
+  await clickAction(page, '#tab-advanced [data-action="runReviewSubmit"]', '"submitted": true');
   await expect(page.locator('#reviewId')).not.toHaveValue('');
-  await expect(page.locator('#out')).toContainText('"submitted": true');
 
-  await page.locator('#tab-advanced [data-action="runReviewApprove"]').click();
-  await expect(page.locator('#out')).toContainText('"approved": true');
+  await clickAction(page, '#tab-advanced [data-action="runReviewApprove"]', '"approved": true');
   await expect(page.locator('#out')).toContainText('"status": "approved"');
+});
+
+test('shows project audit log and diff from the browser UI', async ({ page }) => {
+  const baseName = `e2e_audit_base_${Date.now()}`;
+  const variantName = `e2e_audit_variant_${Date.now()}`;
+  const baseContent = `>${baseName}\nGAATTCCGGATCCATGGCCATTGTAATGGGCC`;
+  const variantContent = `>${variantName}\nGAATTCCGGATCCATGGCCATTGTAAAGGGCC`;
+
+  await saveProjectFromUi(page, baseName, baseContent);
+  await saveProjectFromUi(page, variantName, variantContent);
+
+  await page.locator('#permProjectName').fill(baseName);
+  await page.locator('#reviewProjectName').fill(baseName);
+  await page.locator('#reviewSubmitter').fill('editor_user');
+  await page.locator('#reviewerName').fill('reviewer_user');
+  await page.locator('#permRole').selectOption('reviewer');
+  await clickAction(page, '#tab-advanced [data-action="runProjectPermissionsSet"]', '"saved": true');
+  await clickAction(page, '#tab-advanced [data-action="runReviewSubmit"]', '"submitted": true');
+  await expect(page.locator('#reviewId')).not.toHaveValue('');
+  await clickAction(page, '#tab-advanced [data-action="runReviewApprove"]', '"approved": true');
+
+  await clickAction(page, '#tab-advanced [data-action="runProjectAuditLogGet"]', '"events"');
+  await expect(page.locator('#out')).toContainText('"action": "project_save"');
+  await expect(page.locator('#out')).toContainText('"action": "review_approve"');
+
+  await page.locator('#projectName').fill(baseName);
+  await page.locator('#permProjectName').fill(variantName);
+  await clickAction(page, '#tab-advanced [data-action="runProjectDiff"]', '"sequence_identity_pct"');
+  await expect(page.locator('#out')).toContainText('"sequence_change_count"');
+  await expect(page.locator('#out')).toContainText('"name_a"');
+  await expect(page.locator('#out')).toContainText('"name_b"');
 });
