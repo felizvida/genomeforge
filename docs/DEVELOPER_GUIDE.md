@@ -96,7 +96,7 @@ Current shipped baseline:
 - focused unit coverage in `tests/`
 - broad API regression through `smoke_test.py`
 - end-to-end biology workflow regression through `real_world_functional_test.py`
-- browser workflow regression through `e2e/webui.spec.js`
+- browser workflow regression through `e2e/webui.spec.js` and shared helpers under `e2e/support/`
 
 ## Generated Runtime Data
 

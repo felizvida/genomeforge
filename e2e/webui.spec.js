@@ -1,32 +1,12 @@
 const { test, expect } = require('@playwright/test');
-
-async function waitForInitialStats(page) {
-  await expect(page.locator('#sLen')).not.toHaveText('-');
-}
-
-async function activateTab(page, tabId) {
-  await page.locator(`#tabs .tab[data-tab="${tabId}"]`).click();
-  await expect(page.locator(`#${tabId}`)).toHaveClass(/active/);
-}
-
-async function clickAction(page, selector, expectedText = null) {
-  await page.locator(selector).click();
-  if (expectedText) {
-    await expect(page.locator('#out')).toContainText(expectedText);
-  }
-}
-
-async function readOutJson(page) {
-  return JSON.parse(await page.locator('#out').innerText());
-}
-
-async function saveProjectFromUi(page, projectName, content, recordName = projectName) {
-  await activateTab(page, 'tab-advanced');
-  await page.locator('#projectName').fill(projectName);
-  await page.locator('#name').fill(recordName);
-  await page.locator('#content').fill(content);
-  await clickAction(page, '#tab-advanced [data-action="runProjectSave"]', '"saved": true');
-}
+const {
+  activateTab,
+  clickAction,
+  expectOutError,
+  readOutJson,
+  saveProjectFromUi,
+  waitForInitialStats,
+} = require('./support/ui');
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -233,4 +213,24 @@ test('lists and deletes projects and collections from the browser UI', async ({ 
   await clickAction(page, '#tab-advanced [data-action="runProjectList"]', '"projects"');
   const projectListAfterDelete = await readOutJson(page);
   expect(projectListAfterDelete.projects.map((row) => row.project_name)).not.toContain(projectName);
+});
+
+test('shows missing-resource errors from the browser UI', async ({ page }) => {
+  const missingProject = `e2e_missing_project_${Date.now()}`;
+  const missingCollection = `e2e_missing_collection_${Date.now()}`;
+  const missingShare = `missing_share_${Date.now()}`;
+
+  await activateTab(page, 'tab-advanced');
+
+  await page.locator('#projectName').fill(missingProject);
+  await clickAction(page, '#tab-advanced [data-action="runProjectLoad"]');
+  await expectOutError(page, 'Project not found');
+
+  await page.locator('#collectionName').fill(missingCollection);
+  await clickAction(page, '#tab-advanced [data-action="runCollectionLoad"]');
+  await expectOutError(page, 'Collection not found');
+
+  await page.locator('#shareId').fill(missingShare);
+  await clickAction(page, '#tab-advanced [data-action="runShareLoad"]');
+  await expectOutError(page, 'Share bundle not found');
 });
