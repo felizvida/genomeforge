@@ -16,6 +16,10 @@ async function clickAction(page, selector, expectedText = null) {
   }
 }
 
+async function readOutJson(page) {
+  return JSON.parse(await page.locator('#out').innerText());
+}
+
 async function saveProjectFromUi(page, projectName, content, recordName = projectName) {
   await activateTab(page, 'tab-advanced');
   await page.locator('#projectName').fill(projectName);
@@ -194,4 +198,39 @@ test('shows project audit log and diff from the browser UI', async ({ page }) =>
   await expect(page.locator('#out')).toContainText('"sequence_change_count"');
   await expect(page.locator('#out')).toContainText('"name_a"');
   await expect(page.locator('#out')).toContainText('"name_b"');
+});
+
+test('lists and deletes projects and collections from the browser UI', async ({ page }) => {
+  const projectName = `e2e_delete_project_${Date.now()}`;
+  const collectionName = `e2e_delete_collection_${Date.now()}`;
+
+  await saveProjectFromUi(page, projectName, `>${projectName}\nGAATTCCGGATCCATGGCCATTGTAATGGGCC`);
+
+  await page.locator('#collectionName').fill(collectionName);
+  await page.locator('#collectionProjects').fill(projectName);
+  await clickAction(page, '#tab-advanced [data-action="runCollectionSave"]', '"saved": true');
+
+  await clickAction(page, '#tab-advanced [data-action="runProjectList"]', '"projects"');
+  const projectList = await readOutJson(page);
+  expect(projectList.projects.map((row) => row.project_name)).toContain(projectName);
+
+  await clickAction(page, '#tab-advanced [data-action="runCollectionList"]', '"collections"');
+  const collectionList = await readOutJson(page);
+  expect(collectionList.collections.map((row) => row.collection_name)).toContain(collectionName);
+
+  await clickAction(page, '#tab-advanced [data-action="runCollectionDelete"]', '"deleted": true');
+  const collectionDelete = await readOutJson(page);
+  expect(collectionDelete.collection_name).toBe(collectionName);
+
+  await clickAction(page, '#tab-advanced [data-action="runCollectionList"]', '"collections"');
+  const collectionListAfterDelete = await readOutJson(page);
+  expect(collectionListAfterDelete.collections.map((row) => row.collection_name)).not.toContain(collectionName);
+
+  await clickAction(page, '#tab-advanced [data-action="runProjectDelete"]', '"deleted": true');
+  const projectDelete = await readOutJson(page);
+  expect(projectDelete.project_name).toBe(projectName);
+
+  await clickAction(page, '#tab-advanced [data-action="runProjectList"]', '"projects"');
+  const projectListAfterDelete = await readOutJson(page);
+  expect(projectListAfterDelete.projects.map((row) => row.project_name)).not.toContain(projectName);
 });
