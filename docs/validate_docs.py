@@ -62,11 +62,21 @@ def main() -> int:
         API_DOC,
         ROOT / "docs" / "MODERNIZATION_PLAN.md",
         ROOT / "CHANGELOG.md",
+        ROOT / "CONTRIBUTING.md",
         README,
         HANDOFF,
         TUTORIAL,
         PLAYBOOK,
         DATASET_README,
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "config.yml",
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "bug_report.yml",
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "feature_request.yml",
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "workflow_feedback.yml",
+        ROOT / ".github" / "DISCUSSION_TEMPLATE" / "general.yml",
+        ROOT / ".github" / "DISCUSSION_TEMPLATE" / "ideas.yml",
+        ROOT / ".github" / "DISCUSSION_TEMPLATE" / "q-a.yml",
+        ROOT / ".github" / "DISCUSSION_TEMPLATE" / "show-and-tell.yml",
+        ROOT / ".github" / "pull_request_template.md",
     ]
     for path in required_files:
         if not path.exists():
@@ -129,7 +139,7 @@ def main() -> int:
             errors.append(f"API.md documents unknown endpoints: {', '.join(extra)}")
 
     readme_text = README.read_text(encoding="utf-8")
-    for needle in ["docs/README.md", "docs/INSTALL.md", "docs/API.md", "docs/MODERNIZATION_PLAN.md"]:
+    for needle in ["docs/README.md", "docs/INSTALL.md", "docs/API.md", "docs/MODERNIZATION_PLAN.md", "CONTRIBUTING.md", "Roadmap Snapshot"]:
         if needle not in readme_text:
             errors.append(f"README.md does not reference {needle}")
 

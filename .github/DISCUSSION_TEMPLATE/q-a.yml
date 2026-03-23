@@ -1,0 +1,35 @@
+title: "[Question] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask for usage help here. Questions are a good fit when you are trying to accomplish something in Genome Forge and want advice, interpretation help, or a better workflow.
+  - type: input
+    id: goal
+    attributes:
+      label: Goal
+      description: What are you trying to accomplish?
+      placeholder: Annotate a plasmid, verify a sequence, compare variants, export a map figure
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you already tried
+      description: Tell us the steps you took so far and where you got stuck.
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data or example input
+      description: What kind of sequence, trace, or project data are you working with?
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Desired result
+      description: What answer, figure, or decision are you hoping to get out of the workflow?
+    validations:
+      required: true

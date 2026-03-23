@@ -1,0 +1,80 @@
+name: Bug report
+description: Report a reproducible defect in the web UI, CLI, analysis logic, import/export, or tutorial workflow.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. The most helpful bug reports in Genome Forge include the workflow goal, input data type, and the exact point where the result stopped matching expectations.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Which part of Genome Forge is closest to the problem?
+      options:
+        - Web UI
+        - CLI
+        - Sequence import or export
+        - Visualization or map rendering
+        - Cloning or assembly
+        - Primer, PCR, or mutagenesis
+        - Trace, verification, or genotyping
+        - Search, alignment, or comparison
+        - Tutorial or training assets
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Release version, tag, or commit SHA.
+      placeholder: v0.1.4 or aa87a9a
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, Python version, and browser if relevant.
+      placeholder: macOS 15, Python 3.12, Chrome 134
+    validations:
+      required: true
+  - type: textarea
+    id: input_data
+    attributes:
+      label: Input data
+      description: What kind of data triggered the problem?
+      placeholder: FASTA, GenBank, AB1 trace, tutorial bundle, or a short de-identified example sequence.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps that lead to the issue.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What result were you expecting?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead? Include error text if there is any.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Screenshots, logs, or extra notes
+      description: Add anything else that would help us reproduce or diagnose the problem.

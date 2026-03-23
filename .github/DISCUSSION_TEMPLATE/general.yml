@@ -1,0 +1,28 @@
+title: "[Discussion] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this discussion for broad conversation about Genome Forge: design tradeoffs, roadmap reactions, usage patterns, or anything that does not fit neatly into a bug or feature request.
+  - type: input
+    id: topic
+    attributes:
+      label: Topic
+      description: What would you like to discuss?
+      placeholder: Long-term direction for project sharing, tutorial improvements, UI clarity, or lab adoption patterns
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What workflow, user group, or scientific problem is behind this discussion?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What would make this discussion useful
+      description: What decision, clarification, or next step are you hoping to reach?
+    validations:
+      required: true

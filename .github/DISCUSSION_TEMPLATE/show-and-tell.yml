@@ -1,0 +1,32 @@
+title: "[Show and Tell] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share something you built, analyzed, or learned with Genome Forge. Good posts here help others discover useful workflows and edge cases.
+  - type: input
+    id: summary
+    attributes:
+      label: What did you do?
+      description: Give a short summary of the workflow or result.
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data and workflow
+      description: What did you start with, and what steps did you use?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What result, figure, or conclusion came out of it?
+    validations:
+      required: true
+  - type: textarea
+    id: lessons
+    attributes:
+      label: Lessons learned
+      description: What would help the next person trying something similar?

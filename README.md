@@ -118,8 +118,29 @@ Start with:
 - [Developer Guide](docs/DEVELOPER_GUIDE.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [API Reference](docs/API.md)
+- [Contributing Guide](CONTRIBUTING.md)
 - [Modernization Plan](docs/MODERNIZATION_PLAN.md)
 - [Changelog](CHANGELOG.md)
+
+## Community
+
+Ways to engage:
+
+- open an Issue for a reproducible bug or concrete feature request
+- start a Discussion for workflow design, usage help, or broader product feedback
+- use the [Contributing Guide](CONTRIBUTING.md) for setup, test expectations, and PR discipline
+
+This repo now includes structured GitHub issue forms and discussion prompts tuned for scientific workflow feedback, not just generic software bug reports.
+
+## Roadmap Snapshot
+
+```mermaid
+flowchart LR
+  A["Now<br/>Stabilize workflows<br/>Broaden browser regression<br/>Polish docs and training"] --> B["Next<br/>Typed frontend state<br/>Cleaner component boundaries<br/>Generated capability docs"]
+  B --> C["Later<br/>Structured API layer<br/>Deeper collaboration flows<br/>Longer-term platform hardening"]
+```
+
+For the fuller engineering roadmap, see [docs/MODERNIZATION_PLAN.md](docs/MODERNIZATION_PLAN.md).
 
 ## Common Commands
 

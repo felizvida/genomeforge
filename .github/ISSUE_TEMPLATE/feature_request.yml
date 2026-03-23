@@ -1,0 +1,65 @@
+name: Feature request
+description: Propose a new capability, workflow improvement, or missing analysis feature.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please focus on the user problem first. The best requests explain the biological or analysis task, the starting data, and what a trustworthy output would look like.
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: Workflow area
+      options:
+        - Visualization and maps
+        - Cloning and assembly
+        - Primer or PCR design
+        - Trace review and sequence verification
+        - Annotation and reference libraries
+        - Alignment, comparison, or search
+        - CRISPR or design assist
+        - Project sharing and review
+        - Tutorial and training
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What is hard, slow, or risky in the current workflow?
+    validations:
+      required: true
+  - type: textarea
+    id: users
+    attributes:
+      label: Who benefits and in what context
+      description: Tell us who needs this and what task they are trying to complete.
+      placeholder: "Example: a lab member verifying plasmids from Sanger traces before ordering a new construct."
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Typical input data
+      description: What data would the user start with?
+      placeholder: plasmid record, FASTA insert, AB1 trace, gRNA list, GenBank genome segment
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: Desired outcome
+      description: What should Genome Forge help the user conclude, design, or export?
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround
+      description: How do you solve this today, and what is painful about that workaround?
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example tools, screenshots, or references
+      description: Optional. Include other products or papers only if they clarify the request.

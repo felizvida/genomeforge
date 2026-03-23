@@ -1,0 +1,53 @@
+name: Workflow feedback
+description: Share a lab or analysis workflow that feels awkward, incomplete, or especially important.
+title: "[Workflow]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This form is for real-world usage feedback. It is especially useful when the software technically works, but the flow is still too slow, too confusing, or too fragile for day-to-day use.
+  - type: input
+    id: task
+    attributes:
+      label: Biological or analysis task
+      description: What are you trying to accomplish?
+      placeholder: Verify a plasmid from Sanger traces, plan a Gibson assembly, compare a mutant against wild type
+    validations:
+      required: true
+  - type: textarea
+    id: starting_point
+    attributes:
+      label: Starting data and context
+      description: What do you start with, and what decisions depend on the result?
+    validations:
+      required: true
+  - type: textarea
+    id: current_flow
+    attributes:
+      label: Current Genome Forge flow
+      description: Describe the steps you take today.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: friction
+    attributes:
+      label: Where the friction is
+      description: What part is confusing, repetitive, easy to misread, or missing entirely?
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What a better result would look like
+      description: If the workflow were great, what would the user see or learn at the end?
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Real-world examples or sample records
+      description: Optional. Public sequences, screenshots, or de-identified examples are especially helpful.

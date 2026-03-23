@@ -139,6 +139,7 @@ Current engineering priorities are tracked in:
 - [Modernization Plan](MODERNIZATION_PLAN.md)
 - [Architecture](ARCHITECTURE.md)
 - [API Reference](API.md)
+- [Contributing Guide](../CONTRIBUTING.md)
 
 In practice, the highest-value work right now is:
 
@@ -173,3 +174,13 @@ Then update:
 - release notes in `docs/releases/`
 - tutorial PDF if tutorial HTML changed
 - any affected product docs
+
+## Community Intake
+
+GitHub community-facing files now live in:
+
+- `.github/ISSUE_TEMPLATE/`: structured issue intake for bugs, feature requests, and workflow feedback
+- `.github/DISCUSSION_TEMPLATE/`: prompts for ideas, questions, general discussion, and show-and-tell posts
+- `.github/pull_request_template.md`: PR summary and validation checklist
+
+When changing user-facing workflows, update these files if the best intake path or expected reproduction details change.

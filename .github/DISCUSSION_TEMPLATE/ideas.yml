@@ -1,0 +1,32 @@
+title: "[Idea] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share a product or workflow idea. Focus on the underlying problem first, then the possible implementation.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem worth solving
+      description: What gap or frustration is motivating this idea?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_direction
+    attributes:
+      label: Proposed direction
+      description: What would you like Genome Forge to do differently?
+    validations:
+      required: true
+  - type: textarea
+    id: beneficiaries
+    attributes:
+      label: Who would benefit
+      description: Which users or workflows would get better because of this?
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples, references, or sketches
+      description: Optional. Link to screenshots, figures, public sequences, or other tools only if they help explain the idea.

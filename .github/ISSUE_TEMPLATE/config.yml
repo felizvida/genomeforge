@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Workflow Questions And Design Discussion
+    url: https://github.com/felizvida/genomeforge/discussions
+    about: Use Discussions for usage questions, workflow design, interpretation help, and broader feedback.
+  - name: Tutorial And Training Dataset
+    url: https://github.com/felizvida/genomeforge/tree/master/docs/tutorial
+    about: Start here for the self-study tutorial, screenshots, bundled sample data, and training workflows.

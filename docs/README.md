@@ -9,6 +9,7 @@ This directory is the structured documentation index for Genome Forge.
 - [Developer Guide](DEVELOPER_GUIDE.md): repo layout, commands, test strategy, and release workflow.
 - [Architecture](ARCHITECTURE.md): current system structure, data flow, and modernization notes.
 - [API Reference](API.md): endpoint inventory grouped by workflow domain.
+- [Contributing Guide](../CONTRIBUTING.md): contribution flow, feedback channels, and validation expectations.
 - [Modernization Plan](MODERNIZATION_PLAN.md): phased roadmap for packaging, architecture, UI, CI, and delivery improvements.
 
 ## Training And Validation
