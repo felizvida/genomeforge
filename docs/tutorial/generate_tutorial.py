@@ -919,6 +919,28 @@ def render_cover_spread() -> str:
     return f'<div class="cover-spread">{cards}</div>'
 
 
+def render_publication_note(case_count: int) -> str:
+    return dedent(f'''
+      <section class="section frontmatter">
+        <p class="section-kicker">Front Matter</p>
+        <h2>Publication Notes</h2>
+        <div class="pub-grid">
+          <div class="card">
+            <h3>Abstract</h3>
+            <p>This tutorial is designed as a publication-style course reader for learning practical bioinformatics with Genome Forge. It combines real biological records, stepwise software workflows, expected outputs, interpretation guidance, and biological explanation in one reproducible volume.</p>
+            <p>The current edition contains {case_count} lessons arranged into themed clusters that progress from molecular architecture and restriction logic through assay design, assembly, comparative reasoning, ambiguity-aware analysis, and reproducible project delivery.</p>
+          </div>
+          <div class="card alt">
+            <h3>Edition and Citation</h3>
+            <p><b>Edition:</b> Genome Forge Textbook Edition, generated from repository source on <code>{escape(TODAY)}</code>.</p>
+            <p><b>Preferred citation:</b> <i>Teach Yourself Bioinformatics with Genome Forge</i>, Genome Forge {escape(APP_VERSION)}, tutorial edition.</p>
+            <p><b>Formats:</b> HTML and PDF are generated from the same source, so case numbering, sample data, and screenshots stay aligned.</p>
+          </div>
+        </div>
+      </section>
+    ''').strip()
+
+
 def render_iupac_table() -> str:
     rows = ''.join(
         '<tr>'
@@ -1031,7 +1053,7 @@ def render_cluster(cluster: dict) -> str:
 
 def render_html() -> str:
     cluster_links = ''.join(
-        f'<li><a href="#cluster-{escape(cluster["id"])}">Cluster {escape(cluster["id"])}: {escape(cluster["title"])} ({len(CLUSTER_CASES[cluster["id"]])} cases)</a></li>'
+        f'<li><a href="#cluster-{escape(cluster["id"])}"><span class="toc-title">Cluster {escape(cluster["id"])}: {escape(cluster["title"])}</span><span class="toc-count">{len(CLUSTER_CASES[cluster["id"]])} cases</span></a></li>'
         for cluster in CLUSTERS
     )
     cluster_sections = '\n'.join(render_cluster(cluster) for cluster in CLUSTERS)
@@ -1045,12 +1067,49 @@ def render_html() -> str:
   <style>
     @page {{
       size: A4;
-      margin: 15mm 13mm 18mm 13mm;
-      @bottom-right {{
-        content: "Genome Forge Tutorial | Page " counter(page);
+      margin: 17mm 15mm 20mm 15mm;
+    }}
+    @page :left {{
+      margin-left: 18mm;
+      margin-right: 14mm;
+      @top-left {{
+        content: "Teach Yourself Bioinformatics with Genome Forge";
+        color: #6b7280;
+        font-size: 8.5px;
+        letter-spacing: 0.06em;
+      }}
+      @bottom-left {{
+        content: counter(page);
         color: #64748b;
         font-size: 9px;
       }}
+    }}
+    @page :right {{
+      margin-left: 14mm;
+      margin-right: 18mm;
+      @top-right {{
+        content: "Genome Forge Tutorial";
+        color: #6b7280;
+        font-size: 8.5px;
+        letter-spacing: 0.06em;
+      }}
+      @bottom-right {{
+        content: counter(page);
+        color: #64748b;
+        font-size: 9px;
+      }}
+    }}
+    @page :first {{
+      @top-left {{ content: none; }}
+      @top-right {{ content: none; }}
+      @bottom-left {{ content: none; }}
+      @bottom-right {{ content: none; }}
+    }}
+    @page cover {{
+      @top-left {{ content: none; }}
+      @top-right {{ content: none; }}
+      @bottom-left {{ content: none; }}
+      @bottom-right {{ content: none; }}
     }}
     :root {{
       --ink: #1d2733;
@@ -1068,17 +1127,18 @@ def render_html() -> str:
       --code-ink: #dbeafe;
     }}
     * {{ box-sizing: border-box; }}
+    html {{ hyphens: auto; }}
     body {{
       margin: 0;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 246, 238, 0.94)),
-        repeating-linear-gradient(0deg, rgba(90, 85, 70, 0.02), rgba(90, 85, 70, 0.02) 1px, transparent 1px, transparent 24px);
+      background: #f4efe6;
       color: var(--ink);
       font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-      font-size: 12px;
-      line-height: 1.72;
+      font-size: 11.3px;
+      line-height: 1.64;
+      counter-reset: figure;
     }}
     a {{ color: var(--teal); text-decoration: none; }}
+    p, li {{ widows: 3; orphans: 3; }}
     code {{
       font-family: "IBM Plex Mono", Menlo, Consolas, monospace;
       background: #ece6da;
@@ -1099,11 +1159,13 @@ def render_html() -> str:
       white-space: pre-wrap;
       page-break-inside: avoid;
     }}
-    .doc {{ max-width: 1040px; margin: 0 auto; padding: 14px 10px 30px; }}
+    .doc {{ max-width: 940px; margin: 0 auto; padding: 20px 14px 44px; }}
     .cover {{
+      page: cover;
+      break-after: page;
       position: relative;
       overflow: hidden;
-      padding: 24px 24px 18px;
+      padding: 26px 26px 22px;
       border-radius: 20px;
       background:
         linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248, 242, 230, 0.98)),
@@ -1126,12 +1188,17 @@ def render_html() -> str:
     .cover h1 {{
       margin: 4px 0 10px;
       font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-      font-size: 34px;
+      font-size: 33px;
       line-height: 1.05;
-      max-width: 760px;
+      max-width: 720px;
       color: var(--navy);
     }}
-    .cover p {{ margin: 8px 0; max-width: 760px; }}
+    .cover p {{ margin: 8px 0; max-width: 720px; }}
+    .cover .deck {{
+      max-width: 700px;
+      font-size: 13px;
+      color: #344454;
+    }}
     .eyebrow {{
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -1152,17 +1219,14 @@ def render_html() -> str:
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     .meta .k b {{ display: block; margin-top: 4px; font-size: 12px; color: var(--navy); }}
-    .quickstart {{
+    .cover-note {{
       margin-top: 14px;
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 10px;
-    }}
-    .quickstart > div {{
-      border-radius: 14px;
-      padding: 12px;
-      background: rgba(255,255,255,0.65);
-      border: 1px solid #d8cdb8;
+      padding-top: 10px;
+      border-top: 1px solid rgba(158, 106, 46, 0.22);
+      max-width: 720px;
+      color: #4c5966;
+      font-size: 10.7px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     .cover-spread {{
       margin-top: 14px;
@@ -1198,14 +1262,23 @@ def render_html() -> str:
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }}
+    .section-kicker {{
+      margin: 0 0 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 9.4px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
     .section {{
       background: var(--paper);
       border: 1px solid var(--line);
       border-radius: 18px;
-      padding: 16px;
-      margin: 12px 0;
+      padding: 16px 16px 14px;
+      margin: 14px 0;
       box-shadow: var(--shadow);
     }}
+    .frontmatter {{ margin-top: 0; }}
     .section h2 {{
       margin: 0 0 8px;
       font-size: 21px;
@@ -1222,6 +1295,7 @@ def render_html() -> str:
     .muted {{ color: var(--muted); }}
     .tiny {{ font-size: 10px; }}
     .grid2 {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }}
+    .pub-grid {{ display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 12px; }}
     .cards {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }}
     .cards.cards-wide {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
     .card {{
@@ -1254,6 +1328,22 @@ def render_html() -> str:
     th {{ background: #eee7d7; color: #17314b; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     .toc ol, .toc ul, ul, ol {{ margin: 6px 0 6px 18px; padding: 0; }}
     li {{ margin: 3px 0; }}
+    .toc ol {{ margin-left: 0; list-style: none; }}
+    .toc li {{ margin: 0; }}
+    .toc a {{
+      display: block;
+      padding: 6px 0;
+      border-bottom: 1px dotted #d7cfbf;
+      color: var(--ink);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
+    .toc .toc-title {{ font-weight: 600; }}
+    .toc .toc-count {{ color: var(--muted); font-size: 10px; margin-left: 8px; }}
+    .toc a::after {{
+      content: leader(".") target-counter(attr(href), page);
+      color: var(--muted);
+      float: right;
+    }}
     .figure {{
       border: 1px solid #d6cebe;
       border-radius: 14px;
@@ -1262,11 +1352,18 @@ def render_html() -> str:
       margin: 10px 0 0;
       text-align: center;
       page-break-inside: avoid;
+      counter-increment: figure;
     }}
     .figure img {{ width: 100%; max-width: 860px; height: auto; border-radius: 8px; display: block; margin: 0 auto; }}
     .figure.narrow img {{ max-width: 620px; }}
     .figure.ui-shot img {{ max-width: 940px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12); }}
     .caption {{ margin: 6px 0 0; font-size: 10.2px; color: var(--muted); text-align: left; }}
+    .caption::before {{
+      content: "Figure " counter(figure) ". ";
+      color: var(--navy);
+      font-weight: 700;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
     .gallery {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }}
     .figure-card {{
       border: 1px solid var(--line);
@@ -1278,9 +1375,20 @@ def render_html() -> str:
       gap: 10px;
       align-items: start;
       page-break-inside: avoid;
+      counter-increment: figure;
     }}
     .figure-card img {{ width: 100%; height: auto; border-radius: 10px; background: #f8fbff; }}
     .figure-card h3 {{ margin: 0 0 4px; font-size: 13px; }}
+    .figure-card h3::before {{
+      content: "Figure " counter(figure) ". ";
+      display: block;
+      margin-bottom: 4px;
+      color: var(--gold);
+      font-size: 9.6px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
     .figure-card p {{ margin: 0; font-size: 10.8px; color: var(--muted); }}
     .cluster-head {{ display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 12px; align-items: start; margin-bottom: 10px; }}
     .case-strip {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }}
@@ -1294,6 +1402,7 @@ def render_html() -> str:
       font-size: 9.8px;
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
+    .cluster {{ break-before: page; }}
     .case {{ border-top: 1px dashed #c7bba6; padding-top: 12px; margin-top: 12px; page-break-inside: avoid; }}
     .case:first-of-type {{ border-top: none; padding-top: 0; margin-top: 0; }}
     .case-head {{ display: grid; grid-template-columns: 1.25fr 0.95fr; gap: 12px; align-items: start; }}
@@ -1316,6 +1425,16 @@ def render_html() -> str:
     .biology {{ border: 1px solid #e5cdd6; background: #fcf4f7; }}
     .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b {{ display: block; margin-bottom: 4px; color: var(--navy); font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     .cluster, .section, .case, .card, .figure, table, pre {{ page-break-inside: avoid; }}
+    @media print {{
+      body {{ background: #ffffff; }}
+      .doc {{ max-width: none; margin: 0; padding: 0; }}
+      .section, .cover, .card, .figure, .figure-card, .cover-shot {{
+        box-shadow: none;
+      }}
+      .section {{
+        border-radius: 14px;
+      }}
+    }}
   </style>
 </head>
 <body>
@@ -1323,7 +1442,7 @@ def render_html() -> str:
     <section class="cover">
       <p class="eyebrow">Genome Forge {escape(APP_VERSION)} · Textbook Edition</p>
       <h1>Teach Yourself Bioinformatics with Genome Forge</h1>
-      <p>This edition is written like a practical course reader for engineers, analysts, and curious scientists who want to learn bioinformatics by working through real laboratory molecules: reporter genes, classic cloning vectors, ambiguity-bearing consensus sequences, and clinically important genomic DNA.</p>
+      <p class="deck">A publication-style course reader for engineers, analysts, and curious scientists who want to learn bioinformatics by working through real laboratory molecules: reporter genes, cloning vectors, ambiguity-bearing consensus sequences, and clinically important genomic DNA.</p>
       <p>Instead of generic toy examples, the course uses public-source records such as EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. Clearly labelled training derivatives appear only where they sharpen a teaching goal, such as variant interpretation, family-wide assay design, or how to preserve uncertainty with IUPAC ambiguity symbols.</p>
       <div class="meta">
         <div class="k">Mode<b>Self-study course</b></div>
@@ -1331,29 +1450,39 @@ def render_html() -> str:
         <div class="k">Audience<b>CS to biology bridge</b></div>
         <div class="k">Release<b>{escape(TODAY)}</b></div>
       </div>
-      <div class="quickstart">
-        <div>
-          <h3 style="margin-top:0">Quickstart</h3>
+      {render_cover_spread()}
+      <p class="cover-note">This edition is written to be read like a lab-ready monograph: each lesson combines software procedure, expected results, biological interpretation, and the reason the data matter in practice.</p>
+    </section>
+
+    {render_publication_note(case_count)}
+
+    <section class="section">
+      <p class="section-kicker">Using This Edition</p>
+      <h2>How to Start and What Makes This Edition Different</h2>
+      <div class="grid2">
+        <div class="card">
+          <h3>Quickstart</h3>
           <p>1. Start the web UI with <code>python3 web_ui.py --port 8080</code>.</p>
           <p>2. Materialize a case bundle with <code>{escape(case_bundle_command('A'))}</code>.</p>
           <p>3. Open <code>http://127.0.0.1:8080</code>, load the FASTA from your case bundle, and follow the matching case steps below.</p>
         </div>
-        <div>
-          <h3 style="margin-top:0">Why This Edition Is Different</h3>
+        <div class="card alt">
+          <h3>Why This Edition Is Different</h3>
           <p>This version explains what the input data actually are, why the task matters biologically, what a meaningful result would look like, and what you should and should not conclude from the output.</p>
           <p>Each lesson is designed so the numbers point to a real scientific story rather than a generic demo, and the newer ambiguity-aware methods are taught directly instead of being buried as silent implementation details.</p>
         </div>
       </div>
-      {render_cover_spread()}
     </section>
 
     <section class="section">
+      <p class="section-kicker">Orientation</p>
       <h2>Meaningful Results Preview</h2>
       <p class="muted">These quick facts are derived directly from the bundled records. They are here to orient you before you dive into the {case_count} hands-on lessons.</p>
       {render_featured_results()}
     </section>
 
     <section class="section">
+      <p class="section-kicker">Data</p>
       <h2>How to Use the Sample Data</h2>
       <div class="grid2">
         <div class="card">
@@ -1375,6 +1504,7 @@ def render_html() -> str:
     </section>
 
     <section class="section">
+      <p class="section-kicker">Study Method</p>
       <h2>How to Study This Book</h2>
       <div class="cards">
         <div class="card">
@@ -1393,6 +1523,7 @@ def render_html() -> str:
     </section>
 
     <section class="section">
+      <p class="section-kicker">Reference</p>
       <h2>Primer on Ambiguity Codes</h2>
       <p class="muted">Several later lessons now teach ambiguity-aware matching directly. These symbols do not mean the sequence is broken. They mean the evidence still permits a small set of bases at a position, and Genome Forge can now search, compare, and design around that uncertainty.</p>
       {render_iupac_table()}
@@ -1404,12 +1535,14 @@ def render_html() -> str:
     </section>
 
     <section class="section">
+      <p class="section-kicker">Interface</p>
       <h2>Visual Tour of the Workbench</h2>
       <p class="muted">These illustrations are included to help you recognize what Genome Forge is trying to show you in each workflow: structure, evidence, divergence, and provenance.</p>
       {render_visual_gallery()}
     </section>
 
     <section class="section">
+      <p class="section-kicker">Biological Objects</p>
       <h2>Real-World Record Field Guide</h2>
       <p>These are the biological objects that power the tutorial. Some are public-source sequences bundled directly in the FASTA file. Others are clearly labelled training derivatives created from those public records so specific comparison cases have an answer key.</p>
       <table>
@@ -1424,12 +1557,14 @@ def render_html() -> str:
     </section>
 
     <section class="section toc">
+      <p class="section-kicker">Contents</p>
       <h2>Case Map</h2>
       <p class="muted">Recommended order if you are new to biology: Cluster A → B → C → D → G → E → F → H.</p>
       <ol>{cluster_links}</ol>
     </section>
 
     <section class="section">
+      <p class="section-kicker">Interpretation</p>
       <h2>How to Read a Bioinformatics Result Like a Scientist</h2>
       <div class="cards">
         <div class="card"><h3>Start with the biological question</h3><p>Ask what decision the output is supposed to support. A beautiful visualization is not useful if it does not change a real experimental choice.</p></div>
