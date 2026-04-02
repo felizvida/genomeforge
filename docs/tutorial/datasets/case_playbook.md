@@ -108,6 +108,16 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case F --out ./tmp/genomeforge_case_f `
 - Key expected signal: A ranked candidate list with at least one rejected pair and one preferred pair.
 
+## Case AL: Degenerate Primer Strategy for a Variant Family
+
+- Cluster: Assay and Primer System Design
+- Focus: How do you keep a PCR assay useful when the target family varies at one or two positions, or when your consensus still contains unresolved bases?
+- Records: EGFP_CDS, EGFP_ambiguity_consensus_training, EGFP_Y67H_training_variant
+- Workflow: Use an ambiguity-coded primer to keep one assay useful across a small reporter family and an uncertainty-bearing consensus sequence.
+- APIs: /api/primer-diagnostics, /api/primer-specificity, /api/pcr
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AL --out ./tmp/genomeforge_case_al `
+- Key expected signal: A primer pair in which at least one primer contains IUPAC ambiguity symbols rather than only A/C/G/T.
+
 ## Case Q: Multiplex PCR Panel Balancing
 
 - Cluster: Assay and Primer System Design
@@ -335,6 +345,16 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - APIs: /api/reference-db-save, /api/reference-scan, /api/sirna-design, /api/sirna-map
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AK --out ./tmp/genomeforge_case_ak `
 - Key expected signal: A reference-scan result showing which familiar elements were auto-flagged.
+
+## Case AM: Ambiguity-Aware Identity Search and Motif Rescue
+
+- Cluster: Data Fidelity and Interoperability
+- Focus: If a sequence contains unresolved positions, can you still recover its likely identity and use it responsibly instead of discarding it as “bad data”?
+- Records: EGFP_CDS, EGFP_ambiguity_consensus_training, mCherry_CDS
+- Workflow: Treat an ambiguity-bearing consensus record as a real query and verify that identity search and motif logic still recover the correct biological family.
+- APIs: /api/motif, /api/blast-search, /api/search-entities
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AM --out ./tmp/genomeforge_case_am `
+- Key expected signal: A motif or similarity search in which an ambiguity-containing query still returns a biologically sensible top match.
 
 ## Cluster H: Reproducibility, Governance, and Delivery
 

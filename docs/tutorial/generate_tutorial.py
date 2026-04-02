@@ -112,6 +112,24 @@ FEATURE_GALLERY = [
     },
 ]
 
+IUPAC_GUIDE = [
+    ('A', 'A', 'Adenine only', 'Exact called base or exact assay requirement.'),
+    ('C', 'C', 'Cytosine only', 'Exact called base or exact assay requirement.'),
+    ('G', 'G', 'Guanine only', 'Exact called base or exact assay requirement.'),
+    ('T', 'T', 'Thymine only', 'Exact called base or exact assay requirement.'),
+    ('R', 'A or G', 'Purine', 'Useful when a site varies between adenine and guanine.'),
+    ('Y', 'C or T', 'Pyrimidine', 'Common in mixed trace calls and degenerate primers.'),
+    ('S', 'G or C', 'Strong pair', 'Both options make three hydrogen bonds to the complement.'),
+    ('W', 'A or T', 'Weak pair', 'Both options make two hydrogen bonds to the complement.'),
+    ('K', 'G or T', 'Keto', 'Used when the target family tolerates a purine/pyrimidine swap at one site.'),
+    ('M', 'A or C', 'Amino', 'Useful for family-wide assay design.'),
+    ('B', 'C or G or T', 'Not A', 'Represents uncertainty while still excluding one base.'),
+    ('D', 'A or G or T', 'Not C', 'Represents uncertainty while still excluding one base.'),
+    ('H', 'A or C or T', 'Not G', 'Represents uncertainty while still excluding one base.'),
+    ('V', 'A or C or G', 'Not T', 'Represents uncertainty while still excluding one base.'),
+    ('N', 'A or C or G or T', 'Any base', 'Used when the evidence does not justify a more specific call.'),
+]
+
 FLAGSHIP_SCREENSHOTS = {
     'A': {
         'file': 'assets/screenshots/flagship_case_a_map.png',
@@ -147,6 +165,16 @@ FLAGSHIP_SCREENSHOTS = {
         'file': 'assets/screenshots/flagship_case_aj_blast.png',
         'title': 'BLAST-like identity search workflow',
         'caption': 'Real UI screenshot from the local similarity-search case using the tutorial panel of EGFP, mCherry, lacZ, and BRAF. This is the kind of view you use to ask where an unknown sequence most plausibly came from.',
+    },
+    'AL': {
+        'file': 'assets/screenshots/flagship_case_al_degenerate_primers.png',
+        'title': 'Degenerate-primer assay workflow',
+        'caption': 'Real UI screenshot from the ambiguity-aware primer lesson. The primer fields intentionally contain IUPAC ambiguity symbols so one assay can tolerate a small reporter-family variation without hiding where uncertainty lives.',
+    },
+    'AM': {
+        'file': 'assets/screenshots/flagship_case_am_ambiguity_search.png',
+        'title': 'Ambiguity-aware identity search workflow',
+        'caption': 'Real UI screenshot from the ambiguity-aware search lesson. The query itself carries unresolved positions, yet the search still recovers the correct reporter-family identity instead of treating the sequence as unusable.',
     },
     'AB': {
         'file': 'assets/screenshots/flagship_case_ab_history.png',
@@ -261,6 +289,25 @@ RECORDS = {
             {'key': 'CDS', 'location': '1..720', 'qualifiers': {'label': 'EGFP S204Y-like variant', 'codon_start': '1'}},
         ],
     },
+    'EGFP_ambiguity_consensus_training': {
+        'type': 'derived-training',
+        'topology': 'linear',
+        'derived_from': 'EGFP_CDS',
+        'edits': [
+            {'start_1based': 7, 'end_1based': 7, 'replacement': 'R', 'label': 'mixed A/G-like trace call'},
+            {'start_1based': 10, 'end_1based': 10, 'replacement': 'Y', 'label': 'mixed C/T-like trace call'},
+            {'start_1based': 67, 'end_1based': 67, 'replacement': 'N', 'label': 'low-confidence consensus position'},
+        ],
+        'origin': 'Training derivative of EGFP that uses IUPAC ambiguity symbols to mimic a consensus sequence assembled from uncertain or mixed evidence.',
+        'why_it_matters': 'It teaches that uncertainty can be represented explicitly instead of being hidden behind a forced single-base call.',
+        'input_details': 'This record is still an EGFP-like coding sequence, but a few positions are encoded as ambiguity symbols such as R, Y, and N. That means the sequence stands for a small set of plausible molecules rather than one exact DNA string.',
+        'fun_fact': 'IUPAC ambiguity codes are basically a compact lossless summary of “here is what the data still allow” at a given position.',
+        'source_label': 'Derived from EGFP_CDS for ambiguity-aware assay and search training',
+        'source_url': 'https://pubmed.ncbi.nlm.nih.gov/9526659/',
+        'suggested_features': [
+            {'key': 'CDS', 'location': '1..720', 'qualifiers': {'label': 'EGFP ambiguity-aware consensus', 'codon_start': '1'}},
+        ],
+    },
 }
 
 RECORD_SETS = {
@@ -268,6 +315,7 @@ RECORD_SETS = {
     'cloning_panel': ['pUC19_MCS', 'lacZ_alpha_fragment', 'EGFP_CDS'],
     'oncology_panel': ['BRAF_exon15_fragment'],
     'roundtrip_panel': ['EGFP_CDS', 'mCherry_CDS', 'pUC19_MCS'],
+    'ambiguity_panel': ['EGFP_CDS', 'EGFP_ambiguity_consensus_training', 'EGFP_Y67H_training_variant'],
 }
 
 
@@ -287,6 +335,7 @@ def case(
     expected: list[str],
     interpretation: list[str],
     parameter_knob: str,
+    starter_values: list[str] | None = None,
 ) -> dict:
     return {
         'id': case_id,
@@ -304,6 +353,7 @@ def case(
         'expected': expected,
         'interpretation': interpretation,
         'parameter_knob': parameter_knob,
+        'starter_values': starter_values or [],
     }
 
 
@@ -398,6 +448,20 @@ CASES = [
          ['A ranked candidate list with at least one rejected pair and one preferred pair.', 'A predicted gel pattern that explains the ranking in experimental terms.', 'A final recommendation that ties specificity back to the intended assay.'],
          ['Use the gel view to explain specificity, not just the score table.', 'A pair with a slightly lower score but cleaner off-target profile may still be the better scientific choice.', 'The winning pair is the one you would be comfortable handing to someone else in the lab.'],
          'changing the background record panel'),
+    case('AL', 'Degenerate Primer Strategy for a Variant Family', 'C', ['EGFP_CDS', 'EGFP_ambiguity_consensus_training', 'EGFP_Y67H_training_variant'], 'Primer/PCR', 'Use an ambiguity-coded primer to keep one assay useful across a small reporter family and an uncertainty-bearing consensus sequence.', ['/api/primer-diagnostics', '/api/primer-specificity', '/api/pcr'],
+         'How do you keep a PCR assay useful when the target family varies at one or two positions, or when your consensus still contains unresolved bases?',
+         'This case uses one clean reporter CDS, one biologically meaningful single-codon variant, and one uncertainty-bearing consensus sequence. That combination mirrors a real workflow in which a lab wants one assay that still works across a clone family, a mutagenesis panel, or a partially resolved sequencing result.',
+         'Degenerate primers are a controlled way to encode biological uncertainty into an assay design. Instead of pretending every member of a target family is identical, you let the primer represent a small allowed set of bases at carefully chosen positions. Computationally, that means the primer is no longer one string. Biologically, it means one assay can cover a family without lying about where the family differs.',
+         'A degenerate primer is a compact statement that says, “I know exactly where uncertainty lives, and I am designing around it rather than ignoring it.”',
+         {'forward_primer': 'ATGGTGRGYAAGGGCGAGGA', 'reverse_primer': 'CTTGTACAGCTCGTCCATGC', 'background_records': 3, 'predicted_products': [{'record': 'EGFP_CDS', 'size_bp': 119}, {'record': 'EGFP_ambiguity_consensus_training', 'size_bp': 119}, {'record': 'EGFP_Y67H_training_variant', 'size_bp': 119}], 'interpretation': 'one family-tolerant assay retained while off-target risk stays low in the reporter panel'},
+         ['A primer pair in which at least one primer contains IUPAC ambiguity symbols rather than only A/C/G/T.', 'A specificity report showing that the intended family members still amplify while unrelated products remain limited.', 'A justification for why the ambiguity positions were placed where they were, rather than scattered arbitrarily.'],
+         ['A degenerate primer is valuable only if the ambiguous positions reflect real biological uncertainty or family diversity.', 'If a primer becomes too degenerate, you gain family coverage but may lose specificity or synthesis practicality.', 'The best outcome is not “maximum ambiguity”; it is the smallest ambiguity set that still captures the biological family you care about.'],
+         'changing the ambiguous positions or the background family',
+         starter_values=[
+             'Forward primer seed: <code>ATGGTGRGYAAGGGCGAGGA</code>',
+             'Reverse primer seed: <code>CTTGTACAGCTCGTCCATGC</code>',
+             'Background panel: <code>EGFP_CDS, EGFP_ambiguity_consensus_training, EGFP_Y67H_training_variant</code>',
+         ]),
     case('Q', 'Multiplex PCR Panel Balancing', 'C', ['EGFP_CDS', 'mCherry_CDS', 'BRAF_exon15_fragment'], 'Primer/PCR', 'Compare multiple assay targets and ask whether they can coexist in one panel without obvious conflict.', ['/api/primer-design', '/api/primer-specificity', '/api/pcr'],
          'Can several assays be run together without one primer pair dominating or confusing the readout?',
          'Multiplex design is where assay design becomes systems design. The same three tutorial records now behave like a miniature panel: reporter control, second reporter, and clinically interesting target. You are no longer optimizing one pair in isolation.',
@@ -596,6 +660,20 @@ CASES = [
          ['A reference-scan result showing which familiar elements were auto-flagged.', 'A ranked siRNA candidate list with mapped target positions.', 'A note explaining why reuse of reference knowledge reduces human error.'],
          ['Auto-flagging is strongest when the reference database is curated and versioned.', 'siRNA ranking is still a prioritization tool; experimental validation remains necessary.', 'The useful lesson is workflow reuse: annotation and design can feed each other.'],
          'changing the reference library or siRNA ranking cutoff'),
+    case('AM', 'Ambiguity-Aware Identity Search and Motif Rescue', 'G', ['EGFP_CDS', 'EGFP_ambiguity_consensus_training', 'mCherry_CDS'], 'Advanced', 'Treat an ambiguity-bearing consensus record as a real query and verify that identity search and motif logic still recover the correct biological family.', ['/api/motif', '/api/blast-search', '/api/search-entities'],
+         'If a sequence contains unresolved positions, can you still recover its likely identity and use it responsibly instead of discarding it as “bad data”?',
+         'The key input here is not a perfect sequence but a partially uncertain one. The ambiguity-bearing EGFP consensus stands in for a realistic intermediate artifact: a query that is clearly close to a known reporter family, yet still carries unresolved positions from sequencing or consensus assembly.',
+         'A huge amount of practical bioinformatics is about deciding what to do before the data are perfectly clean. Ambiguity codes let you represent uncertainty honestly. Ambiguity-aware search then lets you ask whether the uncertain record is still informative enough to identify, classify, or troubleshoot. The lesson is not that ambiguity disappears. The lesson is that uncertainty can still be computationally useful when represented explicitly.',
+         'The scientific upgrade is subtle but important: you move from “this sequence is messy” to “this sequence still rules out many stories and supports a smaller plausible set.”',
+         {'query_record': 'EGFP_ambiguity_consensus_training', 'motif_query': 'ATGGTGRG', 'top_blast_hit': 'EGFP_CDS', 'identity_pct': 100.0, 'query_coverage_pct': 100.0, 'runner_up': 'mCherry_CDS', 'interpretation': 'uncertain positions did not erase reporter-family identity'},
+         ['A motif or similarity search in which an ambiguity-containing query still returns a biologically sensible top match.', 'A ranked hit list that shows why the correct family remains the strongest explanation.', 'A short statement separating what is still known confidently from what remains unresolved.'],
+         ['Ambiguity-aware search should narrow the plausible identity space even when it cannot force every base to one final call.', 'A strong top hit with high coverage means the uncertain sequence is still informative, not that uncertainty vanished.', 'The right interpretation sounds like “this is still EGFP-family-like, with unresolved positions at specific sites,” not “the data are now magically exact.”'],
+         'changing the ambiguous query window or comparison panel',
+         starter_values=[
+             'Query record: <code>EGFP_ambiguity_consensus_training</code>',
+             'Example motif query: <code>ATGGTGRG</code>',
+             'Comparison panel: <code>EGFP_CDS, EGFP_ambiguity_consensus_training, mCherry_CDS</code>',
+         ]),
     case('L', 'Collaboration, Audit, and Review Governance', 'H', ['EGFP_CDS'], 'Advanced', 'Create a workspace, assign roles, and run a simple review flow on a saved construct project.', ['/api/workspace-create', '/api/project-permissions', '/api/review-submit', '/api/review-approve'],
          'How do you make sequence work reviewable by another person instead of leaving it as personal screen state?',
          'This governance cluster deliberately uses a familiar record so the tutorial attention stays on process rather than molecular interpretation. The point is to show how sequence work becomes team knowledge.',
@@ -757,6 +835,7 @@ def compute_featured_results() -> list[dict[str, str]]:
     puc = resolved_record_sequence('pUC19_MCS', base_sequences)
     braf = resolved_record_sequence('BRAF_exon15_fragment', base_sequences)
     y67h = resolved_record_sequence('EGFP_Y67H_training_variant', base_sequences)
+    ambiguous = resolved_record_sequence('EGFP_ambiguity_consensus_training', base_sequences)
     common_sites = ['GAATTC', 'GGATCC', 'AAGCTT', 'TCTAGA', 'CTGCAG', 'GGTACC']
     unique_sites = sum(1 for motif in common_sites if _count_site(puc, motif) == 1)
     return [
@@ -784,6 +863,11 @@ def compute_featured_results() -> list[dict[str, str]]:
             'title': 'Reporter proteins can do similar jobs while having different sequence histories',
             'value': f'EGFP length {len(egfp)} bp vs mCherry length {len(mcherry)} bp',
             'story': 'Comparing them is a good reminder that “same use in the lab” does not imply “same sequence architecture” or even the same engineering tradeoffs.',
+        },
+        {
+            'title': 'Genome Forge now teaches uncertainty as a first-class sequence state',
+            'value': f'EGFP ambiguity training record carries {sum(1 for ch in ambiguous if ch not in "ACGT")} explicit unresolved positions',
+            'story': 'That matters because real assay design and identity search often start before every position is perfectly resolved. Good workflows preserve uncertainty instead of flattening it away.',
         },
     ]
 
@@ -818,6 +902,24 @@ def render_visual_gallery() -> str:
     return f'<div class="gallery">{figures}</div>'
 
 
+def render_iupac_table() -> str:
+    rows = ''.join(
+        '<tr>'
+        f'<td><code>{escape(code)}</code></td>'
+        f'<td>{escape(bases)}</td>'
+        f'<td>{escape(name)}</td>'
+        f'<td>{escape(use)}</td>'
+        '</tr>'
+        for code, bases, name, use in IUPAC_GUIDE
+    )
+    return (
+        '<table>'
+        '<thead><tr><th>Code</th><th>Allowed base(s)</th><th>Meaning</th><th>Why you would keep it</th></tr></thead>'
+        f'<tbody>{rows}</tbody>'
+        '</table>'
+    )
+
+
 def render_case_screenshot(case_id: str) -> str:
     shot = FLAGSHIP_SCREENSHOTS.get(case_id)
     if not shot:
@@ -833,6 +935,7 @@ def render_case_screenshot(case_id: str) -> str:
 def render_case(case_info: dict) -> str:
     records = case_info['records']
     record_details = ' '.join(RECORDS[name]['input_details'] for name in records)
+    starter_values = case_info.get('starter_values', [])
     steps = [
         f'Use the included prebuilt bundle <code>{escape(prebuilt_case_bundle_path(case_info["id"]))}</code> or regenerate it with <code>{escape(case_bundle_command(case_info["id"]))}</code>.',
         f"Open the <code>{escape(case_info['tab'])}</code> tab in Genome Forge and load: <code>{escape(', '.join(records))}</code>.",
@@ -843,6 +946,9 @@ def render_case(case_info: dict) -> str:
     expected = case_info['expected']
     interpretation = case_info['interpretation']
     screenshot_html = render_case_screenshot(case_info['id'])
+    starter_html = ''
+    if starter_values:
+        starter_html = f'<div class="study-note"><b>Starter Values</b><ul>{format_list(starter_values, escape_items=False)}</ul></div>'
     return dedent(f'''
       <article class="case" id="case-{escape(case_info['id'])}">
         <div class="case-head">
@@ -870,6 +976,7 @@ def render_case(case_info: dict) -> str:
             <p>{escape(case_info['fun_fact'])}</p>
           </div>
         </div>
+        {starter_html}
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol>{format_list(steps, escape_items=False)}</ol></div>
         {screenshot_html}
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{format_json_block(case_info['sample_result'])}</pre></div>
@@ -882,6 +989,10 @@ def render_case(case_info: dict) -> str:
 
 def render_cluster(cluster: dict) -> str:
     cases_html = '\n'.join(render_case(case_info) for case_info in CLUSTER_CASES[cluster['id']])
+    cluster_case_strip = ''.join(
+        f'<span class="case-chip">Case {escape(case_info["id"])} · {escape(case_info["title"])}</span>'
+        for case_info in CLUSTER_CASES[cluster['id']]
+    )
     return dedent(f'''
       <section class="section cluster" id="cluster-{escape(cluster['id'])}">
         <div class="cluster-head">
@@ -889,6 +1000,7 @@ def render_cluster(cluster: dict) -> str:
             <p class="eyebrow">Cluster {escape(cluster['id'])}</p>
             <h2>Cluster {escape(cluster['id'])}: {escape(cluster['title'])}</h2>
             <p class="muted">{escape(cluster['theme'])}</p>
+            <div class="case-strip">{cluster_case_strip}</div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="{escape(cluster['figure'])}" alt="{escape(cluster['title'])}" />
@@ -906,6 +1018,7 @@ def render_html() -> str:
         for cluster in CLUSTERS
     )
     cluster_sections = '\n'.join(render_cluster(cluster) for cluster in CLUSTERS)
+    case_count = len(CASES)
     return dedent(f'''<!doctype html>
 <html lang="en">
 <head>
@@ -923,33 +1036,35 @@ def render_html() -> str:
       }}
     }}
     :root {{
-      --ink: #0f172a;
-      --muted: #475569;
-      --line: #d8e2ef;
-      --panel: #f8fbff;
-      --panel-strong: #eef6ff;
-      --navy: #0b3954;
-      --teal: #1f6f78;
-      --gold: #c27a2c;
-      --rose: #9a4d63;
-      --paper: #ffffff;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --ink: #1d2733;
+      --muted: #5c6773;
+      --line: #d8d3c9;
+      --panel: #fbf8f1;
+      --panel-strong: #f3ede1;
+      --navy: #24364b;
+      --teal: #335e63;
+      --gold: #9e6a2e;
+      --rose: #7d4f5d;
+      --paper: #fffdf8;
+      --shadow: 0 12px 34px rgba(52, 55, 57, 0.08);
       --code-bg: #0b1220;
       --code-ink: #dbeafe;
     }}
     * {{ box-sizing: border-box; }}
     body {{
       margin: 0;
-      background: radial-gradient(circle at top left, #f2f9ff, #ffffff 32%);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 246, 238, 0.94)),
+        repeating-linear-gradient(0deg, rgba(90, 85, 70, 0.02), rgba(90, 85, 70, 0.02) 1px, transparent 1px, transparent 24px);
       color: var(--ink);
-      font-family: "Avenir Next", "IBM Plex Sans", "Segoe UI", sans-serif;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
       font-size: 12px;
-      line-height: 1.62;
+      line-height: 1.72;
     }}
     a {{ color: var(--teal); text-decoration: none; }}
     code {{
       font-family: "IBM Plex Mono", Menlo, Consolas, monospace;
-      background: #eaf2fb;
+      background: #ece6da;
       color: #16324f;
       padding: 2px 5px;
       border-radius: 5px;
@@ -967,33 +1082,37 @@ def render_html() -> str:
       white-space: pre-wrap;
       page-break-inside: avoid;
     }}
-    .doc {{ max-width: 1040px; margin: 0 auto; padding: 12px 8px 28px; }}
+    .doc {{ max-width: 1040px; margin: 0 auto; padding: 14px 10px 30px; }}
     .cover {{
       position: relative;
       overflow: hidden;
-      padding: 18px;
+      padding: 24px 24px 18px;
       border-radius: 20px;
-      background: linear-gradient(135deg, #0b3954 0%, #1f6f78 55%, #f7b267 160%);
-      color: white;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248, 242, 230, 0.98)),
+        linear-gradient(135deg, #f6f0e3 0%, #fffdf7 100%);
+      color: var(--ink);
       box-shadow: var(--shadow);
       margin-bottom: 12px;
+      border: 1px solid #d7cfbf;
     }}
     .cover::after {{
       content: "";
       position: absolute;
-      right: -70px;
-      top: -70px;
-      width: 220px;
-      height: 220px;
+      right: 24px;
+      top: 22px;
+      width: 170px;
+      height: 170px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.10);
+      background: radial-gradient(circle, rgba(36, 54, 75, 0.08), rgba(36, 54, 75, 0.02) 58%, transparent 60%);
     }}
     .cover h1 {{
       margin: 4px 0 10px;
-      font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-      font-size: 32px;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-size: 34px;
       line-height: 1.05;
       max-width: 760px;
+      color: var(--navy);
     }}
     .cover p {{ margin: 8px 0; max-width: 760px; }}
     .eyebrow {{
@@ -1003,16 +1122,19 @@ def render_html() -> str:
       font-weight: 700;
       opacity: 0.9;
       margin: 0;
+      color: var(--gold);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     .meta {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }}
     .meta .k {{
-      border: 1px solid rgba(255,255,255,0.18);
+      border: 1px solid #d8cdb8;
       border-radius: 12px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.6);
       padding: 9px 10px;
       font-size: 10px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
-    .meta .k b {{ display: block; margin-top: 4px; font-size: 12px; color: white; }}
+    .meta .k b {{ display: block; margin-top: 4px; font-size: 12px; color: var(--navy); }}
     .quickstart {{
       margin-top: 14px;
       display: grid;
@@ -1022,8 +1144,8 @@ def render_html() -> str:
     .quickstart > div {{
       border-radius: 14px;
       padding: 12px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.65);
+      border: 1px solid #d8cdb8;
     }}
     .section {{
       background: var(--paper);
@@ -1035,30 +1157,30 @@ def render_html() -> str:
     }}
     .section h2 {{
       margin: 0 0 8px;
-      font-size: 20px;
+      font-size: 21px;
       color: var(--navy);
-      font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     }}
     .section h3 {{
       margin: 0 0 6px;
       font-size: 14px;
       color: var(--teal);
-      font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     }}
     .lead {{ font-size: 13px; color: var(--ink); margin: 5px 0 0; }}
     .muted {{ color: var(--muted); }}
     .tiny {{ font-size: 10px; }}
     .grid2 {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }}
     .cards {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }}
-    .cards.cards-wide {{ grid-template-columns: repeat(5, minmax(0, 1fr)); }}
+    .cards.cards-wide {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
     .card {{
       border: 1px solid var(--line);
       border-radius: 14px;
-      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      background: linear-gradient(180deg, #fffef9, #f8f2e8);
       padding: 12px;
       page-break-inside: avoid;
     }}
-    .card.alt {{ background: linear-gradient(180deg, #fffaf5, #ffffff); }}
+    .card.alt {{ background: linear-gradient(180deg, #fbf6eb, #fffef9); }}
     .metric {{
       margin: 6px 0;
       font-size: 15px;
@@ -1070,20 +1192,21 @@ def render_html() -> str:
       margin: 2px 4px 2px 0;
       padding: 3px 8px;
       border-radius: 999px;
-      background: #e8f4f4;
-      color: #155e63;
+      background: #ece7db;
+      color: #304c52;
       font-size: 10px;
       font-weight: 700;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     table {{ width: 100%; border-collapse: collapse; font-size: 10.7px; margin-top: 8px; }}
     th, td {{ border: 1px solid #d9e4f0; padding: 7px; vertical-align: top; text-align: left; }}
-    th {{ background: #edf5ff; color: #17314b; }}
+    th {{ background: #eee7d7; color: #17314b; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     .toc ol, .toc ul, ul, ol {{ margin: 6px 0 6px 18px; padding: 0; }}
     li {{ margin: 3px 0; }}
     .figure {{
-      border: 1px solid #d9e5f3;
+      border: 1px solid #d6cebe;
       border-radius: 14px;
-      background: #f8fbff;
+      background: #fdfaf2;
       padding: 8px;
       margin: 10px 0 0;
       text-align: center;
@@ -1097,7 +1220,7 @@ def render_html() -> str:
     .figure-card {{
       border: 1px solid var(--line);
       border-radius: 14px;
-      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      background: linear-gradient(180deg, #fffef9, #f6efe4);
       padding: 10px;
       display: grid;
       grid-template-columns: 0.95fr 1.05fr;
@@ -1109,60 +1232,72 @@ def render_html() -> str:
     .figure-card h3 {{ margin: 0 0 4px; font-size: 13px; }}
     .figure-card p {{ margin: 0; font-size: 10.8px; color: var(--muted); }}
     .cluster-head {{ display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 12px; align-items: start; margin-bottom: 10px; }}
-    .case {{ border-top: 1px dashed #c9d9e6; padding-top: 12px; margin-top: 12px; page-break-inside: avoid; }}
+    .case-strip {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }}
+    .case-chip {{
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #d3c7b1;
+      background: #f8f2e5;
+      color: #4b5563;
+      font-size: 9.8px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
+    .case {{ border-top: 1px dashed #c7bba6; padding-top: 12px; margin-top: 12px; page-break-inside: avoid; }}
     .case:first-of-type {{ border-top: none; padding-top: 0; margin-top: 0; }}
     .case-head {{ display: grid; grid-template-columns: 1.25fr 0.95fr; gap: 12px; align-items: start; }}
     .case-meta {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: 10.4px; }}
     .case-meta > div {{ border: 1px solid var(--line); border-radius: 12px; padding: 8px; background: var(--panel); }}
-    .case-meta b {{ display: block; color: var(--muted); margin-bottom: 4px; font-size: 9.8px; text-transform: uppercase; letter-spacing: 0.06em; }}
+    .case-meta b {{ display: block; color: var(--muted); margin-bottom: 4px; font-size: 9.8px; text-transform: uppercase; letter-spacing: 0.06em; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     .case-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }}
     .narrative h4 {{ margin: 0 0 4px; font-size: 12px; color: var(--navy); }}
-    .stepbox, .resultbox, .expected, .interpret, .biology {{
+    .study-note, .stepbox, .resultbox, .expected, .interpret, .biology {{
       margin-top: 10px;
       border-radius: 14px;
       padding: 10px 12px;
       page-break-inside: avoid;
     }}
-    .stepbox {{ border: 1px solid #bae6fd; background: #ecfeff; }}
-    .resultbox {{ border: 1px solid #dbeafe; background: #f8fbff; }}
-    .expected {{ border: 1px solid #d1fae5; background: #f0fdf4; }}
-    .interpret {{ border: 1px solid #fde68a; background: #fffbeb; }}
-    .biology {{ border: 1px solid #fbcfe8; background: #fff1f6; }}
-    .stepbox b, .resultbox b, .expected b, .interpret b, .biology b {{ display: block; margin-bottom: 4px; color: var(--navy); }}
+    .study-note {{ border: 1px solid #d3c7b1; background: #faf3e8; }}
+    .stepbox {{ border: 1px solid #c9d8dc; background: #f4f9f9; }}
+    .resultbox {{ border: 1px solid #d8d3c9; background: #fbf8f1; }}
+    .expected {{ border: 1px solid #d6dfcf; background: #f8fcf5; }}
+    .interpret {{ border: 1px solid #e4d7ab; background: #fff9eb; }}
+    .biology {{ border: 1px solid #e5cdd6; background: #fcf4f7; }}
+    .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b {{ display: block; margin-bottom: 4px; color: var(--navy); font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     .cluster, .section, .case, .card, .figure, table, pre {{ page-break-inside: avoid; }}
   </style>
 </head>
 <body>
   <main class="doc">
     <section class="cover">
-      <p class="eyebrow">Genome Forge {escape(APP_VERSION)} · Real-World Training Edition</p>
+      <p class="eyebrow">Genome Forge {escape(APP_VERSION)} · Textbook Edition</p>
       <h1>Teach Yourself Bioinformatics with Genome Forge</h1>
-      <p>This rebuilt tutorial is written for engineers, analysts, and curious scientists who want to learn practical bioinformatics by working through real laboratory molecules: reporter genes, classic cloning vectors, and clinically important genomic sequence.</p>
-      <p>Instead of generic toy examples, the course uses public-source records such as EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. A few derived training variants are included where they help reveal meaningful sequence-to-function ideas that are hard to see with only one reference record.</p>
+      <p>This edition is written like a practical course reader for engineers, analysts, and curious scientists who want to learn bioinformatics by working through real laboratory molecules: reporter genes, classic cloning vectors, ambiguity-bearing consensus sequences, and clinically important genomic DNA.</p>
+      <p>Instead of generic toy examples, the course uses public-source records such as EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. Clearly labelled training derivatives appear only where they sharpen a teaching goal, such as variant interpretation, family-wide assay design, or how to preserve uncertainty with IUPAC ambiguity symbols.</p>
       <div class="meta">
         <div class="k">Mode<b>Self-study course</b></div>
-        <div class="k">Cases<b>37 (A-AK)</b></div>
+        <div class="k">Cases<b>{case_count} total lessons</b></div>
         <div class="k">Audience<b>CS to biology bridge</b></div>
         <div class="k">Release<b>{escape(TODAY)}</b></div>
       </div>
       <div class="quickstart">
         <div>
-          <h3 style="color:white;margin-top:0">Quickstart</h3>
+          <h3 style="margin-top:0">Quickstart</h3>
           <p>1. Start the web UI with <code>python3 web_ui.py --port 8080</code>.</p>
           <p>2. Materialize a case bundle with <code>{escape(case_bundle_command('A'))}</code>.</p>
           <p>3. Open <code>http://127.0.0.1:8080</code>, load the FASTA from your case bundle, and follow the matching case steps below.</p>
         </div>
         <div>
-          <h3 style="color:white;margin-top:0">Why This Edition Is Different</h3>
+          <h3 style="margin-top:0">Why This Edition Is Different</h3>
           <p>This version explains what the input data actually are, why the task matters biologically, what a meaningful result would look like, and what you should and should not conclude from the output.</p>
-          <p>Each case is designed so the numbers point to a real scientific story rather than a generic demo.</p>
+          <p>Each lesson is designed so the numbers point to a real scientific story rather than a generic demo, and the newer ambiguity-aware methods are taught directly instead of being buried as silent implementation details.</p>
         </div>
       </div>
     </section>
 
     <section class="section">
       <h2>Meaningful Results Preview</h2>
-      <p class="muted">These quick facts are derived directly from the bundled records. They are here to orient you before you dive into the 37 hands-on cases.</p>
+      <p class="muted">These quick facts are derived directly from the bundled records. They are here to orient you before you dive into the {case_count} hands-on lessons.</p>
       {render_featured_results()}
     </section>
 
@@ -1175,7 +1310,7 @@ def render_html() -> str:
             <li><code>docs/tutorial/datasets/training_real_world_sequences.fasta</code>: base public-source sequences.</li>
             <li><code>docs/tutorial/datasets/training_real_world_dataset.json</code>: metadata, sources, case inputs, and derived-record definitions.</li>
             <li><code>docs/tutorial/datasets/case_playbook.md</code>: compact case-by-case checklist.</li>
-            <li><code>docs/tutorial/datasets/case_bundles/</code>: prebuilt ready-to-load bundles for all 37 tutorial cases.</li>
+            <li><code>docs/tutorial/datasets/case_bundles/</code>: prebuilt ready-to-load bundles for all {case_count} tutorial cases.</li>
             <li><code>docs/tutorial/datasets/extract_case_bundle.py</code>: writes ready-to-run per-case FASTA bundles.</li>
           </ul>
         </div>
@@ -1184,6 +1319,35 @@ def render_html() -> str:
           <p>Always save the exact case bundle you used. That keeps the tutorial reproducible and prevents “I think I loaded the right sequence” problems. Every case already ships with a prebuilt bundle, so you can start quickly and still regenerate it later if you want to inspect provenance.</p>
           <pre>{escape(case_bundle_command('K'))}</pre>
         </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>How to Study This Book</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Read the data type first</h3>
+          <p>Before you run anything, identify whether the input is a coding sequence, genomic fragment, plasmid-like construct, chromatogram-derived consensus, or uncertainty-bearing record. Most downstream mistakes come from treating those as interchangeable.</p>
+        </div>
+        <div class="card">
+          <h3>Use the sample results as calibration, not as a cheat sheet</h3>
+          <p>The sample results tell you what a believable answer should feel like. They do not replace your own run. A good habit is to compare your output to the sample and ask why any difference exists.</p>
+        </div>
+        <div class="card">
+          <h3>Write down the biological claim separately from the software output</h3>
+          <p>The result is not just “the tool said X.” The result is the biological sentence you can defend after seeing X. That distinction is what turns software use into bioinformatics reasoning.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Primer on Ambiguity Codes</h2>
+      <p class="muted">Several later lessons now teach ambiguity-aware matching directly. These symbols do not mean the sequence is broken. They mean the evidence still permits a small set of bases at a position, and Genome Forge can now search, compare, and design around that uncertainty.</p>
+      {render_iupac_table()}
+      <div class="cards" style="margin-top:10px">
+        <div class="card"><h3>Why ambiguity is honest</h3><p>Forcing an uncertain position to one exact base may look cleaner, but it destroys evidence. Ambiguity codes preserve what the data still allow.</p></div>
+        <div class="card"><h3>Why assay design cares</h3><p>Degenerate primers use these symbols on purpose so one assay can still cover a small family of related templates.</p></div>
+        <div class="card"><h3>Why search still works</h3><p>An uncertainty-bearing query can still identify the correct molecule family if the unresolved positions are represented explicitly instead of hidden.</p></div>
       </div>
     </section>
 
@@ -1324,7 +1488,7 @@ def render_playbook() -> str:
 
 
 def render_dataset_readme() -> str:
-    return dedent('''
+    return dedent(f'''
     # Genome Forge Tutorial Datasets
 
     This folder contains the reproducible sample data used by the self-study tutorial.
@@ -1334,7 +1498,7 @@ def render_dataset_readme() -> str:
     - `training_real_world_sequences.fasta`: public-source base records bundled directly in FASTA.
     - `training_real_world_dataset.json`: metadata, sources, case-to-record mapping, and definitions for derived training records.
     - `case_playbook.md`: compact tutorial checklist.
-    - `case_bundles/`: prebuilt ready-to-load bundles for all 37 cases.
+    - `case_bundles/`: prebuilt ready-to-load bundles for all {len(CASES)} cases.
     - `extract_case_bundle.py`: helper that writes a case-specific FASTA bundle plus a manifest JSON.
 
     ## Quick Use
@@ -1349,7 +1513,7 @@ def render_dataset_readme() -> str:
 
     ## Why derived records exist
 
-    Some tutorial cases use clearly labeled training derivatives of public-source records. Those are included so you can practice pairwise comparison, variant interpretation, and phylogeny-style reasoning on examples with known biological intent.
+    Some tutorial cases use clearly labeled training derivatives of public-source records. Those are included so you can practice pairwise comparison, variant interpretation, ambiguity-aware search, and phylogeny-style reasoning on examples with known biological intent.
     ''').strip() + '\n'
 
 

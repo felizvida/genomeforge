@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Teach Yourself Bioinformatics with Genome Forge (v0.1.4)</title>
+  <title>Teach Yourself Bioinformatics with Genome Forge (v0.1.5)</title>
   <style>
     @page {
       size: A4;
@@ -15,33 +15,35 @@
       }
     }
     :root {
-      --ink: #0f172a;
-      --muted: #475569;
-      --line: #d8e2ef;
-      --panel: #f8fbff;
-      --panel-strong: #eef6ff;
-      --navy: #0b3954;
-      --teal: #1f6f78;
-      --gold: #c27a2c;
-      --rose: #9a4d63;
-      --paper: #ffffff;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --ink: #1d2733;
+      --muted: #5c6773;
+      --line: #d8d3c9;
+      --panel: #fbf8f1;
+      --panel-strong: #f3ede1;
+      --navy: #24364b;
+      --teal: #335e63;
+      --gold: #9e6a2e;
+      --rose: #7d4f5d;
+      --paper: #fffdf8;
+      --shadow: 0 12px 34px rgba(52, 55, 57, 0.08);
       --code-bg: #0b1220;
       --code-ink: #dbeafe;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: radial-gradient(circle at top left, #f2f9ff, #ffffff 32%);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 246, 238, 0.94)),
+        repeating-linear-gradient(0deg, rgba(90, 85, 70, 0.02), rgba(90, 85, 70, 0.02) 1px, transparent 1px, transparent 24px);
       color: var(--ink);
-      font-family: "Avenir Next", "IBM Plex Sans", "Segoe UI", sans-serif;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
       font-size: 12px;
-      line-height: 1.62;
+      line-height: 1.72;
     }
     a { color: var(--teal); text-decoration: none; }
     code {
       font-family: "IBM Plex Mono", Menlo, Consolas, monospace;
-      background: #eaf2fb;
+      background: #ece6da;
       color: #16324f;
       padding: 2px 5px;
       border-radius: 5px;
@@ -59,33 +61,37 @@
       white-space: pre-wrap;
       page-break-inside: avoid;
     }
-    .doc { max-width: 1040px; margin: 0 auto; padding: 12px 8px 28px; }
+    .doc { max-width: 1040px; margin: 0 auto; padding: 14px 10px 30px; }
     .cover {
       position: relative;
       overflow: hidden;
-      padding: 18px;
+      padding: 24px 24px 18px;
       border-radius: 20px;
-      background: linear-gradient(135deg, #0b3954 0%, #1f6f78 55%, #f7b267 160%);
-      color: white;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248, 242, 230, 0.98)),
+        linear-gradient(135deg, #f6f0e3 0%, #fffdf7 100%);
+      color: var(--ink);
       box-shadow: var(--shadow);
       margin-bottom: 12px;
+      border: 1px solid #d7cfbf;
     }
     .cover::after {
       content: "";
       position: absolute;
-      right: -70px;
-      top: -70px;
-      width: 220px;
-      height: 220px;
+      right: 24px;
+      top: 22px;
+      width: 170px;
+      height: 170px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.10);
+      background: radial-gradient(circle, rgba(36, 54, 75, 0.08), rgba(36, 54, 75, 0.02) 58%, transparent 60%);
     }
     .cover h1 {
       margin: 4px 0 10px;
-      font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-      font-size: 32px;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-size: 34px;
       line-height: 1.05;
       max-width: 760px;
+      color: var(--navy);
     }
     .cover p { margin: 8px 0; max-width: 760px; }
     .eyebrow {
@@ -95,16 +101,19 @@
       font-weight: 700;
       opacity: 0.9;
       margin: 0;
+      color: var(--gold);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }
     .meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
     .meta .k {
-      border: 1px solid rgba(255,255,255,0.18);
+      border: 1px solid #d8cdb8;
       border-radius: 12px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.6);
       padding: 9px 10px;
       font-size: 10px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }
-    .meta .k b { display: block; margin-top: 4px; font-size: 12px; color: white; }
+    .meta .k b { display: block; margin-top: 4px; font-size: 12px; color: var(--navy); }
     .quickstart {
       margin-top: 14px;
       display: grid;
@@ -114,8 +123,8 @@
     .quickstart > div {
       border-radius: 14px;
       padding: 12px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.65);
+      border: 1px solid #d8cdb8;
     }
     .section {
       background: var(--paper);
@@ -127,30 +136,30 @@
     }
     .section h2 {
       margin: 0 0 8px;
-      font-size: 20px;
+      font-size: 21px;
       color: var(--navy);
-      font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     }
     .section h3 {
       margin: 0 0 6px;
       font-size: 14px;
       color: var(--teal);
-      font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     }
     .lead { font-size: 13px; color: var(--ink); margin: 5px 0 0; }
     .muted { color: var(--muted); }
     .tiny { font-size: 10px; }
     .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-    .cards.cards-wide { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .cards.cards-wide { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .card {
       border: 1px solid var(--line);
       border-radius: 14px;
-      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      background: linear-gradient(180deg, #fffef9, #f8f2e8);
       padding: 12px;
       page-break-inside: avoid;
     }
-    .card.alt { background: linear-gradient(180deg, #fffaf5, #ffffff); }
+    .card.alt { background: linear-gradient(180deg, #fbf6eb, #fffef9); }
     .metric {
       margin: 6px 0;
       font-size: 15px;
@@ -162,20 +171,21 @@
       margin: 2px 4px 2px 0;
       padding: 3px 8px;
       border-radius: 999px;
-      background: #e8f4f4;
-      color: #155e63;
+      background: #ece7db;
+      color: #304c52;
       font-size: 10px;
       font-weight: 700;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }
     table { width: 100%; border-collapse: collapse; font-size: 10.7px; margin-top: 8px; }
     th, td { border: 1px solid #d9e4f0; padding: 7px; vertical-align: top; text-align: left; }
-    th { background: #edf5ff; color: #17314b; }
+    th { background: #eee7d7; color: #17314b; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }
     .toc ol, .toc ul, ul, ol { margin: 6px 0 6px 18px; padding: 0; }
     li { margin: 3px 0; }
     .figure {
-      border: 1px solid #d9e5f3;
+      border: 1px solid #d6cebe;
       border-radius: 14px;
-      background: #f8fbff;
+      background: #fdfaf2;
       padding: 8px;
       margin: 10px 0 0;
       text-align: center;
@@ -189,7 +199,7 @@
     .figure-card {
       border: 1px solid var(--line);
       border-radius: 14px;
-      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      background: linear-gradient(180deg, #fffef9, #f6efe4);
       padding: 10px;
       display: grid;
       grid-template-columns: 0.95fr 1.05fr;
@@ -201,60 +211,72 @@
     .figure-card h3 { margin: 0 0 4px; font-size: 13px; }
     .figure-card p { margin: 0; font-size: 10.8px; color: var(--muted); }
     .cluster-head { display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 12px; align-items: start; margin-bottom: 10px; }
-    .case { border-top: 1px dashed #c9d9e6; padding-top: 12px; margin-top: 12px; page-break-inside: avoid; }
+    .case-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .case-chip {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #d3c7b1;
+      background: #f8f2e5;
+      color: #4b5563;
+      font-size: 9.8px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }
+    .case { border-top: 1px dashed #c7bba6; padding-top: 12px; margin-top: 12px; page-break-inside: avoid; }
     .case:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
     .case-head { display: grid; grid-template-columns: 1.25fr 0.95fr; gap: 12px; align-items: start; }
     .case-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: 10.4px; }
     .case-meta > div { border: 1px solid var(--line); border-radius: 12px; padding: 8px; background: var(--panel); }
-    .case-meta b { display: block; color: var(--muted); margin-bottom: 4px; font-size: 9.8px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .case-meta b { display: block; color: var(--muted); margin-bottom: 4px; font-size: 9.8px; text-transform: uppercase; letter-spacing: 0.06em; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }
     .case-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
     .narrative h4 { margin: 0 0 4px; font-size: 12px; color: var(--navy); }
-    .stepbox, .resultbox, .expected, .interpret, .biology {
+    .study-note, .stepbox, .resultbox, .expected, .interpret, .biology {
       margin-top: 10px;
       border-radius: 14px;
       padding: 10px 12px;
       page-break-inside: avoid;
     }
-    .stepbox { border: 1px solid #bae6fd; background: #ecfeff; }
-    .resultbox { border: 1px solid #dbeafe; background: #f8fbff; }
-    .expected { border: 1px solid #d1fae5; background: #f0fdf4; }
-    .interpret { border: 1px solid #fde68a; background: #fffbeb; }
-    .biology { border: 1px solid #fbcfe8; background: #fff1f6; }
-    .stepbox b, .resultbox b, .expected b, .interpret b, .biology b { display: block; margin-bottom: 4px; color: var(--navy); }
+    .study-note { border: 1px solid #d3c7b1; background: #faf3e8; }
+    .stepbox { border: 1px solid #c9d8dc; background: #f4f9f9; }
+    .resultbox { border: 1px solid #d8d3c9; background: #fbf8f1; }
+    .expected { border: 1px solid #d6dfcf; background: #f8fcf5; }
+    .interpret { border: 1px solid #e4d7ab; background: #fff9eb; }
+    .biology { border: 1px solid #e5cdd6; background: #fcf4f7; }
+    .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b { display: block; margin-bottom: 4px; color: var(--navy); font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }
     .cluster, .section, .case, .card, .figure, table, pre { page-break-inside: avoid; }
   </style>
 </head>
 <body>
   <main class="doc">
     <section class="cover">
-      <p class="eyebrow">Genome Forge v0.1.4 · Real-World Training Edition</p>
+      <p class="eyebrow">Genome Forge v0.1.5 · Textbook Edition</p>
       <h1>Teach Yourself Bioinformatics with Genome Forge</h1>
-      <p>This rebuilt tutorial is written for engineers, analysts, and curious scientists who want to learn practical bioinformatics by working through real laboratory molecules: reporter genes, classic cloning vectors, and clinically important genomic sequence.</p>
-      <p>Instead of generic toy examples, the course uses public-source records such as EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. A few derived training variants are included where they help reveal meaningful sequence-to-function ideas that are hard to see with only one reference record.</p>
+      <p>This edition is written like a practical course reader for engineers, analysts, and curious scientists who want to learn bioinformatics by working through real laboratory molecules: reporter genes, classic cloning vectors, ambiguity-bearing consensus sequences, and clinically important genomic DNA.</p>
+      <p>Instead of generic toy examples, the course uses public-source records such as EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. Clearly labelled training derivatives appear only where they sharpen a teaching goal, such as variant interpretation, family-wide assay design, or how to preserve uncertainty with IUPAC ambiguity symbols.</p>
       <div class="meta">
         <div class="k">Mode<b>Self-study course</b></div>
-        <div class="k">Cases<b>37 (A-AK)</b></div>
+        <div class="k">Cases<b>39 total lessons</b></div>
         <div class="k">Audience<b>CS to biology bridge</b></div>
-        <div class="k">Release<b>2026-03-23</b></div>
+        <div class="k">Release<b>2026-04-02</b></div>
       </div>
       <div class="quickstart">
         <div>
-          <h3 style="color:white;margin-top:0">Quickstart</h3>
+          <h3 style="margin-top:0">Quickstart</h3>
           <p>1. Start the web UI with <code>python3 web_ui.py --port 8080</code>.</p>
           <p>2. Materialize a case bundle with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case A --out ./tmp/genomeforge_case_a</code>.</p>
           <p>3. Open <code>http://127.0.0.1:8080</code>, load the FASTA from your case bundle, and follow the matching case steps below.</p>
         </div>
         <div>
-          <h3 style="color:white;margin-top:0">Why This Edition Is Different</h3>
+          <h3 style="margin-top:0">Why This Edition Is Different</h3>
           <p>This version explains what the input data actually are, why the task matters biologically, what a meaningful result would look like, and what you should and should not conclude from the output.</p>
-          <p>Each case is designed so the numbers point to a real scientific story rather than a generic demo.</p>
+          <p>Each lesson is designed so the numbers point to a real scientific story rather than a generic demo, and the newer ambiguity-aware methods are taught directly instead of being buried as silent implementation details.</p>
         </div>
       </div>
     </section>
 
     <section class="section">
       <h2>Meaningful Results Preview</h2>
-      <p class="muted">These quick facts are derived directly from the bundled records. They are here to orient you before you dive into the 37 hands-on cases.</p>
+      <p class="muted">These quick facts are derived directly from the bundled records. They are here to orient you before you dive into the 39 hands-on lessons.</p>
       <div class="cards cards-wide"><div class="card">
   <h3>EGFP is a clean coding-sequence teaching record</h3>
   <p class="metric">720 bp → 239 aa + stop</p>
@@ -275,6 +297,10 @@
   <h3>Reporter proteins can do similar jobs while having different sequence histories</h3>
   <p class="metric">EGFP length 720 bp vs mCherry length 711 bp</p>
   <p>Comparing them is a good reminder that “same use in the lab” does not imply “same sequence architecture” or even the same engineering tradeoffs.</p>
+</div><div class="card">
+  <h3>Genome Forge now teaches uncertainty as a first-class sequence state</h3>
+  <p class="metric">EGFP ambiguity training record carries 3 explicit unresolved positions</p>
+  <p>That matters because real assay design and identity search often start before every position is perfectly resolved. Good workflows preserve uncertainty instead of flattening it away.</p>
 </div></div>
     </section>
 
@@ -287,7 +313,7 @@
             <li><code>docs/tutorial/datasets/training_real_world_sequences.fasta</code>: base public-source sequences.</li>
             <li><code>docs/tutorial/datasets/training_real_world_dataset.json</code>: metadata, sources, case inputs, and derived-record definitions.</li>
             <li><code>docs/tutorial/datasets/case_playbook.md</code>: compact case-by-case checklist.</li>
-            <li><code>docs/tutorial/datasets/case_bundles/</code>: prebuilt ready-to-load bundles for all 37 tutorial cases.</li>
+            <li><code>docs/tutorial/datasets/case_bundles/</code>: prebuilt ready-to-load bundles for all 39 tutorial cases.</li>
             <li><code>docs/tutorial/datasets/extract_case_bundle.py</code>: writes ready-to-run per-case FASTA bundles.</li>
           </ul>
         </div>
@@ -296,6 +322,35 @@
           <p>Always save the exact case bundle you used. That keeps the tutorial reproducible and prevents “I think I loaded the right sequence” problems. Every case already ships with a prebuilt bundle, so you can start quickly and still regenerate it later if you want to inspect provenance.</p>
           <pre>python3 docs/tutorial/datasets/extract_case_bundle.py --case K --out ./tmp/genomeforge_case_k</pre>
         </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>How to Study This Book</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Read the data type first</h3>
+          <p>Before you run anything, identify whether the input is a coding sequence, genomic fragment, plasmid-like construct, chromatogram-derived consensus, or uncertainty-bearing record. Most downstream mistakes come from treating those as interchangeable.</p>
+        </div>
+        <div class="card">
+          <h3>Use the sample results as calibration, not as a cheat sheet</h3>
+          <p>The sample results tell you what a believable answer should feel like. They do not replace your own run. A good habit is to compare your output to the sample and ask why any difference exists.</p>
+        </div>
+        <div class="card">
+          <h3>Write down the biological claim separately from the software output</h3>
+          <p>The result is not just “the tool said X.” The result is the biological sentence you can defend after seeing X. That distinction is what turns software use into bioinformatics reasoning.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Primer on Ambiguity Codes</h2>
+      <p class="muted">Several later lessons now teach ambiguity-aware matching directly. These symbols do not mean the sequence is broken. They mean the evidence still permits a small set of bases at a position, and Genome Forge can now search, compare, and design around that uncertainty.</p>
+      <table><thead><tr><th>Code</th><th>Allowed base(s)</th><th>Meaning</th><th>Why you would keep it</th></tr></thead><tbody><tr><td><code>A</code></td><td>A</td><td>Adenine only</td><td>Exact called base or exact assay requirement.</td></tr><tr><td><code>C</code></td><td>C</td><td>Cytosine only</td><td>Exact called base or exact assay requirement.</td></tr><tr><td><code>G</code></td><td>G</td><td>Guanine only</td><td>Exact called base or exact assay requirement.</td></tr><tr><td><code>T</code></td><td>T</td><td>Thymine only</td><td>Exact called base or exact assay requirement.</td></tr><tr><td><code>R</code></td><td>A or G</td><td>Purine</td><td>Useful when a site varies between adenine and guanine.</td></tr><tr><td><code>Y</code></td><td>C or T</td><td>Pyrimidine</td><td>Common in mixed trace calls and degenerate primers.</td></tr><tr><td><code>S</code></td><td>G or C</td><td>Strong pair</td><td>Both options make three hydrogen bonds to the complement.</td></tr><tr><td><code>W</code></td><td>A or T</td><td>Weak pair</td><td>Both options make two hydrogen bonds to the complement.</td></tr><tr><td><code>K</code></td><td>G or T</td><td>Keto</td><td>Used when the target family tolerates a purine/pyrimidine swap at one site.</td></tr><tr><td><code>M</code></td><td>A or C</td><td>Amino</td><td>Useful for family-wide assay design.</td></tr><tr><td><code>B</code></td><td>C or G or T</td><td>Not A</td><td>Represents uncertainty while still excluding one base.</td></tr><tr><td><code>D</code></td><td>A or G or T</td><td>Not C</td><td>Represents uncertainty while still excluding one base.</td></tr><tr><td><code>H</code></td><td>A or C or T</td><td>Not G</td><td>Represents uncertainty while still excluding one base.</td></tr><tr><td><code>V</code></td><td>A or C or G</td><td>Not T</td><td>Represents uncertainty while still excluding one base.</td></tr><tr><td><code>N</code></td><td>A or C or G or T</td><td>Any base</td><td>Used when the evidence does not justify a more specific call.</td></tr></tbody></table>
+      <div class="cards" style="margin-top:10px">
+        <div class="card"><h3>Why ambiguity is honest</h3><p>Forcing an uncertain position to one exact base may look cleaner, but it destroys evidence. Ambiguity codes preserve what the data still allow.</p></div>
+        <div class="card"><h3>Why assay design cares</h3><p>Degenerate primers use these symbols on purpose so one assay can still cover a small family of related templates.</p></div>
+        <div class="card"><h3>Why search still works</h3><p>An uncertainty-bearing query can still identify the correct molecule family if the unresolved positions are represented explicitly instead of hidden.</p></div>
       </div>
     </section>
 
@@ -346,7 +401,7 @@
       <p>These are the biological objects that power the tutorial. Some are public-source sequences bundled directly in the FASTA file. Others are clearly labelled training derivatives created from those public records so specific comparison cases have an answer key.</p>
       <table>
         <thead><tr><th>Record</th><th>Origin</th><th>Why it matters</th><th>Input data explained</th><th>Source</th></tr></thead>
-        <tbody><tr><td><code>EGFP_CDS</code><div class="tiny muted">public-source</div></td><td>Engineered fluorescent reporter derived from the Aequorea victoria GFP family.</td><td>EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.</td><td>This is a protein-coding DNA sequence (CDS). The sequence is meant to be translated from the first base, so codon boundaries and reading frame matter immediately.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/9526659/">PubMed: enhanced GFP mutants overview</a></td></tr><tr><td><code>mCherry_CDS</code><div class="tiny muted">public-source</div></td><td>Monomeric red fluorescent protein from the mFruit engineering lineage.</td><td>mCherry is a real-world counterexample to GFP: same broad job as a reporter, different sequence history, color, and engineering constraints.</td><td>This is also a CDS, but it encodes a coral-derived red fluorescent protein rather than a GFP-family green reporter. That makes it useful for pairwise comparison and identity search.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/12060735/">PubMed: A monomeric red fluorescent protein</a></td></tr><tr><td><code>pUC19_MCS</code><div class="tiny muted">public-source</div></td><td>The pUC19 multiple-cloning site from one of the most widely used teaching and cloning vectors in molecular biology.</td><td>A dense multiple-cloning site is a perfect example of engineered sequence architecture: every base exists to make cloning more flexible.</td><td>This sequence is short, circularly interpreted, and packed with restriction motifs. It is intentionally synthetic and engineered for manipulation rather than natural gene expression.</td><td><a href="https://www.ncbi.nlm.nih.gov/nuccore/M77789.2">NCBI Nucleotide: pUC19 complete sequence</a></td></tr><tr><td><code>lacZ_alpha_fragment</code><div class="tiny muted">public-source</div></td><td>lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.</td><td>This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.</td><td>The sequence is a cloning-era workhorse. It contains coding material, but many workflows care more about its role as a reporter module than as a standalone protein-coding fragment.</td><td><a href="https://www.ncbi.nlm.nih.gov/nuccore/M77789.2">NCBI Nucleotide: pUC19 complete sequence</a></td></tr><tr><td><code>BRAF_exon15_fragment</code><div class="tiny muted">public-source</div></td><td>A hotspot-rich fragment centered on human BRAF exon 15, the region associated with the famous V600 oncogenic mutation family.</td><td>This is the most medically consequential sequence in the training set. It is ideal for primer design, genotyping logic, CRISPR planning, and explaining why genomic DNA is not the same thing as a CDS.</td><td>This is a genomic fragment, not a clean coding-sequence input. If you translate it naively, you hit stop codons because intron/exon context and strand assumptions matter.</td><td><a href="https://www.ncbi.nlm.nih.gov/gene/673">NCBI Gene: BRAF (human)</a></td></tr><tr><td><code>EGFP_Y67H_training_variant</code><div class="tiny muted">derived-training</div></td><td>Training derivative of EGFP that changes the aromatic residue in the chromophore-forming motif.</td><td>This is not a random mutation. It models the idea that one codon change near a chromophore can produce a large optical shift, which is a powerful lesson for variant interpretation.</td><td>Because this record is derived from EGFP by a single codon change, it is excellent for pairwise alignment, amino-acid consequence analysis, and demonstrating how “small diff, big phenotype” problems happen in biology.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/9526659/">Derived from EGFP mutant logic described in GFP engineering literature</a></td></tr><tr><td><code>EGFP_S204Y_training_variant</code><div class="tiny muted">derived-training</div></td><td>Training derivative of EGFP that alters an aromatic-packing site near the chromophore environment.</td><td>It gives the tutorial a second closely related variant, which makes alignment, consensus, and comparison-lens examples far more realistic than comparing unrelated proteins only.</td><td>Like the Y67H-like variant, this record is generated from a public-source EGFP backbone. The point is not to claim a specific commercial reagent but to give you a realistic engineering-style mutation to reason about.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/9526659/">Derived from EGFP engineering principles</a></td></tr></tbody>
+        <tbody><tr><td><code>EGFP_CDS</code><div class="tiny muted">public-source</div></td><td>Engineered fluorescent reporter derived from the Aequorea victoria GFP family.</td><td>EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.</td><td>This is a protein-coding DNA sequence (CDS). The sequence is meant to be translated from the first base, so codon boundaries and reading frame matter immediately.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/9526659/">PubMed: enhanced GFP mutants overview</a></td></tr><tr><td><code>mCherry_CDS</code><div class="tiny muted">public-source</div></td><td>Monomeric red fluorescent protein from the mFruit engineering lineage.</td><td>mCherry is a real-world counterexample to GFP: same broad job as a reporter, different sequence history, color, and engineering constraints.</td><td>This is also a CDS, but it encodes a coral-derived red fluorescent protein rather than a GFP-family green reporter. That makes it useful for pairwise comparison and identity search.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/12060735/">PubMed: A monomeric red fluorescent protein</a></td></tr><tr><td><code>pUC19_MCS</code><div class="tiny muted">public-source</div></td><td>The pUC19 multiple-cloning site from one of the most widely used teaching and cloning vectors in molecular biology.</td><td>A dense multiple-cloning site is a perfect example of engineered sequence architecture: every base exists to make cloning more flexible.</td><td>This sequence is short, circularly interpreted, and packed with restriction motifs. It is intentionally synthetic and engineered for manipulation rather than natural gene expression.</td><td><a href="https://www.ncbi.nlm.nih.gov/nuccore/M77789.2">NCBI Nucleotide: pUC19 complete sequence</a></td></tr><tr><td><code>lacZ_alpha_fragment</code><div class="tiny muted">public-source</div></td><td>lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.</td><td>This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.</td><td>The sequence is a cloning-era workhorse. It contains coding material, but many workflows care more about its role as a reporter module than as a standalone protein-coding fragment.</td><td><a href="https://www.ncbi.nlm.nih.gov/nuccore/M77789.2">NCBI Nucleotide: pUC19 complete sequence</a></td></tr><tr><td><code>BRAF_exon15_fragment</code><div class="tiny muted">public-source</div></td><td>A hotspot-rich fragment centered on human BRAF exon 15, the region associated with the famous V600 oncogenic mutation family.</td><td>This is the most medically consequential sequence in the training set. It is ideal for primer design, genotyping logic, CRISPR planning, and explaining why genomic DNA is not the same thing as a CDS.</td><td>This is a genomic fragment, not a clean coding-sequence input. If you translate it naively, you hit stop codons because intron/exon context and strand assumptions matter.</td><td><a href="https://www.ncbi.nlm.nih.gov/gene/673">NCBI Gene: BRAF (human)</a></td></tr><tr><td><code>EGFP_Y67H_training_variant</code><div class="tiny muted">derived-training</div></td><td>Training derivative of EGFP that changes the aromatic residue in the chromophore-forming motif.</td><td>This is not a random mutation. It models the idea that one codon change near a chromophore can produce a large optical shift, which is a powerful lesson for variant interpretation.</td><td>Because this record is derived from EGFP by a single codon change, it is excellent for pairwise alignment, amino-acid consequence analysis, and demonstrating how “small diff, big phenotype” problems happen in biology.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/9526659/">Derived from EGFP mutant logic described in GFP engineering literature</a></td></tr><tr><td><code>EGFP_S204Y_training_variant</code><div class="tiny muted">derived-training</div></td><td>Training derivative of EGFP that alters an aromatic-packing site near the chromophore environment.</td><td>It gives the tutorial a second closely related variant, which makes alignment, consensus, and comparison-lens examples far more realistic than comparing unrelated proteins only.</td><td>Like the Y67H-like variant, this record is generated from a public-source EGFP backbone. The point is not to claim a specific commercial reagent but to give you a realistic engineering-style mutation to reason about.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/9526659/">Derived from EGFP engineering principles</a></td></tr><tr><td><code>EGFP_ambiguity_consensus_training</code><div class="tiny muted">derived-training</div></td><td>Training derivative of EGFP that uses IUPAC ambiguity symbols to mimic a consensus sequence assembled from uncertain or mixed evidence.</td><td>It teaches that uncertainty can be represented explicitly instead of being hidden behind a forced single-base call.</td><td>This record is still an EGFP-like coding sequence, but a few positions are encoded as ambiguity symbols such as R, Y, and N. That means the sequence stands for a small set of plausible molecules rather than one exact DNA string.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/9526659/">Derived from EGFP_CDS for ambiguity-aware assay and search training</a></td></tr></tbody>
       </table>
       <div class="cards" style="margin-top:10px">
         <div class="card"><h3>Reporter Biology</h3><p>EGFP and mCherry let you practice coding-sequence analysis on records that many labs actually clone, image, and verify.</p></div>
@@ -358,7 +413,7 @@
     <section class="section toc">
       <h2>Case Map</h2>
       <p class="muted">Recommended order if you are new to biology: Cluster A → B → C → D → G → E → F → H.</p>
-      <ol><li><a href="#cluster-A">Cluster A: Molecule Architecture and Restriction Logic (4 cases)</a></li><li><a href="#cluster-B">Cluster B: Sequence Meaning and Functional Annotation (4 cases)</a></li><li><a href="#cluster-C">Cluster C: Assay and Primer System Design (4 cases)</a></li><li><a href="#cluster-D">Cluster D: Assembly and Construct Validation (3 cases)</a></li><li><a href="#cluster-E">Cluster E: Comparative and Population-Level Reasoning (4 cases)</a></li><li><a href="#cluster-F">Cluster F: Editing and Design for Intervention (3 cases)</a></li><li><a href="#cluster-G">Cluster G: Data Fidelity and Interoperability (10 cases)</a></li><li><a href="#cluster-H">Cluster H: Reproducibility, Governance, and Delivery (5 cases)</a></li></ol>
+      <ol><li><a href="#cluster-A">Cluster A: Molecule Architecture and Restriction Logic (4 cases)</a></li><li><a href="#cluster-B">Cluster B: Sequence Meaning and Functional Annotation (4 cases)</a></li><li><a href="#cluster-C">Cluster C: Assay and Primer System Design (5 cases)</a></li><li><a href="#cluster-D">Cluster D: Assembly and Construct Validation (3 cases)</a></li><li><a href="#cluster-E">Cluster E: Comparative and Population-Level Reasoning (4 cases)</a></li><li><a href="#cluster-F">Cluster F: Editing and Design for Intervention (3 cases)</a></li><li><a href="#cluster-G">Cluster G: Data Fidelity and Interoperability (11 cases)</a></li><li><a href="#cluster-H">Cluster H: Reproducibility, Governance, and Delivery (5 cases)</a></li></ol>
     </section>
 
     <section class="section">
@@ -376,6 +431,7 @@
             <p class="eyebrow">Cluster A</p>
             <h2>Cluster A: Molecule Architecture and Restriction Logic</h2>
             <p class="muted">How a DNA molecule is physically organized and where you can safely cut or modify it.</p>
+            <div class="case-strip"><span class="case-chip">Case A · Restriction Map for Cloning Entry Design</span><span class="case-chip">Case B · Methylation-Aware Digest Interpretation</span><span class="case-chip">Case C · Star Activity Risk Review</span><span class="case-chip">Case U · k-mer Profile for Contamination Suspicion</span></div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="assets/01_map.svg" alt="Molecule Architecture and Restriction Logic" />
@@ -408,6 +464,7 @@
             <p>The pUC19 multiple-cloning site is only a few dozen bases long, but it is one of the most recognizable pieces of engineered DNA in molecular biology.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_a/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case A --out ./tmp/genomeforge_case_a</code>.</li><li>Open the <code>Map</code> tab in Genome Forge and load: <code>pUC19_MCS, lacZ_alpha_fragment</code>.</li><li>Run <code>Render the pUC19 map and compare unique restriction choices before adding a reporter insert.</code> once with default settings, then rerun after changing the enzyme panel.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/map, /api/digest</code> and write one sentence explaining the biological takeaway.</li></ol></div>
         <div class="figure ui-shot">
   <img src="assets/screenshots/flagship_case_a_map.png" alt="Restriction-map workflow in the live UI" />
@@ -458,6 +515,7 @@
             <p>Many “mysterious digest failures” are actually host-state stories, not sequence-identity stories.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_b/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case B --out ./tmp/genomeforge_case_b</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>pUC19_MCS</code>.</li><li>Run <code>Compare standard digest output with methylation-aware digest logic on a real cloning vector motif set.</code> once with default settings, then rerun after changing the methylated motif list.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/digest-advanced</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -503,6 +561,7 @@
             <p>A single risky off-target cut inside a key feature matters more than a long list of harmless near-matches elsewhere.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_c/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case C --out ./tmp/genomeforge_case_c</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>pUC19_MCS, lacZ_alpha_fragment</code>.</li><li>Run <code>Scan relaxed-matching cut risk to understand how star activity can create off-target restriction events.</code> once with default settings, then rerun after changing the mismatch tolerance.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/star-activity-scan</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -540,6 +599,7 @@
             <p>The most useful contamination clue is often not a mismatch; it is a motif or feature that simply should not coexist with the biology you thought you had.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_u/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case U --out ./tmp/genomeforge_case_u</code>.</li><li>Open the <code>Search</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS, pUC19_MCS</code>.</li><li>Run <code>Use motif/entity search patterns to ask whether a supposed single-template sample smells like a mixed cloning population.</code> once with default settings, then rerun after changing the motif query or background panel.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/motif, /api/search-entities</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -561,6 +621,7 @@
             <p class="eyebrow">Cluster B</p>
             <h2>Cluster B: Sequence Meaning and Functional Annotation</h2>
             <p class="muted">How raw letters become genes, codons, proteins, and functional hypotheses.</p>
+            <div class="case-strip"><span class="case-chip">Case D · Sequence Track and Translation Context</span><span class="case-chip">Case M · ORF Scan and Coding Potential Triage</span><span class="case-chip">Case P · Variant Annotation from Reference-Aligned Edits</span><span class="case-chip">Case W · Protein Property Inference from Translation</span></div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="assets/02_sequence_track.svg" alt="Sequence Meaning and Functional Annotation" />
@@ -593,6 +654,7 @@
             <p>Once you see codons and amino acids aligned beneath the DNA, it becomes much easier to explain missense, synonymous, nonsense, and frameshift changes clearly.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_d/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case D --out ./tmp/genomeforge_case_d</code>.</li><li>Open the <code>Map</code> tab in Genome Forge and load: <code>EGFP_CDS</code>.</li><li>Run <code>Inspect EGFP with sequence tracks so base coordinates, codons, amino acids, and features can be read together.</code> once with default settings, then rerun after changing the visible window or frame.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/sequence-tracks</code> and write one sentence explaining the biological takeaway.</li></ol></div>
         <div class="figure ui-shot">
   <img src="assets/screenshots/flagship_case_d_track.png" alt="Sequence-track workflow on EGFP" />
@@ -634,6 +696,7 @@
             <p>The BRAF fragment is useful precisely because it fails the “clean ORF” expectation. That failure is teaching you something true about the data type.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_m/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case M --out ./tmp/genomeforge_case_m</code>.</li><li>Open the <code>ORF/Motif</code> tab in Genome Forge and load: <code>BRAF_exon15_fragment, EGFP_CDS</code>.</li><li>Run <code>Compare a clean coding sequence and a genomic fragment to learn what ORF scanning can and cannot tell you.</code> once with default settings, then rerun after changing the minimum ORF length.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/orfs</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -672,6 +735,7 @@
             <p>“Only one codon changed” is not a reassuring statement if that codon sits inside the business end of the molecule.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_p/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case P --out ./tmp/genomeforge_case_p</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, EGFP_Y67H_training_variant</code>.</li><li>Run <code>Align a public reporter CDS to a derived chromophore variant and explain the difference in protein terms.</code> once with default settings, then rerun after changing the reference/variant pair.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/pairwise-align, /api/translated-features</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -710,6 +774,7 @@
             <p>Fluorescent proteins are great teaching tools because their phenotype is visible, but the visible color still emerges from a long chain of sequence-to-structure-to-chemistry logic.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_w/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case W --out ./tmp/genomeforge_case_w</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS</code>.</li><li>Run <code>Translate two real reporter proteins and compare what the sequence suggests about size, composition, and practical use.</code> once with default settings, then rerun after changing which translated record you compare.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/translate</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -729,6 +794,7 @@
             <p class="eyebrow">Cluster C</p>
             <h2>Cluster C: Assay and Primer System Design</h2>
             <p class="muted">How to design measurements that say something trustworthy about biology.</p>
+            <div class="case-strip"><span class="case-chip">Case E · Primer Design and Thermodynamic Screening</span><span class="case-chip">Case F · Specificity Ranking with Virtual PCR/Gel</span><span class="case-chip">Case AL · Degenerate Primer Strategy for a Variant Family</span><span class="case-chip">Case Q · Multiplex PCR Panel Balancing</span><span class="case-chip">Case AA · Positive and Negative Control Design</span></div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="assets/05_star_activity.svg" alt="Assay and Primer System Design" />
@@ -761,6 +827,7 @@
             <p>A primer pair that looks elegant in FASTA text can still fail because DNA strands form structures and compete for binding.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_e/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case E --out ./tmp/genomeforge_case_e</code>.</li><li>Open the <code>Primer/PCR</code> tab in Genome Forge and load: <code>BRAF_exon15_fragment</code>.</li><li>Run <code>Design primers around the BRAF hotspot region and screen them for temperature and composition sanity.</code> once with default settings, then rerun after changing the amplicon window or primer length.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/primer-design</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -805,6 +872,7 @@
             <p>A clean gel simulation is a communication tool: it helps a junior scientist understand why one primer pair is risky without making them parse thermodynamic tables first.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_f/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case F --out ./tmp/genomeforge_case_f</code>.</li><li>Open the <code>Primer/PCR</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS, BRAF_exon15_fragment</code>.</li><li>Run <code>Rank candidate primer pairs against a realistic background panel and inspect the predicted gel outcome.</code> once with default settings, then rerun after changing the background record panel.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/primer-specificity, /api/pcr, /api/gel-sim</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -816,6 +884,62 @@
         <div class="expected"><b>Expected Results</b><ul><li>A ranked candidate list with at least one rejected pair and one preferred pair.</li><li>A predicted gel pattern that explains the ranking in experimental terms.</li><li>A final recommendation that ties specificity back to the intended assay.</li></ul></div>
         <div class="interpret"><b>How to Interpret the Results</b><ul><li>Use the gel view to explain specificity, not just the score table.</li><li>A pair with a slightly lower score but cleaner off-target profile may still be the better scientific choice.</li><li>The winning pair is the one you would be comfortable handing to someone else in the lab.</li></ul></div>
         <div class="biology"><b>Biological Explanation</b><p>Virtual PCR is valuable because it converts abstract specificity scores into something a bench scientist immediately understands: extra bands, wrong-size bands, or a clean expected product. It turns computational screening into an experimental expectation.</p><p><b>Fun fact from this example:</b> A clean gel simulation is a communication tool: it helps a junior scientist understand why one primer pair is risky without making them parse thermodynamic tables first.</p></div>
+      </article>
+<article class="case" id="case-AL">
+        <div class="case-head">
+          <div>
+            <p class="eyebrow">Case AL · Cluster C</p>
+            <h3>Case AL: Degenerate Primer Strategy for a Variant Family</h3>
+            <p class="lead">How do you keep a PCR assay useful when the target family varies at one or two positions, or when your consensus still contains unresolved bases?</p>
+          </div>
+          <div class="case-meta">
+            <div><b>Tab</b><span>Primer/PCR</span></div>
+            <div><b>Workflow</b><span>Use an ambiguity-coded primer to keep one assay useful across a small reporter family and an uncertainty-bearing consensus sequence.</span></div>
+            <div><b>Records</b><span><span class="badge">EGFP_CDS</span><span class="badge">EGFP_ambiguity_consensus_training</span><span class="badge">EGFP_Y67H_training_variant</span></span></div>
+            <div><b>APIs</b><span><code>/api/primer-diagnostics</code> <code>/api/primer-specificity</code> <code>/api/pcr</code></span></div>
+          </div>
+        </div>
+        <div class="case-grid">
+          <div class="card narrative">
+            <h4>Why This Case Matters</h4>
+            <p>This case uses one clean reporter CDS, one biologically meaningful single-codon variant, and one uncertainty-bearing consensus sequence. That combination mirrors a real workflow in which a lab wants one assay that still works across a clone family, a mutagenesis panel, or a partially resolved sequencing result.</p>
+            <p>Degenerate primers are a controlled way to encode biological uncertainty into an assay design. Instead of pretending every member of a target family is identical, you let the primer represent a small allowed set of bases at carefully chosen positions. Computationally, that means the primer is no longer one string. Biologically, it means one assay can cover a family without lying about where the family differs.</p>
+          </div>
+          <div class="card narrative alt">
+            <h4>Input Data Explained</h4>
+            <p>This is a protein-coding DNA sequence (CDS). The sequence is meant to be translated from the first base, so codon boundaries and reading frame matter immediately. This record is still an EGFP-like coding sequence, but a few positions are encoded as ambiguity symbols such as R, Y, and N. That means the sequence stands for a small set of plausible molecules rather than one exact DNA string. Because this record is derived from EGFP by a single codon change, it is excellent for pairwise alignment, amino-acid consequence analysis, and demonstrating how “small diff, big phenotype” problems happen in biology.</p>
+            <p>A degenerate primer is a compact statement that says, “I know exactly where uncertainty lives, and I am designing around it rather than ignoring it.”</p>
+          </div>
+        </div>
+        <div class="study-note"><b>Starter Values</b><ul><li>Forward primer seed: <code>ATGGTGRGYAAGGGCGAGGA</code></li><li>Reverse primer seed: <code>CTTGTACAGCTCGTCCATGC</code></li><li>Background panel: <code>EGFP_CDS, EGFP_ambiguity_consensus_training, EGFP_Y67H_training_variant</code></li></ul></div>
+        <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_al/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AL --out ./tmp/genomeforge_case_al</code>.</li><li>Open the <code>Primer/PCR</code> tab in Genome Forge and load: <code>EGFP_CDS, EGFP_ambiguity_consensus_training, EGFP_Y67H_training_variant</code>.</li><li>Run <code>Use an ambiguity-coded primer to keep one assay useful across a small reporter family and an uncertainty-bearing consensus sequence.</code> once with default settings, then rerun after changing the ambiguous positions or the background family.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/primer-diagnostics, /api/primer-specificity, /api/pcr</code> and write one sentence explaining the biological takeaway.</li></ol></div>
+        <div class="figure ui-shot">
+  <img src="assets/screenshots/flagship_case_al_degenerate_primers.png" alt="Degenerate-primer assay workflow" />
+  <p class="caption"><b>Degenerate-primer assay workflow</b>. Real UI screenshot from the ambiguity-aware primer lesson. The primer fields intentionally contain IUPAC ambiguity symbols so one assay can tolerate a small reporter-family variation without hiding where uncertainty lives.</p>
+</div>
+        <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
+  &quot;forward_primer&quot;: &quot;ATGGTGRGYAAGGGCGAGGA&quot;,
+  &quot;reverse_primer&quot;: &quot;CTTGTACAGCTCGTCCATGC&quot;,
+  &quot;background_records&quot;: 3,
+  &quot;predicted_products&quot;: [
+    {
+      &quot;record&quot;: &quot;EGFP_CDS&quot;,
+      &quot;size_bp&quot;: 119
+    },
+    {
+      &quot;record&quot;: &quot;EGFP_ambiguity_consensus_training&quot;,
+      &quot;size_bp&quot;: 119
+    },
+    {
+      &quot;record&quot;: &quot;EGFP_Y67H_training_variant&quot;,
+      &quot;size_bp&quot;: 119
+    }
+  ],
+  &quot;interpretation&quot;: &quot;one family-tolerant assay retained while off-target risk stays low in the reporter panel&quot;
+}</pre></div>
+        <div class="expected"><b>Expected Results</b><ul><li>A primer pair in which at least one primer contains IUPAC ambiguity symbols rather than only A/C/G/T.</li><li>A specificity report showing that the intended family members still amplify while unrelated products remain limited.</li><li>A justification for why the ambiguity positions were placed where they were, rather than scattered arbitrarily.</li></ul></div>
+        <div class="interpret"><b>How to Interpret the Results</b><ul><li>A degenerate primer is valuable only if the ambiguous positions reflect real biological uncertainty or family diversity.</li><li>If a primer becomes too degenerate, you gain family coverage but may lose specificity or synthesis practicality.</li><li>The best outcome is not “maximum ambiguity”; it is the smallest ambiguity set that still captures the biological family you care about.</li></ul></div>
+        <div class="biology"><b>Biological Explanation</b><p>Degenerate primers are a controlled way to encode biological uncertainty into an assay design. Instead of pretending every member of a target family is identical, you let the primer represent a small allowed set of bases at carefully chosen positions. Computationally, that means the primer is no longer one string. Biologically, it means one assay can cover a family without lying about where the family differs.</p><p><b>Fun fact from this example:</b> A degenerate primer is a compact statement that says, “I know exactly where uncertainty lives, and I am designing around it rather than ignoring it.”</p></div>
       </article>
 <article class="case" id="case-Q">
         <div class="case-head">
@@ -843,6 +967,7 @@
             <p>When a multiplex assay works, it feels efficient; when it fails, it often fails in ways that are hard to interpret unless the panel was designed carefully from the start.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_q/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case Q --out ./tmp/genomeforge_case_q</code>.</li><li>Open the <code>Primer/PCR</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS, BRAF_exon15_fragment</code>.</li><li>Run <code>Compare multiple assay targets and ask whether they can coexist in one panel without obvious conflict.</code> once with default settings, then rerun after changing the primer pool or target combination.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/primer-design, /api/primer-specificity, /api/pcr</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -884,6 +1009,7 @@
             <p>The best controls are boring in the best possible way: they make the interpretation unambiguous.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_aa/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AA --out ./tmp/genomeforge_case_aa</code>.</li><li>Open the <code>Primer/PCR</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS, BRAF_exon15_fragment</code>.</li><li>Run <code>Design an assay package that includes controls proving both signal presence and signal absence.</code> once with default settings, then rerun after changing which record acts as the control.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/primer-specificity, /api/pcr</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -902,6 +1028,7 @@
             <p class="eyebrow">Cluster D</p>
             <h2>Cluster D: Assembly and Construct Validation</h2>
             <p class="muted">How to move from fragments and overlaps to a believable finished construct.</p>
+            <div class="case-strip"><span class="case-chip">Case G · Cloning Compatibility and Ligation Product Ranking</span><span class="case-chip">Case S · Circular Construct Integrity and Junction Validation</span><span class="case-chip">Case Z · Multi-Trace Consensus for Final Construct Call</span></div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="assets/06_ligation_products.svg" alt="Assembly and Construct Validation" />
@@ -934,6 +1061,7 @@
             <p>A cloning simulation is most helpful when it tells you what wrong products to expect, because that is what saves time on the bench.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_g/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case G --out ./tmp/genomeforge_case_g</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>pUC19_MCS, EGFP_CDS</code>.</li><li>Run <code>Check whether the vector and insert support a coherent directional cloning plan and inspect likely ligation products.</code> once with default settings, then rerun after changing the enzyme pair or overlap rule.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/cloning-check, /api/ligation-sim</code> and write one sentence explaining the biological takeaway.</li></ol></div>
         <div class="figure ui-shot">
   <img src="assets/screenshots/flagship_case_g_ligation.png" alt="Ligation and construct-planning workflow" />
@@ -977,6 +1105,7 @@
             <p>A plasmid is often won or lost at only a handful of bases: the junctions carry disproportionate functional meaning.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_s/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case S --out ./tmp/genomeforge_case_s</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>pUC19_MCS, EGFP_CDS</code>.</li><li>Run <code>Validate a circularized construct by focusing on junctions, scars, and reading-frame continuity.</code> once with default settings, then rerun after changing the overlap length or insert orientation.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/gibson-assemble, /api/project-diff</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1015,6 +1144,7 @@
             <p>Consensus is not democracy; three low-quality reads do not magically beat one high-quality read. Quality still matters.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_z/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case Z --out ./tmp/genomeforge_case_z</code>.</li><li>Open the <code>Trace</code> tab in Genome Forge and load: <code>EGFP_CDS</code>.</li><li>Run <code>Combine multiple trace-derived views into one final verdict about a reporter construct.</code> once with default settings, then rerun after changing the trace subset or quality threshold.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/import-ab1, /api/trace-align, /api/trace-consensus</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1033,6 +1163,7 @@
             <p class="eyebrow">Cluster E</p>
             <h2>Cluster E: Comparative and Population-Level Reasoning</h2>
             <p class="muted">How to compare related molecules, hotspot variants, and engineered families without overclaiming.</p>
+            <div class="case-strip"><span class="case-chip">Case H · MSA, Identity Heatmap, and Phylogeny</span><span class="case-chip">Case N · GC Landscape and Repeat Fragility</span><span class="case-chip">Case O · Homopolymer and Low-Complexity Risk Detection</span><span class="case-chip">Case X · Motif Enrichment and Significance Framing</span></div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="assets/03_msa_heatmap.svg" alt="Comparative and Population-Level Reasoning" />
@@ -1065,6 +1196,7 @@
             <p>A tree is never the biology by itself; it is a summary of the comparison model you chose. But it is still a powerful way to show that one-codon EGFP variants belong in a different interpretive bucket from mCherry.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_h/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case H --out ./tmp/genomeforge_case_h</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, EGFP_Y67H_training_variant, EGFP_S204Y_training_variant, mCherry_CDS</code>.</li><li>Run <code>Compare a small reporter family panel to see what is conserved, what is engineered, and what is genuinely distant.</code> once with default settings, then rerun after changing the sequence panel.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/msa, /api/heatmap, /api/phylo</code> and write one sentence explaining the biological takeaway.</li></ol></div>
         <div class="figure ui-shot">
   <img src="assets/screenshots/flagship_case_h_heatmap.png" alt="Reporter-family comparison workflow" />
@@ -1109,6 +1241,7 @@
             <p>A flat, boring composition profile is often good news. In bioinformatics, sometimes the interesting result is that nothing scary shows up.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_n/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case N --out ./tmp/genomeforge_case_n</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>mCherry_CDS, lacZ_alpha_fragment</code>.</li><li>Run <code>Use analytics tracks to identify composition features that may complicate PCR, synthesis, or sequencing.</code> once with default settings, then rerun after changing the analytics window size.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/sequence-analytics</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1146,6 +1279,7 @@
             <p>The more repetitive a local sequence is, the less each additional base tells you. Information theory shows up in wet-lab troubleshooting more often than people expect.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_o/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case O --out ./tmp/genomeforge_case_o</code>.</li><li>Open the <code>Search</code> tab in Genome Forge and load: <code>lacZ_alpha_fragment, BRAF_exon15_fragment</code>.</li><li>Run <code>Flag simple-sequence patches that often produce weak confidence in sequencing or synthesis workflows.</code> once with default settings, then rerun after changing the complexity threshold.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/search-entities, /api/sequence-analytics</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1183,6 +1317,7 @@
             <p>A multiple-cloning site is almost a parody of motif enrichment: it was literally designed so many motifs would coexist in one tiny interval.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_x/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case X --out ./tmp/genomeforge_case_x</code>.</li><li>Open the <code>Search</code> tab in Genome Forge and load: <code>pUC19_MCS, EGFP_CDS, mCherry_CDS</code>.</li><li>Run <code>Compare motif density across engineered vector DNA and reporter CDS records to learn when motif count is meaningful.</code> once with default settings, then rerun after changing the queried motif set.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/motif, /api/search-entities</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1202,6 +1337,7 @@
             <p class="eyebrow">Cluster F</p>
             <h2>Cluster F: Editing and Design for Intervention</h2>
             <p class="muted">How to turn sequence understanding into a purposeful intervention such as CRISPR, HDR, or expression tuning.</p>
+            <div class="case-strip"><span class="case-chip">Case K · CRISPR Candidate and HDR Donor Design</span><span class="case-chip">Case R · Promoter/RBS Context for Expression Tuning</span><span class="case-chip">Case V · Codon Usage Bias and Host Portability</span></div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="assets/05_star_activity.svg" alt="Editing and Design for Intervention" />
@@ -1234,6 +1370,7 @@
             <p>Hotspot editing tutorials are memorable because the “why” is obvious: one codon in a kinase can alter growth signaling strongly enough to matter in human disease.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_k/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case K --out ./tmp/genomeforge_case_k</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>BRAF_exon15_fragment</code>.</li><li>Run <code>Design guide RNAs and an HDR donor around a medically meaningful BRAF hotspot region.</code> once with default settings, then rerun after changing the PAM or HDR arm length.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/grna-design, /api/crispr-offtargets, /api/hdr-template</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1275,6 +1412,7 @@
             <p>A perfect CDS in the wrong context is like efficient code behind a broken API gateway: nothing useful reaches the user.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_r/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case R --out ./tmp/genomeforge_case_r</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>lacZ_alpha_fragment, EGFP_CDS</code>.</li><li>Run <code>Use annotation and translation context to discuss why expression output depends on more than the CDS alone.</code> once with default settings, then rerun after changing the annotated feature context.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/auto-annotate, /api/sequence-tracks</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1312,6 +1450,7 @@
             <p>Codon optimization is like changing the accent of a sentence without changing its literal meaning: the content stays similar, but the local audience may understand it far more easily.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_v/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case V --out ./tmp/genomeforge_case_v</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS</code>.</li><li>Run <code>Discuss how two common reporter CDS records might look to different host translation systems.</code> once with default settings, then rerun after changing the target host preference.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/codon-optimize</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1333,6 +1472,7 @@
             <p class="eyebrow">Cluster G</p>
             <h2>Cluster G: Data Fidelity and Interoperability</h2>
             <p class="muted">How to move between file formats, trace evidence, reference libraries, and similarity search without losing confidence.</p>
+            <div class="case-strip"><span class="case-chip">Case I · DNA Container Roundtrip Validation</span><span class="case-chip">Case J · AB1 Trace Alignment and Consensus Editing</span><span class="case-chip">Case Y · Read Simulation and Coverage Planning</span><span class="case-chip">Case AE · Sequence Analytics Lens (GC, Skew, Complexity, Stop Density)</span><span class="case-chip">Case AF · Comparison Lens (Divergence + Confidence Hotspots)</span><span class="case-chip">Case AG · Native .dna Import and Multi-Format Conversion Workflow</span><span class="case-chip">Case AH · Chromatogram-First Sanger Review and Confidence Gating</span><span class="case-chip">Case AI · Trace-Based Genotyping and Plasmid Verification</span><span class="case-chip">Case AJ · BLAST-like Similarity Search for Identity, Origin, and Contamination</span><span class="case-chip">Case AK · Reference Element Auto-Flagging and siRNA Design/Mapping</span><span class="case-chip">Case AM · Ambiguity-Aware Identity Search and Motif Rescue</span></div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="assets/04_history_graph.svg" alt="Data Fidelity and Interoperability" />
@@ -1365,6 +1505,7 @@
             <p>Format conversion bugs are the bioinformatics version of data serialization bugs: the molecule may survive, but the meaning can get stripped away.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_i/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case I --out ./tmp/genomeforge_case_i</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS, pUC19_MCS</code>.</li><li>Run <code>Export and re-import multiple records to verify that file conversion preserves sequence identity and annotations.</code> once with default settings, then rerun after changing the export target format.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/export-dna, /api/import-dna, /api/canonicalize-record</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1403,6 +1544,7 @@
             <p>A chromatogram is effectively a time-series signal that has been translated into a symbolic sequence. That makes it a very computer-science-friendly piece of biology once you know what you are looking at.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_j/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case J --out ./tmp/genomeforge_case_j</code>.</li><li>Open the <code>Trace</code> tab in Genome Forge and load: <code>EGFP_CDS</code>.</li><li>Run <code>Import a Sanger-style trace, align it to EGFP, perform an edit, and recompute consensus.</code> once with default settings, then rerun after changing the edited base or alignment window.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/import-ab1, /api/trace-align, /api/trace-edit, /api/trace-consensus</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1441,6 +1583,7 @@
             <p>One extra read over a hotspot can be worth more than many reads over already-boring sequence.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_y/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case Y --out ./tmp/genomeforge_case_y</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>BRAF_exon15_fragment, EGFP_CDS</code>.</li><li>Run <code>Use realistic target regions to think about how much sequencing evidence is enough for a confident call.</code> once with default settings, then rerun after changing the hotspot window or number of planned reads.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/trace-consensus, /api/sequence-analytics</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1484,6 +1627,7 @@
             <p>A stop-density track is a very fast way to remind yourself that not every piece of DNA wants to be translated as-is.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_ae/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AE --out ./tmp/genomeforge_case_ae</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, BRAF_exon15_fragment</code>.</li><li>Run <code>Use the analytics lens on a clean CDS and a genomic fragment to see how sequence context changes interpretation.</code> once with default settings, then rerun after changing the analytics track set or zoom window.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/sequence-analytics</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1526,6 +1670,7 @@
             <p>A good comparison plot does not just say “these sequences differ.” It says “they differ here, and that location is the whole story.”</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_af/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AF --out ./tmp/genomeforge_case_af</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, EGFP_Y67H_training_variant</code>.</li><li>Run <code>Visualize where two nearly identical sequences diverge and decide whether the divergence matters.</code> once with default settings, then rerun after changing the comparison pair.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/comparison-lens</code> and write one sentence explaining the biological takeaway.</li></ol></div>
         <div class="figure ui-shot">
   <img src="assets/screenshots/flagship_case_af_compare.png" alt="Comparison-lens workflow" />
@@ -1566,6 +1711,7 @@
             <p>The most dangerous format bugs are not obvious corruption. They are subtle meaning loss, such as dropped topology or annotations.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_ag/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AG --out ./tmp/genomeforge_case_ag</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, pUC19_MCS</code>.</li><li>Run <code>Demonstrate that a real record can move through multiple formats and come back interpretable.</code> once with default settings, then rerun after changing the export format set.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/import-dna, /api/convert, /api/canonicalize-record</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1609,6 +1755,7 @@
             <p>The chromatogram is a reminder that DNA sequencing is an inference pipeline from analog chemistry to digital symbols.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_ah/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AH --out ./tmp/genomeforge_case_ah</code>.</li><li>Open the <code>Trace</code> tab in Genome Forge and load: <code>EGFP_CDS</code>.</li><li>Run <code>Start with the chromatogram itself before trusting the base calls.</code> once with default settings, then rerun after changing the displayed window or zoom.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/import-ab1, /api/trace-chromatogram-svg</code> and write one sentence explaining the biological takeaway.</li></ol></div>
         <div class="figure ui-shot">
   <img src="assets/screenshots/flagship_case_ah_trace.png" alt="Chromatogram-first review workflow" />
@@ -1649,6 +1796,7 @@
             <p>Plasmid verification and genotyping feel like different tasks, but computationally they are cousins: both compare expected and observed sequence states at decision-critical positions.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_ai/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AI --out ./tmp/genomeforge_case_ai</code>.</li><li>Open the <code>Trace</code> tab in Genome Forge and load: <code>BRAF_exon15_fragment, EGFP_CDS</code>.</li><li>Run <code>Use trace evidence to make either a hotspot genotype call or a plasmid verification call.</code> once with default settings, then rerun after changing the verification target record.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/trace-verify</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1689,6 +1837,7 @@
             <p>BLAST-like search is one of the fastest ways to turn a mystery sequence into a shortlist of plausible stories.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_aj/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AJ --out ./tmp/genomeforge_case_aj</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS, lacZ_alpha_fragment, BRAF_exon15_fragment</code>.</li><li>Run <code>Run local similarity search against a small real-world panel to identify the most likely source of an unknown sequence.</code> once with default settings, then rerun after changing the query sequence or database panel.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/blast-search</code> and write one sentence explaining the biological takeaway.</li></ol></div>
         <div class="figure ui-shot">
   <img src="assets/screenshots/flagship_case_aj_blast.png" alt="BLAST-like identity search workflow" />
@@ -1730,6 +1879,7 @@
             <p>The value of a reference library is partly speed, but mostly consistency: the same sequence gets recognized the same way every time.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_ak/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AK --out ./tmp/genomeforge_case_ak</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS</code>.</li><li>Run <code>Reuse saved element libraries to auto-flag familiar sequence elements, then design and map siRNA candidates.</code> once with default settings, then rerun after changing the reference library or siRNA ranking cutoff.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/reference-db-save, /api/reference-scan, /api/sirna-design, /api/sirna-map</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1744,6 +1894,51 @@
         <div class="interpret"><b>How to Interpret the Results</b><ul><li>Auto-flagging is strongest when the reference database is curated and versioned.</li><li>siRNA ranking is still a prioritization tool; experimental validation remains necessary.</li><li>The useful lesson is workflow reuse: annotation and design can feed each other.</li></ul></div>
         <div class="biology"><b>Biological Explanation</b><p>This case is about reuse. Bioinformatics becomes dramatically more efficient when previously understood sequence elements are captured as searchable reference knowledge rather than rediscovered each time.</p><p><b>Fun fact from this example:</b> The value of a reference library is partly speed, but mostly consistency: the same sequence gets recognized the same way every time.</p></div>
       </article>
+<article class="case" id="case-AM">
+        <div class="case-head">
+          <div>
+            <p class="eyebrow">Case AM · Cluster G</p>
+            <h3>Case AM: Ambiguity-Aware Identity Search and Motif Rescue</h3>
+            <p class="lead">If a sequence contains unresolved positions, can you still recover its likely identity and use it responsibly instead of discarding it as “bad data”?</p>
+          </div>
+          <div class="case-meta">
+            <div><b>Tab</b><span>Advanced</span></div>
+            <div><b>Workflow</b><span>Treat an ambiguity-bearing consensus record as a real query and verify that identity search and motif logic still recover the correct biological family.</span></div>
+            <div><b>Records</b><span><span class="badge">EGFP_CDS</span><span class="badge">EGFP_ambiguity_consensus_training</span><span class="badge">mCherry_CDS</span></span></div>
+            <div><b>APIs</b><span><code>/api/motif</code> <code>/api/blast-search</code> <code>/api/search-entities</code></span></div>
+          </div>
+        </div>
+        <div class="case-grid">
+          <div class="card narrative">
+            <h4>Why This Case Matters</h4>
+            <p>The key input here is not a perfect sequence but a partially uncertain one. The ambiguity-bearing EGFP consensus stands in for a realistic intermediate artifact: a query that is clearly close to a known reporter family, yet still carries unresolved positions from sequencing or consensus assembly.</p>
+            <p>A huge amount of practical bioinformatics is about deciding what to do before the data are perfectly clean. Ambiguity codes let you represent uncertainty honestly. Ambiguity-aware search then lets you ask whether the uncertain record is still informative enough to identify, classify, or troubleshoot. The lesson is not that ambiguity disappears. The lesson is that uncertainty can still be computationally useful when represented explicitly.</p>
+          </div>
+          <div class="card narrative alt">
+            <h4>Input Data Explained</h4>
+            <p>This is a protein-coding DNA sequence (CDS). The sequence is meant to be translated from the first base, so codon boundaries and reading frame matter immediately. This record is still an EGFP-like coding sequence, but a few positions are encoded as ambiguity symbols such as R, Y, and N. That means the sequence stands for a small set of plausible molecules rather than one exact DNA string. This is also a CDS, but it encodes a coral-derived red fluorescent protein rather than a GFP-family green reporter. That makes it useful for pairwise comparison and identity search.</p>
+            <p>The scientific upgrade is subtle but important: you move from “this sequence is messy” to “this sequence still rules out many stories and supports a smaller plausible set.”</p>
+          </div>
+        </div>
+        <div class="study-note"><b>Starter Values</b><ul><li>Query record: <code>EGFP_ambiguity_consensus_training</code></li><li>Example motif query: <code>ATGGTGRG</code></li><li>Comparison panel: <code>EGFP_CDS, EGFP_ambiguity_consensus_training, mCherry_CDS</code></li></ul></div>
+        <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_am/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AM --out ./tmp/genomeforge_case_am</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, EGFP_ambiguity_consensus_training, mCherry_CDS</code>.</li><li>Run <code>Treat an ambiguity-bearing consensus record as a real query and verify that identity search and motif logic still recover the correct biological family.</code> once with default settings, then rerun after changing the ambiguous query window or comparison panel.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/motif, /api/blast-search, /api/search-entities</code> and write one sentence explaining the biological takeaway.</li></ol></div>
+        <div class="figure ui-shot">
+  <img src="assets/screenshots/flagship_case_am_ambiguity_search.png" alt="Ambiguity-aware identity search workflow" />
+  <p class="caption"><b>Ambiguity-aware identity search workflow</b>. Real UI screenshot from the ambiguity-aware search lesson. The query itself carries unresolved positions, yet the search still recovers the correct reporter-family identity instead of treating the sequence as unusable.</p>
+</div>
+        <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
+  &quot;query_record&quot;: &quot;EGFP_ambiguity_consensus_training&quot;,
+  &quot;motif_query&quot;: &quot;ATGGTGRG&quot;,
+  &quot;top_blast_hit&quot;: &quot;EGFP_CDS&quot;,
+  &quot;identity_pct&quot;: 100.0,
+  &quot;query_coverage_pct&quot;: 100.0,
+  &quot;runner_up&quot;: &quot;mCherry_CDS&quot;,
+  &quot;interpretation&quot;: &quot;uncertain positions did not erase reporter-family identity&quot;
+}</pre></div>
+        <div class="expected"><b>Expected Results</b><ul><li>A motif or similarity search in which an ambiguity-containing query still returns a biologically sensible top match.</li><li>A ranked hit list that shows why the correct family remains the strongest explanation.</li><li>A short statement separating what is still known confidently from what remains unresolved.</li></ul></div>
+        <div class="interpret"><b>How to Interpret the Results</b><ul><li>Ambiguity-aware search should narrow the plausible identity space even when it cannot force every base to one final call.</li><li>A strong top hit with high coverage means the uncertain sequence is still informative, not that uncertainty vanished.</li><li>The right interpretation sounds like “this is still EGFP-family-like, with unresolved positions at specific sites,” not “the data are now magically exact.”</li></ul></div>
+        <div class="biology"><b>Biological Explanation</b><p>A huge amount of practical bioinformatics is about deciding what to do before the data are perfectly clean. Ambiguity codes let you represent uncertainty honestly. Ambiguity-aware search then lets you ask whether the uncertain record is still informative enough to identify, classify, or troubleshoot. The lesson is not that ambiguity disappears. The lesson is that uncertainty can still be computationally useful when represented explicitly.</p><p><b>Fun fact from this example:</b> The scientific upgrade is subtle but important: you move from “this sequence is messy” to “this sequence still rules out many stories and supports a smaller plausible set.”</p></div>
+      </article>
       </section>
 <section class="section cluster" id="cluster-H">
         <div class="cluster-head">
@@ -1751,6 +1946,7 @@
             <p class="eyebrow">Cluster H</p>
             <h2>Cluster H: Reproducibility, Governance, and Delivery</h2>
             <p class="muted">How to turn one-off sequence work into something another scientist can review, rerun, and trust.</p>
+            <div class="case-strip"><span class="case-chip">Case L · Collaboration, Audit, and Review Governance</span><span class="case-chip">Case T · Batch Reproducibility and Parameter Locking</span><span class="case-chip">Case AB · Reproducible Report Package</span><span class="case-chip">Case AC · Parameter Sensitivity and Robustness Check</span><span class="case-chip">Case AD · End-to-End Release Checklist and Handoff</span></div>
           </div>
           <div class="cluster-figure figure narrow">
             <img src="assets/04_history_graph.svg" alt="Reproducibility, Governance, and Delivery" />
@@ -1783,6 +1979,7 @@
             <p>In modern labs, the “truth” of a construct often lives partly in people and partly in software; governance features are how you keep those from drifting apart.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_l/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case L --out ./tmp/genomeforge_case_l</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS</code>.</li><li>Run <code>Create a workspace, assign roles, and run a simple review flow on a saved construct project.</code> once with default settings, then rerun after changing the assigned role or review state.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/workspace-create, /api/project-permissions, /api/review-submit, /api/review-approve</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1824,6 +2021,7 @@
             <p>A batch run is only comparable if the software treated each input under the same contract.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_t/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case T --out ./tmp/genomeforge_case_t</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS, BRAF_exon15_fragment</code>.</li><li>Run <code>Run the same logic across several records with a locked parameter set so outputs stay comparable.</code> once with default settings, then rerun after changing one parameter intentionally to test robustness.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/project-save, /api/sequence-analytics, /api/batch-digest</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1861,6 +2059,7 @@
             <p>A good handoff is a kindness to your future self as much as to your collaborators.</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_ab/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AB --out ./tmp/genomeforge_case_ab</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, pUC19_MCS</code>.</li><li>Run <code>Package a saved project and a share bundle so another scientist can reopen the same analysis context.</code> once with default settings, then rerun after changing whether content is embedded in the bundle.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/project-save, /api/share-create, /api/share-load</code> and write one sentence explaining the biological takeaway.</li></ol></div>
         <div class="figure ui-shot">
   <img src="assets/screenshots/flagship_case_ab_history.png" alt="Project-history and reproducibility workflow" />
@@ -1902,6 +2101,7 @@
             <p>Some of the best scientific writing consists of one calm sentence saying, “this result is parameter-sensitive, so treat it cautiously.”</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_ac/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AC --out ./tmp/genomeforge_case_ac</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>BRAF_exon15_fragment, EGFP_CDS</code>.</li><li>Run <code>Rerun a workflow under a small parameter sweep to see whether the biological conclusion is robust or fragile.</code> once with default settings, then rerun after changing one threshold across a small sweep.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/primer-design, /api/grna-design, /api/sequence-analytics</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{
@@ -1941,6 +2141,7 @@
             <p>A handoff is successful when the next person says “I know where to start,” not when they say “I have the files.”</p>
           </div>
         </div>
+
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol><li>Use the included prebuilt bundle <code>docs/tutorial/datasets/case_bundles/case_ad/records.fasta</code> or regenerate it with <code>python3 docs/tutorial/datasets/extract_case_bundle.py --case AD --out ./tmp/genomeforge_case_ad</code>.</li><li>Open the <code>Advanced</code> tab in Genome Forge and load: <code>EGFP_CDS, mCherry_CDS, pUC19_MCS, BRAF_exon15_fragment</code>.</li><li>Run <code>Treat the tutorial workspace like a releasable scientific software product and verify the handoff boundary.</code> once with default settings, then rerun after changing the handoff checklist or packaged artifacts.</li><li>Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.</li><li>Record the relevant endpoint(s): <code>/api/project-save, /api/share-create, /api/project-history-svg</code> and write one sentence explaining the biological takeaway.</li></ol></div>
 
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{

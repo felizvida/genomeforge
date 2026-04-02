@@ -18,7 +18,7 @@ HANDOFF = ROOT / "HANDOFF_ZERO_MEMORY.md"
 WEB_UI = ROOT / "web_ui.py"
 BACKEND_DIR = ROOT / "backend"
 
-EXPECTED_CASE_COUNT = 37
+EXPECTED_CASE_COUNT = 39
 EXPECTED_SECTION_LABELS = [
     "Step-by-Step in Genome Forge",
     "Sample Results",

@@ -143,7 +143,7 @@ Training assets:
 - [docs/tutorial/datasets/README.md](/Users/liux17/Documents/Playground/docs/tutorial/datasets/README.md)
 - [docs/tutorial/generate_tutorial.py](/Users/liux17/Documents/Playground/docs/tutorial/generate_tutorial.py)
 
-The tutorial currently covers `37` cases and the supporting playbook should match those same `37` case identifiers.
+The tutorial currently covers `39` cases and the supporting playbook should match those same `39` case identifiers.
 Prebuilt sample-data bundles for all cases live under `docs/tutorial/datasets/case_bundles/`.
 If the tutorial content changes, regenerate the HTML and dataset outputs with `python3 docs/tutorial/generate_tutorial.py`, then rebuild the PDF with `python3 docs/build_tutorial_pdf.py`.
 

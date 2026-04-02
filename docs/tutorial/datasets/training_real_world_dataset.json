@@ -1,6 +1,6 @@
 {
   "dataset_name": "genomeforge_training_real_world_v2",
-  "created_at": "2026-03-23",
+  "created_at": "2026-04-02",
   "overview": "Real-world teaching bundle for the Genome Forge tutorial, including public-source records and clearly labeled training derivatives.",
   "usage_tips": [
     "Use extract_case_bundle.py to materialize the exact records for one case.",
@@ -26,6 +26,11 @@
       "EGFP_CDS",
       "mCherry_CDS",
       "pUC19_MCS"
+    ],
+    "ambiguity_panel": [
+      "EGFP_CDS",
+      "EGFP_ambiguity_consensus_training",
+      "EGFP_Y67H_training_variant"
     ]
   },
   "records": [
@@ -203,6 +208,48 @@
           }
         }
       ]
+    },
+    {
+      "name": "EGFP_ambiguity_consensus_training",
+      "type": "derived-training",
+      "topology": "linear",
+      "derived_from": "EGFP_CDS",
+      "edits": [
+        {
+          "start_1based": 7,
+          "end_1based": 7,
+          "replacement": "R",
+          "label": "mixed A/G-like trace call"
+        },
+        {
+          "start_1based": 10,
+          "end_1based": 10,
+          "replacement": "Y",
+          "label": "mixed C/T-like trace call"
+        },
+        {
+          "start_1based": 67,
+          "end_1based": 67,
+          "replacement": "N",
+          "label": "low-confidence consensus position"
+        }
+      ],
+      "origin": "Training derivative of EGFP that uses IUPAC ambiguity symbols to mimic a consensus sequence assembled from uncertain or mixed evidence.",
+      "why_it_matters": "It teaches that uncertainty can be represented explicitly instead of being hidden behind a forced single-base call.",
+      "input_details": "This record is still an EGFP-like coding sequence, but a few positions are encoded as ambiguity symbols such as R, Y, and N. That means the sequence stands for a small set of plausible molecules rather than one exact DNA string.",
+      "fun_fact": "IUPAC ambiguity codes are basically a compact lossless summary of \u201chere is what the data still allow\u201d at a given position.",
+      "source_label": "Derived from EGFP_CDS for ambiguity-aware assay and search training",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/",
+      "suggested_features": [
+        {
+          "key": "CDS",
+          "location": "1..720",
+          "qualifiers": {
+            "label": "EGFP ambiguity-aware consensus",
+            "codon_start": "1"
+          }
+        }
+      ]
     }
   ],
   "case_inputs": [
@@ -369,6 +416,25 @@
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case F --out ./tmp/genomeforge_case_f",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_f"
+    },
+    {
+      "case_id": "AL",
+      "title": "Degenerate Primer Strategy for a Variant Family",
+      "cluster": "C",
+      "records": [
+        "EGFP_CDS",
+        "EGFP_ambiguity_consensus_training",
+        "EGFP_Y67H_training_variant"
+      ],
+      "tab": "Primer/PCR",
+      "workflow": "Use an ambiguity-coded primer to keep one assay useful across a small reporter family and an uncertainty-bearing consensus sequence.",
+      "apis": [
+        "/api/primer-diagnostics",
+        "/api/primer-specificity",
+        "/api/pcr"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AL --out ./tmp/genomeforge_case_al",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_al"
     },
     {
       "case_id": "Q",
@@ -751,6 +817,25 @@
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AK --out ./tmp/genomeforge_case_ak",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ak"
+    },
+    {
+      "case_id": "AM",
+      "title": "Ambiguity-Aware Identity Search and Motif Rescue",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS",
+        "EGFP_ambiguity_consensus_training",
+        "mCherry_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Treat an ambiguity-bearing consensus record as a real query and verify that identity search and motif logic still recover the correct biological family.",
+      "apis": [
+        "/api/motif",
+        "/api/blast-search",
+        "/api/search-entities"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AM --out ./tmp/genomeforge_case_am",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_am"
     },
     {
       "case_id": "L",

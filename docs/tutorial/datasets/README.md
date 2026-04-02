@@ -7,7 +7,7 @@ This folder contains the reproducible sample data used by the self-study tutoria
 - `training_real_world_sequences.fasta`: public-source base records bundled directly in FASTA.
 - `training_real_world_dataset.json`: metadata, sources, case-to-record mapping, and definitions for derived training records.
 - `case_playbook.md`: compact tutorial checklist.
-- `case_bundles/`: prebuilt ready-to-load bundles for all 37 cases.
+- `case_bundles/`: prebuilt ready-to-load bundles for all 39 cases.
 - `extract_case_bundle.py`: helper that writes a case-specific FASTA bundle plus a manifest JSON.
 
 ## Quick Use
@@ -22,4 +22,4 @@ If you want a zero-friction starting point, load the already-generated bundle at
 
 ## Why derived records exist
 
-Some tutorial cases use clearly labeled training derivatives of public-source records. Those are included so you can practice pairwise comparison, variant interpretation, and phylogeny-style reasoning on examples with known biological intent.
+Some tutorial cases use clearly labeled training derivatives of public-source records. Those are included so you can practice pairwise comparison, variant interpretation, ambiguity-aware search, and phylogeny-style reasoning on examples with known biological intent.

@@ -29,7 +29,8 @@ function parseFasta(text) {
 function derivedEgfpVariants(egfp) {
   const y67h = egfp.slice(0, 198) + 'CAC' + egfp.slice(201);
   const s204y = egfp.slice(0, 609) + 'TAC' + egfp.slice(612);
-  return { y67h, s204y };
+  const ambiguity = egfp.slice(0, 6) + 'R' + egfp.slice(7, 9) + 'Y' + egfp.slice(10, 66) + 'N' + egfp.slice(67);
+  return { y67h, s204y, ambiguity };
 }
 
 function fasta(name, seq) {
@@ -175,6 +176,51 @@ async function captureBlastWorkflow(page, seqs) {
   await captureViewport(page, 'flagship_case_aj_blast.png', '#out');
 }
 
+async function captureDegeneratePrimerWorkflow(page, seqs) {
+  await page.goto(BASE_URL);
+  await waitForStats(page);
+  const { y67h, ambiguity } = derivedEgfpVariants(seqs.EGFP_CDS);
+  await activateTab(page, 'tab-primers');
+  await setRecord(page, { name: 'EGFP_ambiguity_consensus_training', sequence: ambiguity, topology: 'linear' });
+  await page.locator('#forward').fill('ATGGTGRGYAAGGGCGAGGA');
+  await page.locator('#reverse').fill('CTTGTACAGCTCGTCCATGC');
+  await page.evaluate((backgroundValue) => {
+    document.getElementById('primerSpecificityBackgrounds').value = backgroundValue;
+  }, [
+    seqs.EGFP_CDS,
+    ambiguity,
+    y67h,
+  ].join('\n'));
+  await page.evaluate(async () => { await runPrimerSpecificity(); });
+  await page.waitForFunction(() => {
+    const el = document.getElementById('out');
+    return el && el.textContent && el.textContent.includes('"specificity_risk_score"');
+  });
+  await captureViewport(page, 'flagship_case_al_degenerate_primers.png', '#tab-primers');
+}
+
+async function captureAmbiguitySearchWorkflow(page, seqs) {
+  await page.goto(BASE_URL);
+  await waitForStats(page);
+  const { ambiguity } = derivedEgfpVariants(seqs.EGFP_CDS);
+  await activateTab(page, 'tab-advanced');
+  await setRecord(page, { name: 'EGFP_ambiguity_consensus_training', sequence: ambiguity, topology: 'linear' });
+  await page.locator('#blastQuery').fill(ambiguity.slice(0, 42));
+  await page.locator('#blastDb').fill([
+    seqs.EGFP_CDS,
+    ambiguity,
+    seqs.mCherry_CDS,
+  ].join('\n'));
+  await page.locator('#blastKmer').fill('6');
+  await page.locator('#blastTopHits').fill('3');
+  await click(page, '#tab-advanced [data-action="runBlastSearch"]', 500);
+  await page.waitForFunction(() => {
+    const el = document.getElementById('out');
+    return el && el.textContent && el.textContent.includes('"subject_name"');
+  });
+  await captureViewport(page, 'flagship_case_am_ambiguity_search.png', '#out');
+}
+
 async function captureHistoryWorkflow(page, seqs) {
   await page.goto(BASE_URL);
   await waitForStats(page);
@@ -204,6 +250,8 @@ async function main() {
     await captureComparisonWorkflow(page, seqs);
     await captureTraceWorkflow(page, seqs);
     await captureBlastWorkflow(page, seqs);
+    await captureDegeneratePrimerWorkflow(page, seqs);
+    await captureAmbiguitySearchWorkflow(page, seqs);
     await captureHistoryWorkflow(page, seqs);
   } finally {
     await browser.close();

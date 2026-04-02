@@ -1,0 +1,43 @@
+{
+  "case": {
+    "case_id": "AL",
+    "title": "Degenerate Primer Strategy for a Variant Family",
+    "cluster": "C",
+    "tab": "Primer/PCR",
+    "workflow": "Use an ambiguity-coded primer to keep one assay useful across a small reporter family and an uncertainty-bearing consensus sequence.",
+    "apis": [
+      "/api/primer-diagnostics",
+      "/api/primer-specificity",
+      "/api/pcr"
+    ]
+  },
+  "records": [
+    {
+      "name": "EGFP_CDS",
+      "type": "public-source",
+      "topology": "linear",
+      "origin": "Engineered fluorescent reporter derived from the Aequorea victoria GFP family.",
+      "why_it_matters": "EGFP is a canonical lab reporter: great for teaching translation, cloning, sequence verification, and how a few codons can change an optical phenotype.",
+      "source_label": "PubMed: enhanced GFP mutants overview",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "EGFP_ambiguity_consensus_training",
+      "type": "derived-training",
+      "topology": "linear",
+      "origin": "Training derivative of EGFP that uses IUPAC ambiguity symbols to mimic a consensus sequence assembled from uncertain or mixed evidence.",
+      "why_it_matters": "It teaches that uncertainty can be represented explicitly instead of being hidden behind a forced single-base call.",
+      "source_label": "Derived from EGFP_CDS for ambiguity-aware assay and search training",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    },
+    {
+      "name": "EGFP_Y67H_training_variant",
+      "type": "derived-training",
+      "topology": "linear",
+      "origin": "Training derivative of EGFP that changes the aromatic residue in the chromophore-forming motif.",
+      "why_it_matters": "This is not a random mutation. It models the idea that one codon change near a chromophore can produce a large optical shift, which is a powerful lesson for variant interpretation.",
+      "source_label": "Derived from EGFP mutant logic described in GFP engineering literature",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/9526659/"
+    }
+  ]
+}

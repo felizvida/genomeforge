@@ -3,7 +3,7 @@
 <p align="center">
   <img alt="Release" src="https://img.shields.io/github/v/release/felizvida/genomeforge?display_name=tag">
   <img alt="License" src="https://img.shields.io/github/license/felizvida/genomeforge">
-  <img alt="Tutorial" src="https://img.shields.io/badge/tutorial-37%20real--world%20cases-0ea5e9">
+  <img alt="Tutorial" src="https://img.shields.io/badge/tutorial-39%20real--world%20lessons-0ea5e9">
   <img alt="Web UI" src="https://img.shields.io/badge/interface-modern%20web%20UI-14b8a6">
 </p>
 
@@ -16,7 +16,7 @@ It combines:
 - primer, PCR, trace, and verification workflows
 - CRISPR/design-assist tooling
 - project history, sharing, and lightweight review
-- a 37-case self-study tutorial built on real biological examples
+- a 39-lesson self-study tutorial built on real biological examples
 
 Latest release:
 
