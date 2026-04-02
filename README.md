@@ -20,7 +20,7 @@ It combines:
 
 Latest release:
 
-- [Genome Forge v0.1.5](https://github.com/felizvida/genomeforge/releases/tag/v0.1.5)
+- [Genome Forge v0.1.6](https://github.com/felizvida/genomeforge/releases/tag/v0.1.6)
 
 ## Why Genome Forge
 

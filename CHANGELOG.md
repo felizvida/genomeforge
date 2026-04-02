@@ -4,6 +4,22 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-04-02
+
+### Added
+
+- Added two new ambiguity-aware tutorial lessons:
+  - `Case AL`: degenerate primer strategy across a variant family
+  - `Case AM`: ambiguity-aware identity search and motif rescue
+- Added a new ambiguity-bearing training record to teach IUPAC-aware assay and search behavior explicitly.
+- Added flagship UI screenshots for the new ambiguity-aware lessons and refreshed several existing tutorial screenshots for visual consistency.
+
+### Changed
+
+- Reframed the tutorial as a more textbook-like self-study edition with stronger front matter, calmer print styling, and study-note callouts.
+- Expanded the training package from 37 to 39 lessons and regenerated the HTML, PDF, dataset metadata, playbook, and per-case bundles to match.
+- Updated repo-facing documentation and validation rules to track the new lesson count and tutorial structure.
+
 ## [0.1.5] - 2026-04-02
 
 ### Added
