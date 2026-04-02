@@ -930,14 +930,14 @@ def render_publication_note(case_count: int) -> str:
         <div class="pub-grid">
           <div class="card">
             <h3>Abstract</h3>
-            <p>This tutorial is designed as a publication-style course reader for learning practical bioinformatics with Genome Forge. It combines real biological records, stepwise software workflows, expected outputs, interpretation guidance, and biological explanation in one reproducible volume.</p>
-            <p>The current edition contains {case_count} lessons arranged into themed clusters that progress from molecular architecture and restriction logic through assay design, assembly, comparative reasoning, ambiguity-aware analysis, and reproducible project delivery.</p>
+            <p>This volume teaches practical bioinformatics with Genome Forge through real biological records, stepwise software workflows, expected outputs, interpretation guidance, and biological explanation in one reproducible text.</p>
+            <p>The current edition contains {case_count} lessons organized into clusters that move from molecular architecture and restriction logic to assay design, assembly, comparative reasoning, ambiguity-aware analysis, and reproducible project delivery.</p>
           </div>
           <div class="card alt">
             <h3>Edition and Citation</h3>
             <p><b>Edition:</b> Genome Forge Textbook Edition, generated from repository source on <code>{escape(TODAY)}</code>.</p>
             <p><b>Preferred citation:</b> <i>Teach Yourself Bioinformatics with Genome Forge</i>, Genome Forge {escape(APP_VERSION)}, tutorial edition.</p>
-            <p><b>Formats:</b> HTML and PDF are generated from the same source, so case numbering, sample data, and screenshots stay aligned.</p>
+            <p><b>Formats:</b> HTML and PDF are generated from the same source so case numbering, sample data, and screenshots stay aligned.</p>
           </div>
         </div>
       </section>
@@ -949,7 +949,7 @@ def render_half_title_page() -> str:
       <section class="half-title-page" aria-label="Half title page">
         <p class="half-title-kicker">Genome Forge Tutorial</p>
         <h1 class="half-title">Teach Yourself Bioinformatics with Genome Forge</h1>
-        <p class="half-subtitle">Textbook Edition · Real-world records · Publication-style self-study guide</p>
+        <p class="half-subtitle">Textbook edition · self-study with real molecular data</p>
       </section>
     ''').strip()
 
@@ -964,8 +964,8 @@ def render_imprint_page(case_count: int) -> str:
           <p><b>Edition:</b> Genome Forge {escape(APP_VERSION)} textbook edition generated on <code>{escape(TODAY)}</code>.</p>
           <p><b>Authoring body:</b> {escape(TUTORIAL_AUTHOR)}</p>
           <p><b>Repository:</b> <a href="{escape(REPO_URL)}">{escape(REPO_URL)}</a></p>
-          <p><b>License:</b> Apache License 2.0 for the project source; public-source records and clearly labelled training derivatives are documented in the bundled dataset metadata.</p>
-          <p><b>Scope:</b> This volume contains {case_count} lessons, real-world sample data, and generated HTML/PDF outputs that are rebuilt from the same source-of-truth tutorial generator.</p>
+          <p><b>License:</b> Apache License 2.0 for the project source. Public-source records and clearly labelled training derivatives are documented in the bundled dataset metadata.</p>
+          <p><b>Scope:</b> This volume contains {case_count} lessons, real-world sample data, and HTML/PDF outputs rebuilt from the same source tutorial.</p>
           <p><b>Suggested citation:</b> {escape(TUTORIAL_AUTHOR)}. <i>Teach Yourself Bioinformatics with Genome Forge</i>. Genome Forge {escape(APP_VERSION)}. {escape(COPYRIGHT_YEAR)}.</p>
           <p class="muted">Copyright © {escape(COPYRIGHT_YEAR)} {escape(TUTORIAL_AUTHOR)}.</p>
         </div>
@@ -1091,7 +1091,7 @@ def render_cluster(cluster: dict) -> str:
           <p class="chapter-theme">{escape(cluster['theme'])}</p>
           <div class="chapter-opener-grid">
             <div class="chapter-summary">
-              <h3>Included Lessons</h3>
+              <h3>Lessons in This Cluster</h3>
               <div class="chapter-case-strip">{cluster_case_strip}</div>
             </div>
             <div class="chapter-figure figure narrow">
@@ -1652,8 +1652,8 @@ def render_html() -> str:
     <section class="cover">
       <p class="eyebrow">Genome Forge {escape(APP_VERSION)} · Textbook Edition</p>
       <h1>Teach Yourself Bioinformatics with Genome Forge</h1>
-      <p class="deck">A publication-style course reader for engineers, analysts, and curious scientists who want to learn bioinformatics by working through real laboratory molecules: reporter genes, cloning vectors, ambiguity-bearing consensus sequences, and clinically important genomic DNA.</p>
-      <p>Instead of generic toy examples, the course uses public-source records such as EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. Clearly labelled training derivatives appear only where they sharpen a teaching goal, such as variant interpretation, family-wide assay design, or how to preserve uncertainty with IUPAC ambiguity symbols.</p>
+      <p class="deck">A self-study bioinformatics text for engineers, analysts, and scientists who want to learn from real laboratory molecules rather than toy examples.</p>
+      <p>The course uses public-source records such as EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. Clearly labelled training derivatives appear only when they sharpen a teaching goal, such as variant interpretation, family-wide assay design, or ambiguity-aware search.</p>
       <div class="meta">
         <div class="k">Mode<b>Self-study course</b></div>
         <div class="k">Cases<b>{case_count} total lessons</b></div>
@@ -1661,7 +1661,7 @@ def render_html() -> str:
         <div class="k">Release<b>{escape(TODAY)}</b></div>
       </div>
       {render_cover_spread()}
-      <p class="cover-note">This edition is written to be read like a lab-ready monograph: each lesson combines software procedure, expected results, biological interpretation, and the reason the data matter in practice.</p>
+      <p class="cover-note">Each lesson combines procedure, expected results, biological interpretation, and a clear statement of why the data matter in practice.</p>
     </section>
 
     {render_imprint_page(case_count)}
@@ -1670,7 +1670,7 @@ def render_html() -> str:
 
     <section class="section">
       <p class="section-kicker">Using This Edition</p>
-      <h2>How to Start and What Makes This Edition Different</h2>
+      <h2>How to Use This Edition</h2>
       <div class="grid2">
         <div class="card">
           <h3>Quickstart</h3>
@@ -1679,9 +1679,9 @@ def render_html() -> str:
           <p>3. Open <code>http://127.0.0.1:8080</code>, load the FASTA from your case bundle, and follow the matching case steps below.</p>
         </div>
         <div class="card alt">
-          <h3>Why This Edition Is Different</h3>
-          <p>This version explains what the input data actually are, why the task matters biologically, what a meaningful result would look like, and what you should and should not conclude from the output.</p>
-          <p>Each lesson is designed so the numbers point to a real scientific story rather than a generic demo, and the newer ambiguity-aware methods are taught directly instead of being buried as silent implementation details.</p>
+          <h3>What This Edition Adds</h3>
+          <p>This edition explains what the input data are, why the task matters biologically, what a meaningful result looks like, and what you should not conclude from the output.</p>
+          <p>It is built so the numbers point to a real scientific story, and the ambiguity-aware methods are taught directly rather than left implicit.</p>
         </div>
       </div>
     </section>
@@ -1689,7 +1689,7 @@ def render_html() -> str:
     <section class="section">
       <p class="section-kicker">Orientation</p>
       <h2>Meaningful Results Preview</h2>
-      <p class="muted">These quick facts are derived directly from the bundled records. They are here to orient you before you dive into the {case_count} hands-on lessons.</p>
+      <p class="muted">These quick facts are derived directly from the bundled records and serve as a calibration point before you begin the {case_count} lessons.</p>
       {render_featured_results()}
     </section>
 
@@ -1709,7 +1709,7 @@ def render_html() -> str:
         </div>
         <div class="card alt">
           <h3>One Good Workflow Habit</h3>
-          <p>Always save the exact case bundle you used. That keeps the tutorial reproducible and prevents “I think I loaded the right sequence” problems. Every case already ships with a prebuilt bundle, so you can start quickly and still regenerate it later if you want to inspect provenance.</p>
+          <p>Always save the exact case bundle you used. That keeps the tutorial reproducible and avoids “I think I loaded the right sequence” problems. Every case already ships with a prebuilt bundle, so you can start quickly and still regenerate it later if you want to inspect provenance.</p>
           <pre>{escape(case_bundle_command('K'))}</pre>
         </div>
       </div>
@@ -1737,7 +1737,7 @@ def render_html() -> str:
     <section class="section">
       <p class="section-kicker">Reference</p>
       <h2>Primer on Ambiguity Codes</h2>
-      <p class="muted">Several later lessons now teach ambiguity-aware matching directly. These symbols do not mean the sequence is broken. They mean the evidence still permits a small set of bases at a position, and Genome Forge can now search, compare, and design around that uncertainty.</p>
+      <p class="muted">Several later lessons teach ambiguity-aware matching directly. These symbols do not mean the sequence is broken. They mean the evidence still permits a small set of bases at a position, and Genome Forge can search, compare, and design around that uncertainty.</p>
       {render_iupac_table()}
       <div class="cards" style="margin-top:10px">
         <div class="card"><h3>Why ambiguity is honest</h3><p>Forcing an uncertain position to one exact base may look cleaner, but it destroys evidence. Ambiguity codes preserve what the data still allow.</p></div>
@@ -1749,14 +1749,14 @@ def render_html() -> str:
     <section class="section">
       <p class="section-kicker">Interface</p>
       <h2>Visual Tour of the Workbench</h2>
-      <p class="muted">These illustrations are included to help you recognize what Genome Forge is trying to show you in each workflow: structure, evidence, divergence, and provenance.</p>
+      <p class="muted">These illustrations help you recognize what Genome Forge is showing in each workflow: structure, evidence, divergence, and provenance.</p>
       {render_visual_gallery()}
     </section>
 
     <section class="section">
       <p class="section-kicker">Biological Objects</p>
       <h2>Real-World Record Field Guide</h2>
-      <p>These are the biological objects that power the tutorial. Some are public-source sequences bundled directly in the FASTA file. Others are clearly labelled training derivatives created from those public records so specific comparison cases have an answer key.</p>
+      <p>These are the biological objects that power the tutorial. Some are public-source sequences bundled directly in the FASTA file. Others are clearly labelled training derivatives created so specific comparison cases have an answer key.</p>
       <table>
         <thead><tr><th>Record</th><th>Origin</th><th>Why it matters</th><th>Input data explained</th><th>Source</th></tr></thead>
         <tbody>{record_reference_table()}</tbody>
@@ -1771,7 +1771,7 @@ def render_html() -> str:
     <section class="section toc" role="doc-toc" aria-label="Table of contents">
       <p class="section-kicker">Contents</p>
       <h2>Table of Contents</h2>
-      <p class="muted">Recommended order if you are new to biology: Cluster A → B → C → D → G → E → F → H.</p>
+      <p class="muted">Recommended order for readers new to biology: Cluster A → B → C → D → G → E → F → H.</p>
       {toc_html}
     </section>
 
