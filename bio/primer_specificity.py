@@ -2,17 +2,19 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
+from genomeforge_toolkit import DNA_ALPHABET, RC_TABLE, iupac_hamming_distance
+
 
 def _clean(seq: str) -> str:
-    return "".join(ch for ch in str(seq).upper() if ch in "ACGTN")
+    return "".join(ch for ch in str(seq).upper() if ch in DNA_ALPHABET)
 
 
 def _revcomp(seq: str) -> str:
-    return _clean(seq).translate(str.maketrans("ACGTN", "TGCAN"))[::-1]
+    return _clean(seq).translate(RC_TABLE)[::-1]
 
 
 def _hamming(a: str, b: str) -> int:
-    return sum(1 for x, y in zip(a, b) if x != y)
+    return iupac_hamming_distance(a, b)
 
 
 def _scan_hits(sequence: str, query: str, max_mismatch: int = 0) -> List[Dict[str, Any]]:
@@ -141,4 +143,3 @@ def rank_primer_pairs(
     for i, row in enumerate(rows, start=1):
         row["rank"] = i
     return {"count": len(rows), "ranked_pairs": rows}
-

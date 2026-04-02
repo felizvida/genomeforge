@@ -5,10 +5,13 @@ import unittest
 from genomeforge_toolkit import (
     SequenceRecord,
     design_primer_pair,
+    find_all_occurrences,
+    max_complement_run,
     optimize_coding_sequence,
     parse_feature_interval,
     parse_genbank,
     sanitize_sequence,
+    simulate_pcr,
     simulate_digest,
 )
 from compat.ab1_format import synthetic_trace_from_sequence
@@ -45,6 +48,21 @@ class CoreAlgorithmTests(unittest.TestCase):
         trace = synthetic_trace_from_sequence("ATGRYSWKMBDHVN")
         self.assertEqual(trace["sequence"], "ATGRYSWKMBDHVN")
         self.assertEqual(trace["length"], 14)
+
+    def test_find_all_occurrences_matches_iupac_symbols_bidirectionally(self) -> None:
+        self.assertEqual(find_all_occurrences("ATGRCC", "ATGGCC"), [0])
+        self.assertEqual(find_all_occurrences("ATGGCC", "ATGRCC"), [0])
+
+    def test_max_complement_run_counts_iupac_complementarity(self) -> None:
+        self.assertEqual(max_complement_run("ATGR", "YCAT"), 4)
+
+    def test_simulate_pcr_supports_iupac_template_matches(self) -> None:
+        record = SequenceRecord(name="iupac_amplicon", sequence="ATGRCCGTTCA", topology="linear")
+        result = simulate_pcr(record, forward_primer="ATGGCC", reverse_primer="TGAAC")
+        self.assertEqual(result["forward_hits"], [1])
+        self.assertEqual(result["reverse_hits"], [7])
+        self.assertEqual(len(result["products"]), 1)
+        self.assertEqual(result["products"][0]["sequence"], "ATGRCCGTTCA")
 
     def test_parse_feature_interval_handles_reverse_order(self) -> None:
         self.assertEqual(parse_feature_interval("complement(80..12)"), (12, 80))

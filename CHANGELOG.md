@@ -4,6 +4,18 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-04-02
+
+### Added
+
+- Added ambiguity-aware DNA matching semantics across motif search, PCR product detection, BLAST-like local alignment, and primer-specificity workflows.
+- Added regression coverage for IUPAC-aware motif matching, PCR amplification, complementarity scoring, BLAST-like search, and primer-specificity reporting.
+
+### Fixed
+
+- Fixed a release-blocking regression in `/api/search-entities` so free-text queries like `gene` no longer get routed through the DNA motif matcher.
+- Preserved the prior smoke, real-world, and browser regression baselines after broadening IUPAC handling.
+
 ## [0.1.4] - 2026-03-23
 
 ### Added

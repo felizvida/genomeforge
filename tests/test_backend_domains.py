@@ -42,6 +42,16 @@ class BackendDomainTests(unittest.TestCase):
         self.assertLess(hit["subject_coverage_pct"], 100.0)
         self.assertGreater(hit["query_coverage_pct"], 0.0)
 
+    def test_blast_local_search_accepts_iupac_query_symbols(self) -> None:
+        result = blast_local_search(
+            query_sequence="ATGRCC",
+            database_sequences=[{"name": "subject", "sequence": "TTTATGGCCTTT"}],
+            top_hits=5,
+            kmer=4,
+        )
+        self.assertEqual(result["hit_count"], 1)
+        self.assertGreaterEqual(result["hits"][0]["identity_pct"], 100.0)
+
     def test_trace_endpoint_import_and_summary(self) -> None:
         result = handle_trace_endpoint("/api/import-ab1", {"sequence": "ATGGTGAGCAAG"})
         assert result is not None
@@ -305,6 +315,17 @@ class BackendDomainTests(unittest.TestCase):
         assert hdr is not None
         self.assertEqual(hdr["edit_length"], 3)
         self.assertGreater(hdr["donor_length"], 3)
+
+    def test_design_endpoint_primer_specificity_accepts_iupac_symbols(self) -> None:
+        record = SequenceRecord(name="IUPACSpecificity", sequence="ATGRCCAAAATCGTTCAAAAGGTT", topology="linear")
+        specificity = handle_design_endpoint(
+            "/api/primer-specificity",
+            {"forward": "ATGGCCAAAATC", "reverse": "AACCTTTTGAAC", "min_amplicon_bp": 20},
+            lambda: record,
+        )
+        assert specificity is not None
+        self.assertEqual(specificity["total_predicted_products"], 1)
+        self.assertEqual(specificity["reports"][0]["perfect_products"], 1)
 
     def test_project_endpoint_save_load_and_history(self) -> None:
         suffix = uuid.uuid4().hex[:8]

@@ -6,7 +6,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
-from genomeforge_toolkit import DNA_ALPHABET, Feature, RC_TABLE, SequenceRecord, find_all_occurrences
+from genomeforge_toolkit import (
+    DNA_ALPHABET,
+    Feature,
+    RC_TABLE,
+    SequenceRecord,
+    find_all_occurrences,
+    iupac_hamming_distance,
+    iupac_symbol_matches,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,9 +31,7 @@ def _revcomp(seq: str) -> str:
 
 
 def _hamming_equal_len(a: str, b: str) -> int:
-    if len(a) != len(b):
-        raise ValueError("Hamming distance requires equal length strings")
-    return sum(1 for x, y in zip(a, b) if x != y)
+    return iupac_hamming_distance(a, b)
 
 
 def smith_waterman_dna(
@@ -47,7 +53,7 @@ def smith_waterman_dna(
     best_j = 0
     for i in range(1, m + 1):
         for j in range(1, n + 1):
-            s_diag = score[i - 1][j - 1] + (match if a[i - 1] == b[j - 1] else mismatch)
+            s_diag = score[i - 1][j - 1] + (match if iupac_symbol_matches(a[i - 1], b[j - 1]) else mismatch)
             s_up = score[i - 1][j] + gap
             s_left = score[i][j - 1] + gap
             cell = max(0, s_diag, s_up, s_left)
@@ -92,7 +98,7 @@ def smith_waterman_dna(
     aln_a = "".join(reversed(aa))
     aln_b = "".join(reversed(bb))
     aligned_columns = len(aln_a)
-    matches = sum(1 for x, y in zip(aln_a, aln_b) if x == y and x != "-" and y != "-")
+    matches = sum(1 for x, y in zip(aln_a, aln_b) if x != "-" and y != "-" and iupac_symbol_matches(x, y))
     aligned_a_bases = sum(1 for x in aln_a if x != "-")
     aligned_b_bases = sum(1 for y in aln_b if y != "-")
     return {
@@ -147,7 +153,8 @@ def blast_local_search(
         inter = len(qk & tk)
         union = max(1, len(qk | tk))
         seed_jaccard = inter / union
-        if inter == 0 and len(query) >= k and len(target) >= k:
+        has_ambiguity = any(ch not in "ACGT" for ch in query + target)
+        if inter == 0 and len(query) >= k and len(target) >= k and not has_ambiguity:
             continue
         aln = smith_waterman_dna(query, target, match=2, mismatch=-1, gap=-2)
         if int(aln.get("score", 0)) <= 0:
@@ -155,7 +162,7 @@ def blast_local_search(
         aa = aln["aligned_a"]
         bb = aln["aligned_b"]
         aligned_columns = int(aln.get("alignment_length", len(aa)))
-        matches = sum(1 for x, y in zip(aa, bb) if x == y and x != "-" and y != "-")
+        matches = sum(1 for x, y in zip(aa, bb) if x != "-" and y != "-" and iupac_symbol_matches(x, y))
         aligned_query_bases = int(aln.get("aligned_a_bases", sum(1 for x in aa if x != "-")))
         aligned_target_bases = int(aln.get("aligned_b_bases", sum(1 for y in bb if y != "-")))
         query_cov = aligned_query_bases / max(1, len(query))

@@ -7,7 +7,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
-from genomeforge_toolkit import CODON_TABLE, SequenceRecord, find_all_occurrences, sanitize_sequence
+from genomeforge_toolkit import CODON_TABLE, DNA_ALPHABET, SequenceRecord, find_all_occurrences, sanitize_sequence
 
 
 RecordGetter = Callable[[], SequenceRecord]
@@ -1036,7 +1036,8 @@ def search_entities(
     if not q:
         raise ValueError("query is required")
     seq = record.sequence
-    motif_hits = find_all_occurrences(seq, q, circular=record.topology == "circular")
+    is_dna_query = all(ch in DNA_ALPHABET for ch in q)
+    motif_hits = find_all_occurrences(seq, q, circular=record.topology == "circular") if is_dna_query else []
     motif_rows = [{"start_1based": pos + 1, "end_1based": pos + len(q)} for pos in motif_hits]
     feature_rows = []
     for i, feature in enumerate(record.features):

@@ -25,6 +25,23 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 IUPAC_DNA_CODES = "ACGTRYSWKMBDHVN"
 DNA_ALPHABET = set(IUPAC_DNA_CODES)
+IUPAC_BASE_SETS: Dict[str, frozenset[str]] = {
+    "A": frozenset("A"),
+    "C": frozenset("C"),
+    "G": frozenset("G"),
+    "T": frozenset("T"),
+    "R": frozenset("AG"),
+    "Y": frozenset("CT"),
+    "S": frozenset("GC"),
+    "W": frozenset("AT"),
+    "K": frozenset("GT"),
+    "M": frozenset("AC"),
+    "B": frozenset("CGT"),
+    "D": frozenset("AGT"),
+    "H": frozenset("ACT"),
+    "V": frozenset("ACG"),
+    "N": frozenset("ACGT"),
+}
 
 CODON_TABLE = {
     "TTT": "F", "TTC": "F", "TTA": "L", "TTG": "L",
@@ -224,6 +241,24 @@ def sanitize_sequence(seq: str) -> str:
     return seq
 
 
+def iupac_symbol_matches(symbol_a: str, symbol_b: str) -> bool:
+    bases_a = IUPAC_BASE_SETS.get(symbol_a.upper())
+    bases_b = IUPAC_BASE_SETS.get(symbol_b.upper())
+    return bool(bases_a and bases_b and bases_a & bases_b)
+
+
+def iupac_sequence_matches(seq_a: str, seq_b: str) -> bool:
+    if len(seq_a) != len(seq_b):
+        return False
+    return all(iupac_symbol_matches(a, b) for a, b in zip(seq_a, seq_b))
+
+
+def iupac_hamming_distance(seq_a: str, seq_b: str) -> int:
+    if len(seq_a) != len(seq_b):
+        raise ValueError("Hamming distance requires equal length strings")
+    return sum(1 for a, b in zip(seq_a, seq_b) if not iupac_symbol_matches(a, b))
+
+
 def translate_nt(seq: str, to_stop: bool = False) -> str:
     aa: List[str] = []
     for i in range(0, len(seq) - 2, 3):
@@ -297,7 +332,7 @@ def max_complement_run(seq_a: str, seq_b: str, min_run: int = 3) -> int:
         run = 0
         for i in range(len(a)):
             j = i - offset
-            if 0 <= j < len(b_rc) and a[i] == b_rc[j]:
+            if 0 <= j < len(b_rc) and iupac_symbol_matches(a[i], b_rc[j]):
                 run += 1
                 if run > best:
                     best = run
@@ -324,7 +359,7 @@ def hairpin_risk(seq: str, stem_min: int = 4, loop_min: int = 3) -> int:
         kmer = tail[-stem:]
         target = kmer.translate(RC_TABLE)[::-1]
         for i in range(0, len(s) - stem - loop_min):
-            if s[i : i + stem] == target:
+            if iupac_sequence_matches(s[i : i + stem], target):
                 best = max(best, stem)
     return best
 
@@ -489,6 +524,8 @@ def design_primer_pair(
 
 
 def find_all_occurrences(seq: str, motif: str, circular: bool = False) -> List[int]:
+    seq = sanitize_sequence(seq)
+    motif = sanitize_sequence(motif)
     if not motif:
         return []
     positions: List[int] = []
@@ -499,7 +536,7 @@ def find_all_occurrences(seq: str, motif: str, circular: bool = False) -> List[i
     search = seq + (seq[: m - 1] if circular else "")
     limit = n if circular else n - m + 1
     for i in range(limit):
-        if search[i : i + m] == motif:
+        if iupac_sequence_matches(search[i : i + m], motif):
             positions.append(i)
     return positions
 

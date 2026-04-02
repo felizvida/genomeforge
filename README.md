@@ -20,7 +20,7 @@ It combines:
 
 Latest release:
 
-- [Genome Forge v0.1.4](https://github.com/felizvida/genomeforge/releases/tag/v0.1.4)
+- [Genome Forge v0.1.5](https://github.com/felizvida/genomeforge/releases/tag/v0.1.5)
 
 ## Why Genome Forge
 
@@ -103,7 +103,7 @@ genomeforge input.fasta info
 
 Current shipped baseline:
 
-- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `26/26` passed
+- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `31/31` passed
 - `python3 smoke_test.py` -> `108/108` passed
 - `python3 real_world_functional_test.py` -> `97/97` passed
 - `npm run test:e2e` -> `12/12` passed
