@@ -4,6 +4,20 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-04-02
+
+### Added
+
+- Added publication-style tutorial front matter including a half-title page, full title page, imprint page, and deeper case-level table of contents.
+- Added print-only cluster chapter openers to make the PDF tutorial read more like a formal course reader.
+- Added PDF metadata/tagging support in the tutorial build so the exported volume now carries author/subject metadata and reports as a tagged PDF.
+
+### Changed
+
+- Refined the tutorial typesetting for publication-oriented print output with mirrored folios, figure numbering, cleaner chapter rhythm, and better pagination for long tables.
+- Tightened front-matter and chapter-opener copy so the tutorial reads more cleanly in the final page design.
+- Regenerated the tutorial HTML/PDF after the final layout and editorial pass.
+
 ## [0.1.6] - 2026-04-02
 
 ### Added
