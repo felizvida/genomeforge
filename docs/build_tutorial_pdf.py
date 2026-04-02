@@ -22,7 +22,13 @@ def main() -> None:
     if not HTML_PATH.exists():
         raise SystemExit(f"Tutorial HTML not found: {HTML_PATH}")
 
-    HTML(filename=str(HTML_PATH), base_url=str(HTML_PATH.parent)).write_pdf(str(PDF_PATH))
+    HTML(filename=str(HTML_PATH), base_url=str(HTML_PATH.parent)).write_pdf(
+        str(PDF_PATH),
+        pdf_tags=True,
+        custom_metadata=True,
+        presentational_hints=True,
+        srgb=True,
+    )
     print(f"Wrote {PDF_PATH}")
 
 

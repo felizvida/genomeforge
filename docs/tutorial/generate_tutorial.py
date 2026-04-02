@@ -19,6 +19,9 @@ CASE_BUNDLES_DIR = DATASET_DIR / 'case_bundles'
 
 TODAY = date.today().isoformat()
 APP_VERSION = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
+COPYRIGHT_YEAR = TODAY[:4]
+REPO_URL = 'https://github.com/felizvida/genomeforge'
+TUTORIAL_AUTHOR = 'Genome Forge contributors'
 
 CLUSTERS = [
     {
@@ -941,6 +944,54 @@ def render_publication_note(case_count: int) -> str:
     ''').strip()
 
 
+def render_half_title_page() -> str:
+    return dedent(f'''
+      <section class="half-title-page" aria-label="Half title page">
+        <p class="half-title-kicker">Genome Forge Tutorial</p>
+        <h1 class="half-title">Teach Yourself Bioinformatics with Genome Forge</h1>
+        <p class="half-subtitle">Textbook Edition · Real-world records · Publication-style self-study guide</p>
+      </section>
+    ''').strip()
+
+
+def render_imprint_page(case_count: int) -> str:
+    return dedent(f'''
+      <section class="imprint-page" aria-label="Imprint page">
+        <div class="imprint-box">
+          <p class="section-kicker">Imprint</p>
+          <h2 class="imprint-title">Edition and Copyright</h2>
+          <p><b>Title:</b> <i>Teach Yourself Bioinformatics with Genome Forge</i></p>
+          <p><b>Edition:</b> Genome Forge {escape(APP_VERSION)} textbook edition generated on <code>{escape(TODAY)}</code>.</p>
+          <p><b>Authoring body:</b> {escape(TUTORIAL_AUTHOR)}</p>
+          <p><b>Repository:</b> <a href="{escape(REPO_URL)}">{escape(REPO_URL)}</a></p>
+          <p><b>License:</b> Apache License 2.0 for the project source; public-source records and clearly labelled training derivatives are documented in the bundled dataset metadata.</p>
+          <p><b>Scope:</b> This volume contains {case_count} lessons, real-world sample data, and generated HTML/PDF outputs that are rebuilt from the same source-of-truth tutorial generator.</p>
+          <p><b>Suggested citation:</b> {escape(TUTORIAL_AUTHOR)}. <i>Teach Yourself Bioinformatics with Genome Forge</i>. Genome Forge {escape(APP_VERSION)}. {escape(COPYRIGHT_YEAR)}.</p>
+          <p class="muted">Copyright © {escape(COPYRIGHT_YEAR)} {escape(TUTORIAL_AUTHOR)}.</p>
+        </div>
+      </section>
+    ''').strip()
+
+
+def render_toc() -> str:
+    groups = []
+    for cluster in CLUSTERS:
+        case_entries = ''.join(
+            f'<a class="toc-entry toc-case" href="#case-{escape(case_info["id"])}"><span class="toc-entry-title">Case {escape(case_info["id"])}: {escape(case_info["title"])}</span></a>'
+            for case_info in CLUSTER_CASES[cluster['id']]
+        )
+        groups.append(dedent(f'''
+          <div class="toc-group">
+            <a class="toc-entry toc-cluster" href="#cluster-{escape(cluster["id"])}">
+              <span class="toc-entry-title">Cluster {escape(cluster["id"])}: {escape(cluster["title"])}</span>
+              <span class="toc-count">{len(CLUSTER_CASES[cluster["id"]])} cases</span>
+            </a>
+            <div class="toc-subentries">{case_entries}</div>
+          </div>
+        ''').strip())
+    return '<div class="toc-groups">' + ''.join(groups) + '</div>'
+
+
 def render_iupac_table() -> str:
     rows = ''.join(
         '<tr>'
@@ -993,7 +1044,7 @@ def render_case(case_info: dict) -> str:
         <div class="case-head">
           <div>
             <p class="eyebrow">Case {escape(case_info['id'])} · Cluster {escape(case_info['cluster'])}</p>
-            <h3>Case {escape(case_info['id'])}: {escape(case_info['title'])}</h3>
+            <h3 class="case-title">Case {escape(case_info['id'])}: {escape(case_info['title'])}</h3>
             <p class="lead">{escape(case_info['biological_question'])}</p>
           </div>
           <div class="case-meta">
@@ -1027,17 +1078,32 @@ def render_case(case_info: dict) -> str:
 
 
 def render_cluster(cluster: dict) -> str:
-    cases_html = '\n'.join(render_case(case_info) for case_info in CLUSTER_CASES[cluster['id']])
     cluster_case_strip = ''.join(
         f'<span class="case-chip">Case {escape(case_info["id"])} · {escape(case_info["title"])}</span>'
         for case_info in CLUSTER_CASES[cluster['id']]
     )
+    cases_html = '\n'.join(render_case(case_info) for case_info in CLUSTER_CASES[cluster['id']])
     return dedent(f'''
       <section class="section cluster" id="cluster-{escape(cluster['id'])}">
+        <div class="chapter-opener print-only" aria-label="Cluster {escape(cluster['id'])} opener">
+          <p class="section-kicker">Cluster {escape(cluster['id'])}</p>
+          <h2 class="chapter-title">Cluster {escape(cluster['id'])}: {escape(cluster['title'])}</h2>
+          <p class="chapter-theme">{escape(cluster['theme'])}</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip">{cluster_case_strip}</div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="{escape(cluster['figure'])}" alt="{escape(cluster['title'])}" />
+              <p class="caption">{escape(cluster['caption'])}</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster {escape(cluster['id'])}</p>
-            <h2>Cluster {escape(cluster['id'])}: {escape(cluster['title'])}</h2>
+            <h2 class="cluster-title">Cluster {escape(cluster['id'])}: {escape(cluster['title'])}</h2>
             <p class="muted">{escape(cluster['theme'])}</p>
             <div class="case-strip">{cluster_case_strip}</div>
           </div>
@@ -1052,10 +1118,7 @@ def render_cluster(cluster: dict) -> str:
 
 
 def render_html() -> str:
-    cluster_links = ''.join(
-        f'<li><a href="#cluster-{escape(cluster["id"])}"><span class="toc-title">Cluster {escape(cluster["id"])}: {escape(cluster["title"])}</span><span class="toc-count">{len(CLUSTER_CASES[cluster["id"]])} cases</span></a></li>'
-        for cluster in CLUSTERS
-    )
+    toc_html = render_toc()
     cluster_sections = '\n'.join(render_cluster(cluster) for cluster in CLUSTERS)
     case_count = len(CASES)
     return dedent(f'''<!doctype html>
@@ -1063,6 +1126,12 @@ def render_html() -> str:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="{escape(TUTORIAL_AUTHOR)}" />
+  <meta name="description" content="Publication-style self-study bioinformatics tutorial for Genome Forge using real biological records, stepwise workflows, and biological interpretation." />
+  <meta name="keywords" content="bioinformatics, DNA, cloning, plasmid, genome forge, tutorial, molecular biology" />
+  <meta name="generator" content="Genome Forge tutorial generator" />
+  <meta name="dcterms.created" content="{escape(TODAY)}" />
+  <meta name="dcterms.modified" content="{escape(TODAY)}" />
   <title>Teach Yourself Bioinformatics with Genome Forge ({escape(APP_VERSION)})</title>
   <style>
     @page {{
@@ -1106,6 +1175,18 @@ def render_html() -> str:
       @bottom-right {{ content: none; }}
     }}
     @page cover {{
+      @top-left {{ content: none; }}
+      @top-right {{ content: none; }}
+      @bottom-left {{ content: none; }}
+      @bottom-right {{ content: none; }}
+    }}
+    @page pretitle {{
+      @top-left {{ content: none; }}
+      @top-right {{ content: none; }}
+      @bottom-left {{ content: none; }}
+      @bottom-right {{ content: none; }}
+    }}
+    @page imprint {{
       @top-left {{ content: none; }}
       @top-right {{ content: none; }}
       @bottom-left {{ content: none; }}
@@ -1160,6 +1241,40 @@ def render_html() -> str:
       page-break-inside: avoid;
     }}
     .doc {{ max-width: 940px; margin: 0 auto; padding: 20px 14px 44px; }}
+    .half-title-page {{
+      page: pretitle;
+      min-height: 245mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 12mm 10mm;
+      break-after: page;
+    }}
+    .half-title-kicker {{
+      margin: 0 0 10mm;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 10px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
+    .half-title {{
+      margin: 0;
+      max-width: 600px;
+      color: var(--navy);
+      font-size: 28px;
+      line-height: 1.12;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    }}
+    .half-subtitle {{
+      margin: 10mm 0 0;
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 12px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
     .cover {{
       page: cover;
       break-after: page;
@@ -1219,6 +1334,30 @@ def render_html() -> str:
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     .meta .k b {{ display: block; margin-top: 4px; font-size: 12px; color: var(--navy); }}
+    .imprint-page {{
+      page: imprint;
+      min-height: 245mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10mm 0;
+      break-after: page;
+    }}
+    .imprint-box {{
+      width: 100%;
+      max-width: 760px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fffef9, #f8f2e8);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }}
+    .imprint-title {{
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 22px;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    }}
     .cover-note {{
       margin-top: 14px;
       padding-top: 10px;
@@ -1285,6 +1424,11 @@ def render_html() -> str:
       color: var(--navy);
       font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     }}
+    .cover h1 {{ bookmark-level: 1; }}
+    .half-title {{ bookmark-level: none; }}
+    .section > h2, .cluster-title {{ bookmark-level: 2; }}
+    .chapter-title {{ bookmark-level: none; }}
+    .case-title {{ bookmark-level: 3; }}
     .section h3 {{
       margin: 0 0 6px;
       font-size: 14px;
@@ -1323,23 +1467,45 @@ def render_html() -> str:
       font-weight: 700;
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
-    table {{ width: 100%; border-collapse: collapse; font-size: 10.7px; margin-top: 8px; }}
+    table {{ width: 100%; border-collapse: collapse; font-size: 10.7px; margin-top: 8px; page-break-inside: auto; }}
     th, td {{ border: 1px solid #d9e4f0; padding: 7px; vertical-align: top; text-align: left; }}
     th {{ background: #eee7d7; color: #17314b; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
+    thead {{ display: table-header-group; }}
+    tfoot {{ display: table-footer-group; }}
+    tr {{ page-break-inside: avoid; page-break-after: auto; }}
     .toc ol, .toc ul, ul, ol {{ margin: 6px 0 6px 18px; padding: 0; }}
     li {{ margin: 3px 0; }}
-    .toc ol {{ margin-left: 0; list-style: none; }}
-    .toc li {{ margin: 0; }}
-    .toc a {{
+    .toc-groups {{ margin-top: 10px; }}
+    .toc-group {{
+      border: 1px solid #e3dccf;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #fffef9, #f8f2e8);
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      page-break-inside: avoid;
+    }}
+    .toc-entry {{
       display: block;
-      padding: 6px 0;
-      border-bottom: 1px dotted #d7cfbf;
+      padding: 5px 0;
       color: var(--ink);
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
-    .toc .toc-title {{ font-weight: 600; }}
-    .toc .toc-count {{ color: var(--muted); font-size: 10px; margin-left: 8px; }}
-    .toc a::after {{
+    .toc-cluster {{
+      border-bottom: 1px dotted #d7cfbf;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }}
+    .toc-subentries {{
+      margin-left: 12px;
+      padding-top: 4px;
+    }}
+    .toc-case {{
+      font-size: 10.4px;
+      color: #364754;
+    }}
+    .toc-entry-title {{ display: inline; }}
+    .toc-count {{ color: var(--muted); font-size: 10px; margin-left: 8px; }}
+    .toc-entry::after {{
       content: leader(".") target-counter(attr(href), page);
       color: var(--muted);
       float: right;
@@ -1390,7 +1556,44 @@ def render_html() -> str:
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     .figure-card p {{ margin: 0; font-size: 10.8px; color: var(--muted); }}
+    .print-only {{ display: none; }}
     .cluster-head {{ display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 12px; align-items: start; margin-bottom: 10px; }}
+    .chapter-opener {{
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248, 242, 230, 0.98)),
+        linear-gradient(135deg, #f8f2e7 0%, #fffef9 100%);
+      padding: 18px 20px 16px;
+      break-before: page;
+      break-after: page;
+    }}
+    .chapter-title {{
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 28px;
+      line-height: 1.12;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    }}
+    .chapter-theme {{
+      margin: 0;
+      max-width: 640px;
+      color: #405463;
+      font-size: 13px;
+    }}
+    .chapter-opener-grid {{
+      display: block;
+      margin-top: 16px;
+    }}
+    .chapter-summary {{
+      border: 1px solid #e2d9c9;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.72);
+      padding: 12px 14px;
+    }}
+    .chapter-case-strip {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }}
+    .chapter-figure {{ max-width: 360px; margin-top: 12px; }}
+    .chapter-figure img {{ max-width: 320px; }}
     .case-strip {{ display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }}
     .case-chip {{
       display: inline-block;
@@ -1402,7 +1605,7 @@ def render_html() -> str:
       font-size: 9.8px;
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
-    .cluster {{ break-before: page; }}
+    .cluster {{ break-before: auto; }}
     .case {{ border-top: 1px dashed #c7bba6; padding-top: 12px; margin-top: 12px; page-break-inside: avoid; }}
     .case:first-of-type {{ border-top: none; padding-top: 0; margin-top: 0; }}
     .case-head {{ display: grid; grid-template-columns: 1.25fr 0.95fr; gap: 12px; align-items: start; }}
@@ -1424,21 +1627,28 @@ def render_html() -> str:
     .interpret {{ border: 1px solid #e4d7ab; background: #fff9eb; }}
     .biology {{ border: 1px solid #e5cdd6; background: #fcf4f7; }}
     .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b {{ display: block; margin-bottom: 4px; color: var(--navy); font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
-    .cluster, .section, .case, .card, .figure, table, pre {{ page-break-inside: avoid; }}
+    .cluster, .case, .card, .figure, pre {{ page-break-inside: avoid; }}
     @media print {{
       body {{ background: #ffffff; }}
       .doc {{ max-width: none; margin: 0; padding: 0; }}
-      .section, .cover, .card, .figure, .figure-card, .cover-shot {{
+      .section, .cover, .card, .figure, .figure-card, .cover-shot, .imprint-box {{
         box-shadow: none;
       }}
       .section {{
         border-radius: 14px;
       }}
+      .print-only {{ display: block; }}
+      .cluster-head {{ display: none; }}
+    }}
+    @media screen {{
+      .print-only {{ display: none !important; }}
     }}
   </style>
 </head>
 <body>
   <main class="doc">
+    {render_half_title_page()}
+
     <section class="cover">
       <p class="eyebrow">Genome Forge {escape(APP_VERSION)} · Textbook Edition</p>
       <h1>Teach Yourself Bioinformatics with Genome Forge</h1>
@@ -1453,6 +1663,8 @@ def render_html() -> str:
       {render_cover_spread()}
       <p class="cover-note">This edition is written to be read like a lab-ready monograph: each lesson combines software procedure, expected results, biological interpretation, and the reason the data matter in practice.</p>
     </section>
+
+    {render_imprint_page(case_count)}
 
     {render_publication_note(case_count)}
 
@@ -1556,11 +1768,11 @@ def render_html() -> str:
       </div>
     </section>
 
-    <section class="section toc">
+    <section class="section toc" role="doc-toc" aria-label="Table of contents">
       <p class="section-kicker">Contents</p>
-      <h2>Case Map</h2>
+      <h2>Table of Contents</h2>
       <p class="muted">Recommended order if you are new to biology: Cluster A → B → C → D → G → E → F → H.</p>
-      <ol>{cluster_links}</ol>
+      {toc_html}
     </section>
 
     <section class="section">

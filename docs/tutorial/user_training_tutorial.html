@@ -3,6 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Genome Forge contributors" />
+  <meta name="description" content="Publication-style self-study bioinformatics tutorial for Genome Forge using real biological records, stepwise workflows, and biological interpretation." />
+  <meta name="keywords" content="bioinformatics, DNA, cloning, plasmid, genome forge, tutorial, molecular biology" />
+  <meta name="generator" content="Genome Forge tutorial generator" />
+  <meta name="dcterms.created" content="2026-04-02" />
+  <meta name="dcterms.modified" content="2026-04-02" />
   <title>Teach Yourself Bioinformatics with Genome Forge (v0.1.6)</title>
   <style>
     @page {
@@ -46,6 +52,18 @@
       @bottom-right { content: none; }
     }
     @page cover {
+      @top-left { content: none; }
+      @top-right { content: none; }
+      @bottom-left { content: none; }
+      @bottom-right { content: none; }
+    }
+    @page pretitle {
+      @top-left { content: none; }
+      @top-right { content: none; }
+      @bottom-left { content: none; }
+      @bottom-right { content: none; }
+    }
+    @page imprint {
       @top-left { content: none; }
       @top-right { content: none; }
       @bottom-left { content: none; }
@@ -100,6 +118,40 @@
       page-break-inside: avoid;
     }
     .doc { max-width: 940px; margin: 0 auto; padding: 20px 14px 44px; }
+    .half-title-page {
+      page: pretitle;
+      min-height: 245mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 12mm 10mm;
+      break-after: page;
+    }
+    .half-title-kicker {
+      margin: 0 0 10mm;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 10px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }
+    .half-title {
+      margin: 0;
+      max-width: 600px;
+      color: var(--navy);
+      font-size: 28px;
+      line-height: 1.12;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    }
+    .half-subtitle {
+      margin: 10mm 0 0;
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 12px;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }
     .cover {
       page: cover;
       break-after: page;
@@ -159,6 +211,30 @@
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }
     .meta .k b { display: block; margin-top: 4px; font-size: 12px; color: var(--navy); }
+    .imprint-page {
+      page: imprint;
+      min-height: 245mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10mm 0;
+      break-after: page;
+    }
+    .imprint-box {
+      width: 100%;
+      max-width: 760px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fffef9, #f8f2e8);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+    .imprint-title {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 22px;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    }
     .cover-note {
       margin-top: 14px;
       padding-top: 10px;
@@ -225,6 +301,11 @@
       color: var(--navy);
       font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     }
+    .cover h1 { bookmark-level: 1; }
+    .half-title { bookmark-level: none; }
+    .section > h2, .cluster-title { bookmark-level: 2; }
+    .chapter-title { bookmark-level: none; }
+    .case-title { bookmark-level: 3; }
     .section h3 {
       margin: 0 0 6px;
       font-size: 14px;
@@ -263,23 +344,45 @@
       font-weight: 700;
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }
-    table { width: 100%; border-collapse: collapse; font-size: 10.7px; margin-top: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 10.7px; margin-top: 8px; page-break-inside: auto; }
     th, td { border: 1px solid #d9e4f0; padding: 7px; vertical-align: top; text-align: left; }
     th { background: #eee7d7; color: #17314b; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    tr { page-break-inside: avoid; page-break-after: auto; }
     .toc ol, .toc ul, ul, ol { margin: 6px 0 6px 18px; padding: 0; }
     li { margin: 3px 0; }
-    .toc ol { margin-left: 0; list-style: none; }
-    .toc li { margin: 0; }
-    .toc a {
+    .toc-groups { margin-top: 10px; }
+    .toc-group {
+      border: 1px solid #e3dccf;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #fffef9, #f8f2e8);
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      page-break-inside: avoid;
+    }
+    .toc-entry {
       display: block;
-      padding: 6px 0;
-      border-bottom: 1px dotted #d7cfbf;
+      padding: 5px 0;
       color: var(--ink);
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }
-    .toc .toc-title { font-weight: 600; }
-    .toc .toc-count { color: var(--muted); font-size: 10px; margin-left: 8px; }
-    .toc a::after {
+    .toc-cluster {
+      border-bottom: 1px dotted #d7cfbf;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    .toc-subentries {
+      margin-left: 12px;
+      padding-top: 4px;
+    }
+    .toc-case {
+      font-size: 10.4px;
+      color: #364754;
+    }
+    .toc-entry-title { display: inline; }
+    .toc-count { color: var(--muted); font-size: 10px; margin-left: 8px; }
+    .toc-entry::after {
       content: leader(".") target-counter(attr(href), page);
       color: var(--muted);
       float: right;
@@ -330,7 +433,44 @@
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }
     .figure-card p { margin: 0; font-size: 10.8px; color: var(--muted); }
+    .print-only { display: none; }
     .cluster-head { display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 12px; align-items: start; margin-bottom: 10px; }
+    .chapter-opener {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248, 242, 230, 0.98)),
+        linear-gradient(135deg, #f8f2e7 0%, #fffef9 100%);
+      padding: 18px 20px 16px;
+      break-before: page;
+      break-after: page;
+    }
+    .chapter-title {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 28px;
+      line-height: 1.12;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    }
+    .chapter-theme {
+      margin: 0;
+      max-width: 640px;
+      color: #405463;
+      font-size: 13px;
+    }
+    .chapter-opener-grid {
+      display: block;
+      margin-top: 16px;
+    }
+    .chapter-summary {
+      border: 1px solid #e2d9c9;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.72);
+      padding: 12px 14px;
+    }
+    .chapter-case-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .chapter-figure { max-width: 360px; margin-top: 12px; }
+    .chapter-figure img { max-width: 320px; }
     .case-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .case-chip {
       display: inline-block;
@@ -342,7 +482,7 @@
       font-size: 9.8px;
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }
-    .cluster { break-before: page; }
+    .cluster { break-before: auto; }
     .case { border-top: 1px dashed #c7bba6; padding-top: 12px; margin-top: 12px; page-break-inside: avoid; }
     .case:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
     .case-head { display: grid; grid-template-columns: 1.25fr 0.95fr; gap: 12px; align-items: start; }
@@ -364,21 +504,32 @@
     .interpret { border: 1px solid #e4d7ab; background: #fff9eb; }
     .biology { border: 1px solid #e5cdd6; background: #fcf4f7; }
     .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b { display: block; margin-bottom: 4px; color: var(--navy); font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }
-    .cluster, .section, .case, .card, .figure, table, pre { page-break-inside: avoid; }
+    .cluster, .case, .card, .figure, pre { page-break-inside: avoid; }
     @media print {
       body { background: #ffffff; }
       .doc { max-width: none; margin: 0; padding: 0; }
-      .section, .cover, .card, .figure, .figure-card, .cover-shot {
+      .section, .cover, .card, .figure, .figure-card, .cover-shot, .imprint-box {
         box-shadow: none;
       }
       .section {
         border-radius: 14px;
       }
+      .print-only { display: block; }
+      .cluster-head { display: none; }
+    }
+    @media screen {
+      .print-only { display: none !important; }
     }
   </style>
 </head>
 <body>
   <main class="doc">
+    <section class="half-title-page" aria-label="Half title page">
+  <p class="half-title-kicker">Genome Forge Tutorial</p>
+  <h1 class="half-title">Teach Yourself Bioinformatics with Genome Forge</h1>
+  <p class="half-subtitle">Textbook Edition · Real-world records · Publication-style self-study guide</p>
+</section>
+
     <section class="cover">
       <p class="eyebrow">Genome Forge v0.1.6 · Textbook Edition</p>
       <h1>Teach Yourself Bioinformatics with Genome Forge</h1>
@@ -417,6 +568,21 @@
 </div></div>
       <p class="cover-note">This edition is written to be read like a lab-ready monograph: each lesson combines software procedure, expected results, biological interpretation, and the reason the data matter in practice.</p>
     </section>
+
+    <section class="imprint-page" aria-label="Imprint page">
+  <div class="imprint-box">
+    <p class="section-kicker">Imprint</p>
+    <h2 class="imprint-title">Edition and Copyright</h2>
+    <p><b>Title:</b> <i>Teach Yourself Bioinformatics with Genome Forge</i></p>
+    <p><b>Edition:</b> Genome Forge v0.1.6 textbook edition generated on <code>2026-04-02</code>.</p>
+    <p><b>Authoring body:</b> Genome Forge contributors</p>
+    <p><b>Repository:</b> <a href="https://github.com/felizvida/genomeforge">https://github.com/felizvida/genomeforge</a></p>
+    <p><b>License:</b> Apache License 2.0 for the project source; public-source records and clearly labelled training derivatives are documented in the bundled dataset metadata.</p>
+    <p><b>Scope:</b> This volume contains 39 lessons, real-world sample data, and generated HTML/PDF outputs that are rebuilt from the same source-of-truth tutorial generator.</p>
+    <p><b>Suggested citation:</b> Genome Forge contributors. <i>Teach Yourself Bioinformatics with Genome Forge</i>. Genome Forge v0.1.6. 2026.</p>
+    <p class="muted">Copyright © 2026 Genome Forge contributors.</p>
+  </div>
+</section>
 
     <section class="section frontmatter">
   <p class="section-kicker">Front Matter</p>
@@ -596,11 +762,59 @@
       </div>
     </section>
 
-    <section class="section toc">
+    <section class="section toc" role="doc-toc" aria-label="Table of contents">
       <p class="section-kicker">Contents</p>
-      <h2>Case Map</h2>
+      <h2>Table of Contents</h2>
       <p class="muted">Recommended order if you are new to biology: Cluster A → B → C → D → G → E → F → H.</p>
-      <ol><li><a href="#cluster-A"><span class="toc-title">Cluster A: Molecule Architecture and Restriction Logic</span><span class="toc-count">4 cases</span></a></li><li><a href="#cluster-B"><span class="toc-title">Cluster B: Sequence Meaning and Functional Annotation</span><span class="toc-count">4 cases</span></a></li><li><a href="#cluster-C"><span class="toc-title">Cluster C: Assay and Primer System Design</span><span class="toc-count">5 cases</span></a></li><li><a href="#cluster-D"><span class="toc-title">Cluster D: Assembly and Construct Validation</span><span class="toc-count">3 cases</span></a></li><li><a href="#cluster-E"><span class="toc-title">Cluster E: Comparative and Population-Level Reasoning</span><span class="toc-count">4 cases</span></a></li><li><a href="#cluster-F"><span class="toc-title">Cluster F: Editing and Design for Intervention</span><span class="toc-count">3 cases</span></a></li><li><a href="#cluster-G"><span class="toc-title">Cluster G: Data Fidelity and Interoperability</span><span class="toc-count">11 cases</span></a></li><li><a href="#cluster-H"><span class="toc-title">Cluster H: Reproducibility, Governance, and Delivery</span><span class="toc-count">5 cases</span></a></li></ol>
+      <div class="toc-groups"><div class="toc-group">
+  <a class="toc-entry toc-cluster" href="#cluster-A">
+    <span class="toc-entry-title">Cluster A: Molecule Architecture and Restriction Logic</span>
+    <span class="toc-count">4 cases</span>
+  </a>
+  <div class="toc-subentries"><a class="toc-entry toc-case" href="#case-A"><span class="toc-entry-title">Case A: Restriction Map for Cloning Entry Design</span></a><a class="toc-entry toc-case" href="#case-B"><span class="toc-entry-title">Case B: Methylation-Aware Digest Interpretation</span></a><a class="toc-entry toc-case" href="#case-C"><span class="toc-entry-title">Case C: Star Activity Risk Review</span></a><a class="toc-entry toc-case" href="#case-U"><span class="toc-entry-title">Case U: k-mer Profile for Contamination Suspicion</span></a></div>
+</div><div class="toc-group">
+  <a class="toc-entry toc-cluster" href="#cluster-B">
+    <span class="toc-entry-title">Cluster B: Sequence Meaning and Functional Annotation</span>
+    <span class="toc-count">4 cases</span>
+  </a>
+  <div class="toc-subentries"><a class="toc-entry toc-case" href="#case-D"><span class="toc-entry-title">Case D: Sequence Track and Translation Context</span></a><a class="toc-entry toc-case" href="#case-M"><span class="toc-entry-title">Case M: ORF Scan and Coding Potential Triage</span></a><a class="toc-entry toc-case" href="#case-P"><span class="toc-entry-title">Case P: Variant Annotation from Reference-Aligned Edits</span></a><a class="toc-entry toc-case" href="#case-W"><span class="toc-entry-title">Case W: Protein Property Inference from Translation</span></a></div>
+</div><div class="toc-group">
+  <a class="toc-entry toc-cluster" href="#cluster-C">
+    <span class="toc-entry-title">Cluster C: Assay and Primer System Design</span>
+    <span class="toc-count">5 cases</span>
+  </a>
+  <div class="toc-subentries"><a class="toc-entry toc-case" href="#case-E"><span class="toc-entry-title">Case E: Primer Design and Thermodynamic Screening</span></a><a class="toc-entry toc-case" href="#case-F"><span class="toc-entry-title">Case F: Specificity Ranking with Virtual PCR/Gel</span></a><a class="toc-entry toc-case" href="#case-AL"><span class="toc-entry-title">Case AL: Degenerate Primer Strategy for a Variant Family</span></a><a class="toc-entry toc-case" href="#case-Q"><span class="toc-entry-title">Case Q: Multiplex PCR Panel Balancing</span></a><a class="toc-entry toc-case" href="#case-AA"><span class="toc-entry-title">Case AA: Positive and Negative Control Design</span></a></div>
+</div><div class="toc-group">
+  <a class="toc-entry toc-cluster" href="#cluster-D">
+    <span class="toc-entry-title">Cluster D: Assembly and Construct Validation</span>
+    <span class="toc-count">3 cases</span>
+  </a>
+  <div class="toc-subentries"><a class="toc-entry toc-case" href="#case-G"><span class="toc-entry-title">Case G: Cloning Compatibility and Ligation Product Ranking</span></a><a class="toc-entry toc-case" href="#case-S"><span class="toc-entry-title">Case S: Circular Construct Integrity and Junction Validation</span></a><a class="toc-entry toc-case" href="#case-Z"><span class="toc-entry-title">Case Z: Multi-Trace Consensus for Final Construct Call</span></a></div>
+</div><div class="toc-group">
+  <a class="toc-entry toc-cluster" href="#cluster-E">
+    <span class="toc-entry-title">Cluster E: Comparative and Population-Level Reasoning</span>
+    <span class="toc-count">4 cases</span>
+  </a>
+  <div class="toc-subentries"><a class="toc-entry toc-case" href="#case-H"><span class="toc-entry-title">Case H: MSA, Identity Heatmap, and Phylogeny</span></a><a class="toc-entry toc-case" href="#case-N"><span class="toc-entry-title">Case N: GC Landscape and Repeat Fragility</span></a><a class="toc-entry toc-case" href="#case-O"><span class="toc-entry-title">Case O: Homopolymer and Low-Complexity Risk Detection</span></a><a class="toc-entry toc-case" href="#case-X"><span class="toc-entry-title">Case X: Motif Enrichment and Significance Framing</span></a></div>
+</div><div class="toc-group">
+  <a class="toc-entry toc-cluster" href="#cluster-F">
+    <span class="toc-entry-title">Cluster F: Editing and Design for Intervention</span>
+    <span class="toc-count">3 cases</span>
+  </a>
+  <div class="toc-subentries"><a class="toc-entry toc-case" href="#case-K"><span class="toc-entry-title">Case K: CRISPR Candidate and HDR Donor Design</span></a><a class="toc-entry toc-case" href="#case-R"><span class="toc-entry-title">Case R: Promoter/RBS Context for Expression Tuning</span></a><a class="toc-entry toc-case" href="#case-V"><span class="toc-entry-title">Case V: Codon Usage Bias and Host Portability</span></a></div>
+</div><div class="toc-group">
+  <a class="toc-entry toc-cluster" href="#cluster-G">
+    <span class="toc-entry-title">Cluster G: Data Fidelity and Interoperability</span>
+    <span class="toc-count">11 cases</span>
+  </a>
+  <div class="toc-subentries"><a class="toc-entry toc-case" href="#case-I"><span class="toc-entry-title">Case I: DNA Container Roundtrip Validation</span></a><a class="toc-entry toc-case" href="#case-J"><span class="toc-entry-title">Case J: AB1 Trace Alignment and Consensus Editing</span></a><a class="toc-entry toc-case" href="#case-Y"><span class="toc-entry-title">Case Y: Read Simulation and Coverage Planning</span></a><a class="toc-entry toc-case" href="#case-AE"><span class="toc-entry-title">Case AE: Sequence Analytics Lens (GC, Skew, Complexity, Stop Density)</span></a><a class="toc-entry toc-case" href="#case-AF"><span class="toc-entry-title">Case AF: Comparison Lens (Divergence + Confidence Hotspots)</span></a><a class="toc-entry toc-case" href="#case-AG"><span class="toc-entry-title">Case AG: Native .dna Import and Multi-Format Conversion Workflow</span></a><a class="toc-entry toc-case" href="#case-AH"><span class="toc-entry-title">Case AH: Chromatogram-First Sanger Review and Confidence Gating</span></a><a class="toc-entry toc-case" href="#case-AI"><span class="toc-entry-title">Case AI: Trace-Based Genotyping and Plasmid Verification</span></a><a class="toc-entry toc-case" href="#case-AJ"><span class="toc-entry-title">Case AJ: BLAST-like Similarity Search for Identity, Origin, and Contamination</span></a><a class="toc-entry toc-case" href="#case-AK"><span class="toc-entry-title">Case AK: Reference Element Auto-Flagging and siRNA Design/Mapping</span></a><a class="toc-entry toc-case" href="#case-AM"><span class="toc-entry-title">Case AM: Ambiguity-Aware Identity Search and Motif Rescue</span></a></div>
+</div><div class="toc-group">
+  <a class="toc-entry toc-cluster" href="#cluster-H">
+    <span class="toc-entry-title">Cluster H: Reproducibility, Governance, and Delivery</span>
+    <span class="toc-count">5 cases</span>
+  </a>
+  <div class="toc-subentries"><a class="toc-entry toc-case" href="#case-L"><span class="toc-entry-title">Case L: Collaboration, Audit, and Review Governance</span></a><a class="toc-entry toc-case" href="#case-T"><span class="toc-entry-title">Case T: Batch Reproducibility and Parameter Locking</span></a><a class="toc-entry toc-case" href="#case-AB"><span class="toc-entry-title">Case AB: Reproducible Report Package</span></a><a class="toc-entry toc-case" href="#case-AC"><span class="toc-entry-title">Case AC: Parameter Sensitivity and Robustness Check</span></a><a class="toc-entry toc-case" href="#case-AD"><span class="toc-entry-title">Case AD: End-to-End Release Checklist and Handoff</span></a></div>
+</div></div>
     </section>
 
     <section class="section">
@@ -614,10 +828,25 @@
     </section>
 
     <section class="section cluster" id="cluster-A">
+        <div class="chapter-opener print-only" aria-label="Cluster A opener">
+          <p class="section-kicker">Cluster A</p>
+          <h2 class="chapter-title">Cluster A: Molecule Architecture and Restriction Logic</h2>
+          <p class="chapter-theme">How a DNA molecule is physically organized and where you can safely cut or modify it.</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip"><span class="case-chip">Case A · Restriction Map for Cloning Entry Design</span><span class="case-chip">Case B · Methylation-Aware Digest Interpretation</span><span class="case-chip">Case C · Star Activity Risk Review</span><span class="case-chip">Case U · k-mer Profile for Contamination Suspicion</span></div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="assets/01_map.svg" alt="Molecule Architecture and Restriction Logic" />
+              <p class="caption">Circular and linear sequence views are most useful when you interpret them as future wet-lab decisions, not just graphics.</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster A</p>
-            <h2>Cluster A: Molecule Architecture and Restriction Logic</h2>
+            <h2 class="cluster-title">Cluster A: Molecule Architecture and Restriction Logic</h2>
             <p class="muted">How a DNA molecule is physically organized and where you can safely cut or modify it.</p>
             <div class="case-strip"><span class="case-chip">Case A · Restriction Map for Cloning Entry Design</span><span class="case-chip">Case B · Methylation-Aware Digest Interpretation</span><span class="case-chip">Case C · Star Activity Risk Review</span><span class="case-chip">Case U · k-mer Profile for Contamination Suspicion</span></div>
           </div>
@@ -630,7 +859,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case A · Cluster A</p>
-            <h3>Case A: Restriction Map for Cloning Entry Design</h3>
+            <h3 class="case-title">Case A: Restriction Map for Cloning Entry Design</h3>
             <p class="lead">Which enzyme pair opens the vector cleanly without compromising the blue-white screening logic built around lacZ alpha?</p>
           </div>
           <div class="case-meta">
@@ -681,7 +910,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case B · Cluster A</p>
-            <h3>Case B: Methylation-Aware Digest Interpretation</h3>
+            <h3 class="case-title">Case B: Methylation-Aware Digest Interpretation</h3>
             <p class="lead">Can a sequence that looks correct on paper still digest differently because the DNA was prepared in a methylating host?</p>
           </div>
           <div class="case-meta">
@@ -727,7 +956,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case C · Cluster A</p>
-            <h3>Case C: Star Activity Risk Review</h3>
+            <h3 class="case-title">Case C: Star Activity Risk Review</h3>
             <p class="lead">If reaction conditions get sloppy, where would near-miss cuts land and which of those cuts would actually hurt the experiment?</p>
           </div>
           <div class="case-meta">
@@ -765,7 +994,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case U · Cluster A</p>
-            <h3>Case U: k-mer Profile for Contamination Suspicion</h3>
+            <h3 class="case-title">Case U: k-mer Profile for Contamination Suspicion</h3>
             <p class="lead">Does the sequence composition look like one coherent construct, or does it hint that two familiar lab molecules were mixed together?</p>
           </div>
           <div class="case-meta">
@@ -804,10 +1033,25 @@
       </article>
       </section>
 <section class="section cluster" id="cluster-B">
+        <div class="chapter-opener print-only" aria-label="Cluster B opener">
+          <p class="section-kicker">Cluster B</p>
+          <h2 class="chapter-title">Cluster B: Sequence Meaning and Functional Annotation</h2>
+          <p class="chapter-theme">How raw letters become genes, codons, proteins, and functional hypotheses.</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip"><span class="case-chip">Case D · Sequence Track and Translation Context</span><span class="case-chip">Case M · ORF Scan and Coding Potential Triage</span><span class="case-chip">Case P · Variant Annotation from Reference-Aligned Edits</span><span class="case-chip">Case W · Protein Property Inference from Translation</span></div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="assets/02_sequence_track.svg" alt="Sequence Meaning and Functional Annotation" />
+              <p class="caption">Track views connect raw sequence, strand, feature, and codon logic in one place.</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster B</p>
-            <h2>Cluster B: Sequence Meaning and Functional Annotation</h2>
+            <h2 class="cluster-title">Cluster B: Sequence Meaning and Functional Annotation</h2>
             <p class="muted">How raw letters become genes, codons, proteins, and functional hypotheses.</p>
             <div class="case-strip"><span class="case-chip">Case D · Sequence Track and Translation Context</span><span class="case-chip">Case M · ORF Scan and Coding Potential Triage</span><span class="case-chip">Case P · Variant Annotation from Reference-Aligned Edits</span><span class="case-chip">Case W · Protein Property Inference from Translation</span></div>
           </div>
@@ -820,7 +1064,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case D · Cluster B</p>
-            <h3>Case D: Sequence Track and Translation Context</h3>
+            <h3 class="case-title">Case D: Sequence Track and Translation Context</h3>
             <p class="lead">When you zoom in on a coding sequence, what exactly makes one nucleotide substitution harmless and another catastrophic?</p>
           </div>
           <div class="case-meta">
@@ -862,7 +1106,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case M · Cluster B</p>
-            <h3>Case M: ORF Scan and Coding Potential Triage</h3>
+            <h3 class="case-title">Case M: ORF Scan and Coding Potential Triage</h3>
             <p class="lead">How do you tell whether a DNA segment should be treated like a protein-coding region or like genomic context that needs more annotation first?</p>
           </div>
           <div class="case-meta">
@@ -901,7 +1145,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case P · Cluster B</p>
-            <h3>Case P: Variant Annotation from Reference-Aligned Edits</h3>
+            <h3 class="case-title">Case P: Variant Annotation from Reference-Aligned Edits</h3>
             <p class="lead">How do you turn a one-codon difference into a biologically meaningful statement rather than just reporting a mismatch count?</p>
           </div>
           <div class="case-meta">
@@ -940,7 +1184,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case W · Cluster B</p>
-            <h3>Case W: Protein Property Inference from Translation</h3>
+            <h3 class="case-title">Case W: Protein Property Inference from Translation</h3>
             <p class="lead">What can you infer about a protein from sequence alone, and where do you have to stop and admit that cell context still matters?</p>
           </div>
           <div class="case-meta">
@@ -977,10 +1221,25 @@
       </article>
       </section>
 <section class="section cluster" id="cluster-C">
+        <div class="chapter-opener print-only" aria-label="Cluster C opener">
+          <p class="section-kicker">Cluster C</p>
+          <h2 class="chapter-title">Cluster C: Assay and Primer System Design</h2>
+          <p class="chapter-theme">How to design measurements that say something trustworthy about biology.</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip"><span class="case-chip">Case E · Primer Design and Thermodynamic Screening</span><span class="case-chip">Case F · Specificity Ranking with Virtual PCR/Gel</span><span class="case-chip">Case AL · Degenerate Primer Strategy for a Variant Family</span><span class="case-chip">Case Q · Multiplex PCR Panel Balancing</span><span class="case-chip">Case AA · Positive and Negative Control Design</span></div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="assets/05_star_activity.svg" alt="Assay and Primer System Design" />
+              <p class="caption">Assay design is as much about avoiding false confidence as finding a candidate that “works.”</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster C</p>
-            <h2>Cluster C: Assay and Primer System Design</h2>
+            <h2 class="cluster-title">Cluster C: Assay and Primer System Design</h2>
             <p class="muted">How to design measurements that say something trustworthy about biology.</p>
             <div class="case-strip"><span class="case-chip">Case E · Primer Design and Thermodynamic Screening</span><span class="case-chip">Case F · Specificity Ranking with Virtual PCR/Gel</span><span class="case-chip">Case AL · Degenerate Primer Strategy for a Variant Family</span><span class="case-chip">Case Q · Multiplex PCR Panel Balancing</span><span class="case-chip">Case AA · Positive and Negative Control Design</span></div>
           </div>
@@ -993,7 +1252,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case E · Cluster C</p>
-            <h3>Case E: Primer Design and Thermodynamic Screening</h3>
+            <h3 class="case-title">Case E: Primer Design and Thermodynamic Screening</h3>
             <p class="lead">Can you design a primer pair that frames a clinically interesting genomic region without walking into obvious thermodynamic problems?</p>
           </div>
           <div class="case-meta">
@@ -1038,7 +1297,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case F · Cluster C</p>
-            <h3>Case F: Specificity Ranking with Virtual PCR/Gel</h3>
+            <h3 class="case-title">Case F: Specificity Ranking with Virtual PCR/Gel</h3>
             <p class="lead">Which candidate primer pair is safest once you consider near-matches in the rest of the sequences that live on your bench?</p>
           </div>
           <div class="case-meta">
@@ -1077,7 +1336,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AL · Cluster C</p>
-            <h3>Case AL: Degenerate Primer Strategy for a Variant Family</h3>
+            <h3 class="case-title">Case AL: Degenerate Primer Strategy for a Variant Family</h3>
             <p class="lead">How do you keep a PCR assay useful when the target family varies at one or two positions, or when your consensus still contains unresolved bases?</p>
           </div>
           <div class="case-meta">
@@ -1133,7 +1392,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case Q · Cluster C</p>
-            <h3>Case Q: Multiplex PCR Panel Balancing</h3>
+            <h3 class="case-title">Case Q: Multiplex PCR Panel Balancing</h3>
             <p class="lead">Can several assays be run together without one primer pair dominating or confusing the readout?</p>
           </div>
           <div class="case-meta">
@@ -1175,7 +1434,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AA · Cluster C</p>
-            <h3>Case AA: Positive and Negative Control Design</h3>
+            <h3 class="case-title">Case AA: Positive and Negative Control Design</h3>
             <p class="lead">How do you design controls that let you distinguish “assay failed” from “biology absent”?</p>
           </div>
           <div class="case-meta">
@@ -1211,10 +1470,25 @@
       </article>
       </section>
 <section class="section cluster" id="cluster-D">
+        <div class="chapter-opener print-only" aria-label="Cluster D opener">
+          <p class="section-kicker">Cluster D</p>
+          <h2 class="chapter-title">Cluster D: Assembly and Construct Validation</h2>
+          <p class="chapter-theme">How to move from fragments and overlaps to a believable finished construct.</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip"><span class="case-chip">Case G · Cloning Compatibility and Ligation Product Ranking</span><span class="case-chip">Case S · Circular Construct Integrity and Junction Validation</span><span class="case-chip">Case Z · Multi-Trace Consensus for Final Construct Call</span></div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="assets/06_ligation_products.svg" alt="Assembly and Construct Validation" />
+              <p class="caption">A plausible ligation or assembly plan should survive both sequence logic and biological interpretation.</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster D</p>
-            <h2>Cluster D: Assembly and Construct Validation</h2>
+            <h2 class="cluster-title">Cluster D: Assembly and Construct Validation</h2>
             <p class="muted">How to move from fragments and overlaps to a believable finished construct.</p>
             <div class="case-strip"><span class="case-chip">Case G · Cloning Compatibility and Ligation Product Ranking</span><span class="case-chip">Case S · Circular Construct Integrity and Junction Validation</span><span class="case-chip">Case Z · Multi-Trace Consensus for Final Construct Call</span></div>
           </div>
@@ -1227,7 +1501,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case G · Cluster D</p>
-            <h3>Case G: Cloning Compatibility and Ligation Product Ranking</h3>
+            <h3 class="case-title">Case G: Cloning Compatibility and Ligation Product Ranking</h3>
             <p class="lead">If you pair a standard cloning vector with a reporter insert, what products are most likely and which ones should worry you?</p>
           </div>
           <div class="case-meta">
@@ -1271,7 +1545,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case S · Cluster D</p>
-            <h3>Case S: Circular Construct Integrity and Junction Validation</h3>
+            <h3 class="case-title">Case S: Circular Construct Integrity and Junction Validation</h3>
             <p class="lead">After assembly, do the new junctions preserve the structure and reading logic you intended?</p>
           </div>
           <div class="case-meta">
@@ -1310,7 +1584,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case Z · Cluster D</p>
-            <h3>Case Z: Multi-Trace Consensus for Final Construct Call</h3>
+            <h3 class="case-title">Case Z: Multi-Trace Consensus for Final Construct Call</h3>
             <p class="lead">When several sequencing reads exist for the same construct, how do you combine them into one decision rather than trusting the loudest trace?</p>
           </div>
           <div class="case-meta">
@@ -1346,10 +1620,25 @@
       </article>
       </section>
 <section class="section cluster" id="cluster-E">
+        <div class="chapter-opener print-only" aria-label="Cluster E opener">
+          <p class="section-kicker">Cluster E</p>
+          <h2 class="chapter-title">Cluster E: Comparative and Population-Level Reasoning</h2>
+          <p class="chapter-theme">How to compare related molecules, hotspot variants, and engineered families without overclaiming.</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip"><span class="case-chip">Case H · MSA, Identity Heatmap, and Phylogeny</span><span class="case-chip">Case N · GC Landscape and Repeat Fragility</span><span class="case-chip">Case O · Homopolymer and Low-Complexity Risk Detection</span><span class="case-chip">Case X · Motif Enrichment and Significance Framing</span></div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="assets/03_msa_heatmap.svg" alt="Comparative and Population-Level Reasoning" />
+              <p class="caption">Heatmaps and alignments are only useful when you can explain what a difference means biologically.</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster E</p>
-            <h2>Cluster E: Comparative and Population-Level Reasoning</h2>
+            <h2 class="cluster-title">Cluster E: Comparative and Population-Level Reasoning</h2>
             <p class="muted">How to compare related molecules, hotspot variants, and engineered families without overclaiming.</p>
             <div class="case-strip"><span class="case-chip">Case H · MSA, Identity Heatmap, and Phylogeny</span><span class="case-chip">Case N · GC Landscape and Repeat Fragility</span><span class="case-chip">Case O · Homopolymer and Low-Complexity Risk Detection</span><span class="case-chip">Case X · Motif Enrichment and Significance Framing</span></div>
           </div>
@@ -1362,7 +1651,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case H · Cluster E</p>
-            <h3>Case H: MSA, Identity Heatmap, and Phylogeny</h3>
+            <h3 class="case-title">Case H: MSA, Identity Heatmap, and Phylogeny</h3>
             <p class="lead">How do related engineered proteins cluster, and what does that clustering tell you about reuse versus redesign?</p>
           </div>
           <div class="case-meta">
@@ -1407,7 +1696,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case N · Cluster E</p>
-            <h3>Case N: GC Landscape and Repeat Fragility</h3>
+            <h3 class="case-title">Case N: GC Landscape and Repeat Fragility</h3>
             <p class="lead">Where are the composition hotspots that make a seemingly simple sequence harder to amplify or synthesize?</p>
           </div>
           <div class="case-meta">
@@ -1445,7 +1734,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case O · Cluster E</p>
-            <h3>Case O: Homopolymer and Low-Complexity Risk Detection</h3>
+            <h3 class="case-title">Case O: Homopolymer and Low-Complexity Risk Detection</h3>
             <p class="lead">Do any parts of the sequence look too repetitive or too simple to trust without extra care?</p>
           </div>
           <div class="case-meta">
@@ -1483,7 +1772,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case X · Cluster E</p>
-            <h3>Case X: Motif Enrichment and Significance Framing</h3>
+            <h3 class="case-title">Case X: Motif Enrichment and Significance Framing</h3>
             <p class="lead">When does a motif count reflect biology, and when does it simply reflect that one sequence was engineered to be motif-dense?</p>
           </div>
           <div class="case-meta">
@@ -1520,10 +1809,25 @@
       </article>
       </section>
 <section class="section cluster" id="cluster-F">
+        <div class="chapter-opener print-only" aria-label="Cluster F opener">
+          <p class="section-kicker">Cluster F</p>
+          <h2 class="chapter-title">Cluster F: Editing and Design for Intervention</h2>
+          <p class="chapter-theme">How to turn sequence understanding into a purposeful intervention such as CRISPR, HDR, or expression tuning.</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip"><span class="case-chip">Case K · CRISPR Candidate and HDR Donor Design</span><span class="case-chip">Case R · Promoter/RBS Context for Expression Tuning</span><span class="case-chip">Case V · Codon Usage Bias and Host Portability</span></div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="assets/05_star_activity.svg" alt="Editing and Design for Intervention" />
+              <p class="caption">Intervention design is a tradeoff problem: on-target success, off-target risk, and biological context all compete.</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster F</p>
-            <h2>Cluster F: Editing and Design for Intervention</h2>
+            <h2 class="cluster-title">Cluster F: Editing and Design for Intervention</h2>
             <p class="muted">How to turn sequence understanding into a purposeful intervention such as CRISPR, HDR, or expression tuning.</p>
             <div class="case-strip"><span class="case-chip">Case K · CRISPR Candidate and HDR Donor Design</span><span class="case-chip">Case R · Promoter/RBS Context for Expression Tuning</span><span class="case-chip">Case V · Codon Usage Bias and Host Portability</span></div>
           </div>
@@ -1536,7 +1840,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case K · Cluster F</p>
-            <h3>Case K: CRISPR Candidate and HDR Donor Design</h3>
+            <h3 class="case-title">Case K: CRISPR Candidate and HDR Donor Design</h3>
             <p class="lead">Can you move from a disease-relevant genomic fragment to a plausible editing plan without pretending that design scores are guarantees?</p>
           </div>
           <div class="case-meta">
@@ -1578,7 +1882,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case R · Cluster F</p>
-            <h3>Case R: Promoter/RBS Context for Expression Tuning</h3>
+            <h3 class="case-title">Case R: Promoter/RBS Context for Expression Tuning</h3>
             <p class="lead">Why can two constructs with the same coding sequence express differently in cells or bacteria?</p>
           </div>
           <div class="case-meta">
@@ -1616,7 +1920,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case V · Cluster F</p>
-            <h3>Case V: Codon Usage Bias and Host Portability</h3>
+            <h3 class="case-title">Case V: Codon Usage Bias and Host Portability</h3>
             <p class="lead">If you move a gene between hosts, what sequence properties might become limiting even when the protein target stays the same?</p>
           </div>
           <div class="case-meta">
@@ -1655,10 +1959,25 @@
       </article>
       </section>
 <section class="section cluster" id="cluster-G">
+        <div class="chapter-opener print-only" aria-label="Cluster G opener">
+          <p class="section-kicker">Cluster G</p>
+          <h2 class="chapter-title">Cluster G: Data Fidelity and Interoperability</h2>
+          <p class="chapter-theme">How to move between file formats, trace evidence, reference libraries, and similarity search without losing confidence.</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip"><span class="case-chip">Case I · DNA Container Roundtrip Validation</span><span class="case-chip">Case J · AB1 Trace Alignment and Consensus Editing</span><span class="case-chip">Case Y · Read Simulation and Coverage Planning</span><span class="case-chip">Case AE · Sequence Analytics Lens (GC, Skew, Complexity, Stop Density)</span><span class="case-chip">Case AF · Comparison Lens (Divergence + Confidence Hotspots)</span><span class="case-chip">Case AG · Native .dna Import and Multi-Format Conversion Workflow</span><span class="case-chip">Case AH · Chromatogram-First Sanger Review and Confidence Gating</span><span class="case-chip">Case AI · Trace-Based Genotyping and Plasmid Verification</span><span class="case-chip">Case AJ · BLAST-like Similarity Search for Identity, Origin, and Contamination</span><span class="case-chip">Case AK · Reference Element Auto-Flagging and siRNA Design/Mapping</span><span class="case-chip">Case AM · Ambiguity-Aware Identity Search and Motif Rescue</span></div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="assets/04_history_graph.svg" alt="Data Fidelity and Interoperability" />
+              <p class="caption">A reproducible bioinformatics workflow preserves both molecule state and the evidence that justified it.</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster G</p>
-            <h2>Cluster G: Data Fidelity and Interoperability</h2>
+            <h2 class="cluster-title">Cluster G: Data Fidelity and Interoperability</h2>
             <p class="muted">How to move between file formats, trace evidence, reference libraries, and similarity search without losing confidence.</p>
             <div class="case-strip"><span class="case-chip">Case I · DNA Container Roundtrip Validation</span><span class="case-chip">Case J · AB1 Trace Alignment and Consensus Editing</span><span class="case-chip">Case Y · Read Simulation and Coverage Planning</span><span class="case-chip">Case AE · Sequence Analytics Lens (GC, Skew, Complexity, Stop Density)</span><span class="case-chip">Case AF · Comparison Lens (Divergence + Confidence Hotspots)</span><span class="case-chip">Case AG · Native .dna Import and Multi-Format Conversion Workflow</span><span class="case-chip">Case AH · Chromatogram-First Sanger Review and Confidence Gating</span><span class="case-chip">Case AI · Trace-Based Genotyping and Plasmid Verification</span><span class="case-chip">Case AJ · BLAST-like Similarity Search for Identity, Origin, and Contamination</span><span class="case-chip">Case AK · Reference Element Auto-Flagging and siRNA Design/Mapping</span><span class="case-chip">Case AM · Ambiguity-Aware Identity Search and Motif Rescue</span></div>
           </div>
@@ -1671,7 +1990,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case I · Cluster G</p>
-            <h3>Case I: DNA Container Roundtrip Validation</h3>
+            <h3 class="case-title">Case I: DNA Container Roundtrip Validation</h3>
             <p class="lead">Can you move records through a file format boundary without silently changing what the molecule means?</p>
           </div>
           <div class="case-meta">
@@ -1710,7 +2029,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case J · Cluster G</p>
-            <h3>Case J: AB1 Trace Alignment and Consensus Editing</h3>
+            <h3 class="case-title">Case J: AB1 Trace Alignment and Consensus Editing</h3>
             <p class="lead">How do raw sequencing traces become a confident construct call instead of just a noisy chromatogram picture?</p>
           </div>
           <div class="case-meta">
@@ -1749,7 +2068,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case Y · Cluster G</p>
-            <h3>Case Y: Read Simulation and Coverage Planning</h3>
+            <h3 class="case-title">Case Y: Read Simulation and Coverage Planning</h3>
             <p class="lead">How much evidence is enough before you should trust a genotype or construct-verification conclusion?</p>
           </div>
           <div class="case-meta">
@@ -1793,7 +2112,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AE · Cluster G</p>
-            <h3>Case AE: Sequence Analytics Lens (GC, Skew, Complexity, Stop Density)</h3>
+            <h3 class="case-title">Case AE: Sequence Analytics Lens (GC, Skew, Complexity, Stop Density)</h3>
             <p class="lead">What do multi-track analytics reveal that plain FASTA text hides?</p>
           </div>
           <div class="case-meta">
@@ -1836,7 +2155,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AF · Cluster G</p>
-            <h3>Case AF: Comparison Lens (Divergence + Confidence Hotspots)</h3>
+            <h3 class="case-title">Case AF: Comparison Lens (Divergence + Confidence Hotspots)</h3>
             <p class="lead">How do you present a tiny but biologically meaningful difference in a way that a reviewer can understand at a glance?</p>
           </div>
           <div class="case-meta">
@@ -1877,7 +2196,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AG · Cluster G</p>
-            <h3>Case AG: Native .dna Import and Multi-Format Conversion Workflow</h3>
+            <h3 class="case-title">Case AG: Native .dna Import and Multi-Format Conversion Workflow</h3>
             <p class="lead">Can one molecule remain understandable when it is exported into several popular sequence formats?</p>
           </div>
           <div class="case-meta">
@@ -1921,7 +2240,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AH · Cluster G</p>
-            <h3>Case AH: Chromatogram-First Sanger Review and Confidence Gating</h3>
+            <h3 class="case-title">Case AH: Chromatogram-First Sanger Review and Confidence Gating</h3>
             <p class="lead">What does it look like when you review the measurement first and the called letters second?</p>
           </div>
           <div class="case-meta">
@@ -1962,7 +2281,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AI · Cluster G</p>
-            <h3>Case AI: Trace-Based Genotyping and Plasmid Verification</h3>
+            <h3 class="case-title">Case AI: Trace-Based Genotyping and Plasmid Verification</h3>
             <p class="lead">How do you turn trace evidence into a yes/no biological decision without pretending the trace is infallible?</p>
           </div>
           <div class="case-meta">
@@ -2003,7 +2322,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AJ · Cluster G</p>
-            <h3>Case AJ: BLAST-like Similarity Search for Identity, Origin, and Contamination</h3>
+            <h3 class="case-title">Case AJ: BLAST-like Similarity Search for Identity, Origin, and Contamination</h3>
             <p class="lead">If someone hands you a mystery sequence, which known molecule in your local panel does it most resemble?</p>
           </div>
           <div class="case-meta">
@@ -2045,7 +2364,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AK · Cluster G</p>
-            <h3>Case AK: Reference Element Auto-Flagging and siRNA Design/Mapping</h3>
+            <h3 class="case-title">Case AK: Reference Element Auto-Flagging and siRNA Design/Mapping</h3>
             <p class="lead">How do reusable sequence libraries turn repeated manual annotation into a faster and more consistent design workflow?</p>
           </div>
           <div class="case-meta">
@@ -2086,7 +2405,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AM · Cluster G</p>
-            <h3>Case AM: Ambiguity-Aware Identity Search and Motif Rescue</h3>
+            <h3 class="case-title">Case AM: Ambiguity-Aware Identity Search and Motif Rescue</h3>
             <p class="lead">If a sequence contains unresolved positions, can you still recover its likely identity and use it responsibly instead of discarding it as “bad data”?</p>
           </div>
           <div class="case-meta">
@@ -2129,10 +2448,25 @@
       </article>
       </section>
 <section class="section cluster" id="cluster-H">
+        <div class="chapter-opener print-only" aria-label="Cluster H opener">
+          <p class="section-kicker">Cluster H</p>
+          <h2 class="chapter-title">Cluster H: Reproducibility, Governance, and Delivery</h2>
+          <p class="chapter-theme">How to turn one-off sequence work into something another scientist can review, rerun, and trust.</p>
+          <div class="chapter-opener-grid">
+            <div class="chapter-summary">
+              <h3>Included Lessons</h3>
+              <div class="chapter-case-strip"><span class="case-chip">Case L · Collaboration, Audit, and Review Governance</span><span class="case-chip">Case T · Batch Reproducibility and Parameter Locking</span><span class="case-chip">Case AB · Reproducible Report Package</span><span class="case-chip">Case AC · Parameter Sensitivity and Robustness Check</span><span class="case-chip">Case AD · End-to-End Release Checklist and Handoff</span></div>
+            </div>
+            <div class="chapter-figure figure narrow">
+              <img src="assets/04_history_graph.svg" alt="Reproducibility, Governance, and Delivery" />
+              <p class="caption">Good sequence work is a product, not just a result: it needs history, review, packaging, and handoff.</p>
+            </div>
+          </div>
+        </div>
         <div class="cluster-head">
           <div>
             <p class="eyebrow">Cluster H</p>
-            <h2>Cluster H: Reproducibility, Governance, and Delivery</h2>
+            <h2 class="cluster-title">Cluster H: Reproducibility, Governance, and Delivery</h2>
             <p class="muted">How to turn one-off sequence work into something another scientist can review, rerun, and trust.</p>
             <div class="case-strip"><span class="case-chip">Case L · Collaboration, Audit, and Review Governance</span><span class="case-chip">Case T · Batch Reproducibility and Parameter Locking</span><span class="case-chip">Case AB · Reproducible Report Package</span><span class="case-chip">Case AC · Parameter Sensitivity and Robustness Check</span><span class="case-chip">Case AD · End-to-End Release Checklist and Handoff</span></div>
           </div>
@@ -2145,7 +2479,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case L · Cluster H</p>
-            <h3>Case L: Collaboration, Audit, and Review Governance</h3>
+            <h3 class="case-title">Case L: Collaboration, Audit, and Review Governance</h3>
             <p class="lead">How do you make sequence work reviewable by another person instead of leaving it as personal screen state?</p>
           </div>
           <div class="case-meta">
@@ -2187,7 +2521,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case T · Cluster H</p>
-            <h3>Case T: Batch Reproducibility and Parameter Locking</h3>
+            <h3 class="case-title">Case T: Batch Reproducibility and Parameter Locking</h3>
             <p class="lead">How do you make sure that differences between records reflect biology instead of accidental parameter drift?</p>
           </div>
           <div class="case-meta">
@@ -2225,7 +2559,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AB · Cluster H</p>
-            <h3>Case AB: Reproducible Report Package</h3>
+            <h3 class="case-title">Case AB: Reproducible Report Package</h3>
             <p class="lead">What does a handoff artifact look like when you want another person to inspect the same biological object, not just hear about it?</p>
           </div>
           <div class="case-meta">
@@ -2267,7 +2601,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AC · Cluster H</p>
-            <h3>Case AC: Parameter Sensitivity and Robustness Check</h3>
+            <h3 class="case-title">Case AC: Parameter Sensitivity and Robustness Check</h3>
             <p class="lead">Would you reach the same biological conclusion if a reasonable analyst chose slightly different parameters?</p>
           </div>
           <div class="case-meta">
@@ -2307,7 +2641,7 @@
         <div class="case-head">
           <div>
             <p class="eyebrow">Case AD · Cluster H</p>
-            <h3>Case AD: End-to-End Release Checklist and Handoff</h3>
+            <h3 class="case-title">Case AD: End-to-End Release Checklist and Handoff</h3>
             <p class="lead">If you had to stop work today and let another person continue tomorrow, what would they need?</p>
           </div>
           <div class="case-meta">
