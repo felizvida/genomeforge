@@ -3,6 +3,8 @@ from __future__ import annotations
 import uuid
 from typing import Any, Dict, Tuple
 
+from genomeforge_toolkit import DNA_ALPHABET
+
 
 def _u16be(raw: bytes) -> list[int]:
     if len(raw) % 2:
@@ -74,7 +76,7 @@ def parse_ab1_bytes(data: bytes) -> Dict[str, Any]:
     base_order = "".join(ch for ch in base_order if ch in "ACGT")[:4] or "GATC"
 
     seq = _entry_payload(data, pbas).decode("ascii", errors="ignore").strip("\x00").upper()
-    seq = "".join(ch for ch in seq if ch in "ACGTN")
+    seq = "".join(ch for ch in seq if ch in DNA_ALPHABET)
     qualities = [30] * len(seq)
     if pcon:
         q = list(_entry_payload(data, pcon))
@@ -106,13 +108,35 @@ def parse_ab1_bytes(data: bytes) -> Dict[str, Any]:
 
 
 def synthetic_trace_from_sequence(sequence: str) -> Dict[str, Any]:
-    seq = "".join(ch for ch in str(sequence).upper() if ch in "ACGTN")
+    seq = "".join(ch for ch in str(sequence).upper() if ch in DNA_ALPHABET)
     if not seq:
-        raise ValueError("synthetic trace requires non-empty A/C/G/T/N sequence")
+        raise ValueError("synthetic trace requires non-empty IUPAC DNA sequence")
     traces = {"A": [], "C": [], "G": [], "T": []}
+    ambiguity_map = {
+        "A": {"A"},
+        "C": {"C"},
+        "G": {"G"},
+        "T": {"T"},
+        "R": {"A", "G"},
+        "Y": {"C", "T"},
+        "S": {"G", "C"},
+        "W": {"A", "T"},
+        "K": {"G", "T"},
+        "M": {"A", "C"},
+        "B": {"C", "G", "T"},
+        "D": {"A", "G", "T"},
+        "H": {"A", "C", "T"},
+        "V": {"A", "C", "G"},
+        "N": {"A", "C", "G", "T"},
+    }
     for i, b in enumerate(seq):
+        supported = ambiguity_map.get(b, {"A", "C", "G", "T"})
         for base in "ACGT":
-            traces[base].append(1200 if base == b else (120 + ((i * 19) % 80)))
+            if base in supported:
+                amp = 950 if len(supported) == 1 else max(350, int(900 / len(supported)))
+            else:
+                amp = 120 + ((i * 19) % 80)
+            traces[base].append(amp)
     return {
         "trace_id": "trace_" + uuid.uuid4().hex[:12],
         "source": "synthetic",
@@ -123,4 +147,3 @@ def synthetic_trace_from_sequence(sequence: str) -> Dict[str, Any]:
         "traces": traces,
         "length": len(seq),
     }
-

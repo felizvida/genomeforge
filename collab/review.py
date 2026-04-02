@@ -24,6 +24,13 @@ def review_path(root: Path, review_id: str) -> Path:
     return d / f"{_safe_name(review_id, 'review_id')}.json"
 
 
+def load_review(root: Path, review_id: str) -> Dict[str, Any]:
+    p = review_path(root, review_id)
+    if not p.exists():
+        raise ValueError("Review not found")
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
 def submit_review(
     root: Path,
     project_name: str,
@@ -54,9 +61,7 @@ def submit_review(
 
 def approve_review(root: Path, review_id: str, reviewer: str, note: str = "") -> Dict[str, Any]:
     p = review_path(root, review_id)
-    if not p.exists():
-        raise ValueError("Review not found")
-    doc = json.loads(p.read_text(encoding="utf-8"))
+    doc = load_review(root, review_id)
     if str(doc.get("status", "")) == "approved":
         return {"approved": True, "review": doc, "already_approved": True}
     doc["status"] = "approved"
@@ -66,4 +71,3 @@ def approve_review(root: Path, review_id: str, reviewer: str, note: str = "") ->
     doc["updated_at"] = _now()
     p.write_text(json.dumps(doc, indent=2), encoding="utf-8")
     return {"approved": True, "review": doc}
-

@@ -6,21 +6,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
-from genomeforge_toolkit import Feature, SequenceRecord, find_all_occurrences
+from genomeforge_toolkit import DNA_ALPHABET, Feature, RC_TABLE, SequenceRecord, find_all_occurrences
 
 
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCE_DB_DIR = ROOT / "reference_db"
-RC = str.maketrans("ACGTN", "TGCAN")
 RecordGetter = Callable[[], SequenceRecord]
 
 
 def _clean_dna_string(seq: str) -> str:
-    return "".join(ch for ch in str(seq).upper() if ch in "ACGTN")
+    return "".join(ch for ch in str(seq).upper() if ch in DNA_ALPHABET)
 
 
 def _revcomp(seq: str) -> str:
-    return _clean_dna_string(seq).translate(RC)[::-1]
+    return _clean_dna_string(seq).translate(RC_TABLE)[::-1]
 
 
 def _hamming_equal_len(a: str, b: str) -> int:

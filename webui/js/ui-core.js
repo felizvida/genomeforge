@@ -12,7 +12,14 @@
     let featureState = [];
     let lastMSAAlignment = [];
     let lastLigationResult = null;
-    const minimapState = { dragging: false, dragOffsetBp: 0, mode: '', spanBp: 0 };
+    const minimapState = {
+      dragging: false,
+      dragOffsetBp: 0,
+      mode: '',
+      spanBp: 0,
+      context: null,
+      listenersInstalled: false,
+    };
     /** @type {Record<string, PanelViewport>} */
     const panelState = {};
     let selectedFeatureIndex = null;
@@ -167,7 +174,7 @@
     }
 
     function plainSeq(text) {
-      return String(text || '').toUpperCase().replace(/[^ACGTN]/g, '');
+      return String(text || '').toUpperCase().replace(/[^ACGTRYSWKMBDHVN]/g, '');
     }
 
     function setContentValue(v) {
@@ -265,10 +272,46 @@
       return [a, b];
     }
 
+    function resetMinimapDrag() {
+      minimapState.dragging = false;
+      minimapState.mode = '';
+      minimapState.dragOffsetBp = 0;
+      minimapState.spanBp = 0;
+    }
+
+    function installMinimapDragListeners() {
+      if (minimapState.listenersInstalled) return;
+      window.addEventListener('mousemove', (ev) => {
+        if (!minimapState.dragging || !minimapState.context) return;
+        const { toBp } = minimapState.context;
+        const [curS, curE] = trackWindow();
+        if (minimapState.mode === 'drag') {
+          const span = Math.max(2, minimapState.spanBp || (curE - curS + 1));
+          const leftBp = toBp(ev.clientX) - minimapState.dragOffsetBp;
+          setTrackWindow(leftBp, leftBp + span - 1);
+        } else if (minimapState.mode === 'resize_left') {
+          setTrackWindow(toBp(ev.clientX), curE);
+        } else if (minimapState.mode === 'resize_right') {
+          setTrackWindow(curS, toBp(ev.clientX));
+        }
+      });
+      window.addEventListener('mouseup', () => {
+        if (!minimapState.dragging) return;
+        resetMinimapDrag();
+      });
+      window.addEventListener('blur', () => {
+        if (!minimapState.dragging) return;
+        resetMinimapDrag();
+      });
+      minimapState.listenersInstalled = true;
+    }
+
     function renderTrackMiniMap() {
       const host = document.getElementById('trackMiniMap');
       const len = currentSeqLength();
       if (len <= 0) {
+        minimapState.context = null;
+        resetMinimapDrag();
         host.textContent = 'Track minimap appears after sequence info loads.';
         return;
       }
@@ -317,6 +360,8 @@
         const frac = Math.max(0, Math.min(1, (px - x0) / trackW));
         return 1 + Math.round(frac * (len - 1));
       };
+      minimapState.context = { toBp };
+      installMinimapDragListeners();
 
       brush.onmousedown = (ev) => {
         ev.preventDefault();
@@ -349,26 +394,4 @@
         const span = Math.max(2, e - s + 1);
         setTrackWindow(bp - Math.floor(span / 2), bp + Math.ceil(span / 2));
       };
-
-      window.onmousemove = (ev) => {
-        if (!minimapState.dragging) return;
-        const [curS, curE] = trackWindow();
-        if (minimapState.mode === 'drag') {
-          const span = Math.max(2, minimapState.spanBp || (curE - curS + 1));
-          const leftBp = toBp(ev.clientX) - minimapState.dragOffsetBp;
-          setTrackWindow(leftBp, leftBp + span - 1);
-        } else if (minimapState.mode === 'resize_left') {
-          const bp = toBp(ev.clientX);
-          setTrackWindow(bp, curE);
-        } else if (minimapState.mode === 'resize_right') {
-          const bp = toBp(ev.clientX);
-          setTrackWindow(curS, bp);
-        }
-      };
-      window.onmouseup = () => {
-        if (!minimapState.dragging) return;
-        minimapState.dragging = false;
-        minimapState.mode = '';
-      };
     }
-

@@ -7,9 +7,11 @@ from genomeforge_toolkit import (
     design_primer_pair,
     optimize_coding_sequence,
     parse_feature_interval,
+    parse_genbank,
     sanitize_sequence,
     simulate_digest,
 )
+from compat.ab1_format import synthetic_trace_from_sequence
 
 
 EGFP_SEGMENT = (
@@ -22,6 +24,27 @@ EGFP_SEGMENT = (
 class CoreAlgorithmTests(unittest.TestCase):
     def test_sanitize_sequence_normalizes_whitespace_and_case(self) -> None:
         self.assertEqual(sanitize_sequence(" atg c\nTt "), "ATGCTT")
+
+    def test_sanitize_sequence_accepts_iupac_ambiguity_codes(self) -> None:
+        self.assertEqual(sanitize_sequence(" aryswkmbdhvn "), "ARYSWKMBDHVN")
+
+    def test_reverse_complement_preserves_iupac_ambiguity_codes(self) -> None:
+        record = SequenceRecord(name="iupac", sequence="ARYSWKMBDHVN", topology="linear")
+        self.assertEqual(record.reverse_complement().sequence, "NBDHVKMWSRYT")
+
+    def test_parse_genbank_preserves_iupac_origin_symbols(self) -> None:
+        record = parse_genbank(
+            "LOCUS       IUPACSEQ                 12 bp    DNA     linear\n"
+            "ORIGIN\n"
+            "        1 atgryswkmbdh\n"
+            "//\n"
+        )
+        self.assertEqual(record.sequence, "ATGRYSWKMBDH")
+
+    def test_synthetic_trace_accepts_iupac_sequence(self) -> None:
+        trace = synthetic_trace_from_sequence("ATGRYSWKMBDHVN")
+        self.assertEqual(trace["sequence"], "ATGRYSWKMBDHVN")
+        self.assertEqual(trace["length"], 14)
 
     def test_parse_feature_interval_handles_reverse_order(self) -> None:
         self.assertEqual(parse_feature_interval("complement(80..12)"), (12, 80))

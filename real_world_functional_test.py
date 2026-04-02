@@ -697,10 +697,19 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         "Assign reviewer role for project",
         lambda: r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"reviewer_user": "reviewer"}}),
     )
+
+    def _permissions_round_trip() -> dict[str, Any]:
+        r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"owner_user": "owner"}})
+        permissions = r.post("/api/project-permissions", {"project_name": r.created["project"]})
+        roles = permissions.get("roles", {})
+        assert_condition(roles.get("reviewer_user") == "reviewer", "reviewer role was not preserved")
+        assert_condition(roles.get("owner_user") == "owner", "owner role was not added")
+        return permissions
+
     r.check(
         "project_permissions_get",
         "Read project permission map",
-        lambda: r.post("/api/project-permissions", {"project_name": r.created["project"]}),
+        _permissions_round_trip,
     )
     r.check(
         "project_audit_log",
@@ -723,7 +732,7 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         rid = sub["review"]["review_id"]
         app = r.post(
             "/api/review-approve",
-            {"review_id": rid, "project_name": r.created["project"], "reviewer": "reviewer_user", "note": "looks good"},
+            {"review_id": rid, "reviewer": "reviewer_user", "note": "looks good"},
         )
         return {"review_id": rid, "status": app["review"]["status"]}
 

@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, List
 
 from bio.project_diff import diff_projects
 from canonical_schema import infer_source_format, record_to_canonical
-from collab.review import approve_review, submit_review
+from collab.review import approve_review, load_review, submit_review
 from collab.store import (
     append_audit_event,
     get_audit_log,
@@ -463,7 +463,12 @@ def handle_project_endpoint(path: str, payload: Dict[str, Any], get_record: Reco
         reviewer = str(payload.get("reviewer", "")).strip()
         if not review_id or not reviewer:
             raise ValueError("review_id and reviewer are required")
-        project_name = str(payload.get("project_name", "")).strip()
+        review_doc = load_review(COLLAB_ROOT, review_id)
+        actual_project_name = str(review_doc.get("project_name", "")).strip()
+        payload_project_name = str(payload.get("project_name", "")).strip()
+        if payload_project_name and actual_project_name and payload_project_name != actual_project_name:
+            raise ValueError("project_name does not match review project")
+        project_name = payload_project_name or actual_project_name
         if project_name:
             role = role_for_user(COLLAB_ROOT, project_name, reviewer)
             if role not in {"reviewer", "owner"}:

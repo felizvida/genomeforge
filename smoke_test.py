@@ -81,6 +81,23 @@ def assert_condition(condition: bool, message: str) -> None:
         raise AssertionError(message)
 
 
+def intruder_review_approval_is_blocked(runner: SmokeRunner, project_name: str) -> bool:
+    review = runner.post(
+        "/api/review-submit",
+        {"project_name": project_name, "submitter": "editor_user", "summary": "intruder should fail"},
+    )[1]
+    review_id = review["review"]["review_id"]
+    try:
+        runner.post(
+            "/api/review-approve",
+            {"review_id": review_id, "reviewer": "intruder_user", "note": "should fail"},
+        )
+    except urllib.error.HTTPError as exc:
+        body = json.loads(exc.read().decode("utf-8"))
+        return exc.code == 400 and "lacks permission" in str(body.get("error", ""))
+    raise AssertionError("Expected unauthorized review approval to fail")
+
+
 def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r = SmokeRunner(base_url=base_url, verbose=verbose)
     suffix = uuid.uuid4().hex[:8]
@@ -524,9 +541,16 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
         lambda: r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"reviewer_user": "reviewer"}})[1].get("saved")
         is True,
     )
+
+    def _permissions_are_merged() -> None:
+        r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"owner_user": "owner"}})
+        roles = r.post("/api/project-permissions", {"project_name": r.created["project"]})[1].get("roles", {})
+        assert_condition(roles.get("reviewer_user") == "reviewer", "reviewer role was not preserved")
+        assert_condition(roles.get("owner_user") == "owner", "owner role was not added")
+
     r.check(
         "api_project_permissions_get",
-        lambda: "roles" in r.post("/api/project-permissions", {"project_name": r.created["project"]})[1],
+        _permissions_are_merged,
     )
     r.check(
         "api_project_audit_log",
@@ -551,11 +575,16 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     )
     r.check(
         "api_review_approve",
-        lambda: r.post(
-            "/api/review-approve",
-            {"review_id": r.ctx.get("review_id"), "project_name": r.created["project"], "reviewer": "reviewer_user", "note": "approved"},
-        )[1].get("approved")
-        is True,
+        lambda: (
+            lambda approved: (
+                approved.get("approved") is True and intruder_review_approval_is_blocked(r, r.created["project"])
+            )
+        )(
+            r.post(
+                "/api/review-approve",
+                {"review_id": r.ctx.get("review_id"), "reviewer": "reviewer_user", "note": "approved"},
+            )[1]
+        ),
     )
     r.check(
         "api_collection_save",

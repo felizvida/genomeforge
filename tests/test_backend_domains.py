@@ -5,6 +5,7 @@ import uuid
 import unittest
 from pathlib import Path
 
+import backend.project_api as project_api_module
 from backend.analysis_api import handle_analysis_endpoint
 from backend.assembly_api import handle_assembly_endpoint
 from backend.biology_api import annotation_db_path, enzyme_set_path, handle_biology_endpoint
@@ -23,6 +24,8 @@ from backend.project_api import (
 )
 from backend.search_reference_api import blast_local_search, design_sirna_candidates
 from backend.trace_api import handle_trace_endpoint
+from collab.review import submit_review
+from collab.store import get_project_permissions, set_project_permissions
 from genomeforge_toolkit import SequenceRecord
 
 
@@ -376,6 +379,57 @@ class BackendDomainTests(unittest.TestCase):
                 delete_project(project_name)
             except Exception:
                 pass
+
+    def test_project_permissions_merge_incoming_roles(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            first = set_project_permissions(root, "merge_project", {"alice": "owner"})
+            self.assertTrue(first["saved"])
+            second = set_project_permissions(root, "merge_project", {"bob": "reviewer"})
+            self.assertTrue(second["saved"])
+            roles = get_project_permissions(root, "merge_project")["roles"]
+            self.assertEqual(roles["alice"], "owner")
+            self.assertEqual(roles["bob"], "reviewer")
+
+    def test_review_approve_uses_review_project_for_permissions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            temp_root = Path(tmpdir)
+            old_collab_root = project_api_module.COLLAB_ROOT
+            project_api_module.COLLAB_ROOT = temp_root
+            try:
+                set_project_permissions(temp_root, "review_project", {"reviewer_user": "reviewer"})
+                review = submit_review(temp_root, "review_project", "editor_user", "ready")
+                rid = review["review"]["review_id"]
+
+                approved = handle_project_endpoint(
+                    "/api/review-approve",
+                    {"review_id": rid, "reviewer": "reviewer_user", "note": "approved without payload project"},
+                    lambda: SequenceRecord(name="unused", sequence="ATGC"),
+                )
+                assert approved is not None
+                self.assertTrue(approved["approved"])
+                self.assertEqual(approved["review"]["approved_by"], "reviewer_user")
+            finally:
+                project_api_module.COLLAB_ROOT = old_collab_root
+
+    def test_review_approve_without_permission_is_blocked_even_without_project_name(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            temp_root = Path(tmpdir)
+            old_collab_root = project_api_module.COLLAB_ROOT
+            project_api_module.COLLAB_ROOT = temp_root
+            try:
+                set_project_permissions(temp_root, "review_project", {"other_user": "reviewer"})
+                review = submit_review(temp_root, "review_project", "editor_user", "ready")
+                rid = review["review"]["review_id"]
+
+                with self.assertRaisesRegex(ValueError, "reviewer lacks permission"):
+                    handle_project_endpoint(
+                        "/api/review-approve",
+                        {"review_id": rid, "reviewer": "intruder_user", "note": "should fail"},
+                        lambda: SequenceRecord(name="unused", sequence="ATGC"),
+                    )
+            finally:
+                project_api_module.COLLAB_ROOT = old_collab_root
 
 
 if __name__ == "__main__":

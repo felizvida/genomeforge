@@ -64,7 +64,14 @@ def get_project_permissions(root: Path, project_name: str) -> Dict[str, Any]:
 
 
 def set_project_permissions(root: Path, project_name: str, roles: Dict[str, str]) -> Dict[str, Any]:
+    current = get_project_permissions(root, project_name).get("roles", {})
     clean: Dict[str, str] = {}
+    if isinstance(current, dict):
+        for user, role in current.items():
+            u = str(user).strip()
+            r = str(role).strip().lower()
+            if u and r in {"viewer", "editor", "reviewer", "owner"}:
+                clean[u] = r
     for user, role in dict(roles or {}).items():
         u = str(user).strip()
         r = str(role).strip().lower()
@@ -129,4 +136,3 @@ def get_audit_log(root: Path, project_name: str, limit: int = 200) -> Dict[str, 
     lim = max(1, min(2000, int(limit)))
     tail = events[-lim:]
     return {"project_name": doc.get("project_name", project_name), "count": len(tail), "events": tail}
-

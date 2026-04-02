@@ -26,6 +26,26 @@ test('renders edited map and sequence track', async ({ page }) => {
   await expect(page.locator('#seqTrack svg')).toBeVisible();
 });
 
+test('track minimap rerender does not overwrite global mouse handlers', async ({ page }) => {
+  await page.evaluate(() => {
+    window.__minimapMoveSentinel = function minimapMoveSentinel() {};
+    window.__minimapUpSentinel = function minimapUpSentinel() {};
+    window.onmousemove = window.__minimapMoveSentinel;
+    window.onmouseup = window.__minimapUpSentinel;
+  });
+
+  await page.locator('#trackStart').fill('10');
+  await page.locator('#trackEnd').fill('80');
+
+  const preserved = await page.evaluate(() => ({
+    move: window.onmousemove === window.__minimapMoveSentinel,
+    up: window.onmouseup === window.__minimapUpSentinel,
+  }));
+
+  expect(preserved.move).toBe(true);
+  expect(preserved.up).toBe(true);
+});
+
 test('runs trace import, chromatogram, and BLAST-like search', async ({ page }) => {
   await activateTab(page, 'tab-trace');
   await page.locator('#tab-trace [data-action="runImportAb1"]').click();

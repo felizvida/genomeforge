@@ -23,7 +23,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
-DNA_ALPHABET = set("ACGTN")
+IUPAC_DNA_CODES = "ACGTRYSWKMBDHVN"
+DNA_ALPHABET = set(IUPAC_DNA_CODES)
 
 CODON_TABLE = {
     "TTT": "F", "TTC": "F", "TTA": "L", "TTG": "L",
@@ -89,7 +90,27 @@ FEATURE_COLORS = {
     "default": "#64748b",
 }
 
-RC_TABLE = str.maketrans("ACGTNacgtn", "TGCANtgcan")
+IUPAC_DNA_COMPLEMENTS = {
+    "A": "T",
+    "C": "G",
+    "G": "C",
+    "T": "A",
+    "R": "Y",
+    "Y": "R",
+    "S": "S",
+    "W": "W",
+    "K": "M",
+    "M": "K",
+    "B": "V",
+    "D": "H",
+    "H": "D",
+    "V": "B",
+    "N": "N",
+}
+RC_TABLE = str.maketrans(
+    "".join(IUPAC_DNA_COMPLEMENTS.keys()) + "".join(base.lower() for base in IUPAC_DNA_COMPLEMENTS),
+    "".join(IUPAC_DNA_COMPLEMENTS.values()) + "".join(base.lower() for base in IUPAC_DNA_COMPLEMENTS.values()),
+)
 
 # SantaLucia-style nearest-neighbor parameters for DNA duplex formation.
 # Values: deltaH (kcal/mol), deltaS (cal/mol*K)
@@ -601,7 +622,7 @@ def parse_genbank(text: str) -> SequenceRecord:
         elif line.startswith("//"):
             break
         elif in_origin:
-            chunk = re.sub(r"[^acgtnACGTN]", "", line)
+            chunk = re.sub(r"[^acgtryswkmbdhvnACGTRYSWKMBDHVN]", "", line)
             if chunk:
                 seq_lines.append(chunk)
         elif in_features:

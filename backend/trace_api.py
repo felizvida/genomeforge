@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 
 from bio.trace_tools import align_trace_to_reference, edit_trace_base, trace_consensus, trace_summary
 from compat.ab1_format import parse_ab1_bytes, synthetic_trace_from_sequence
+from genomeforge_toolkit import DNA_ALPHABET
 
 
 TRACE_CACHE: Dict[str, Dict[str, Any]] = {}
@@ -23,7 +24,7 @@ def _decode_b64_field(value: str, label: str) -> bytes:
 
 
 def _clean_dna_string(seq: str) -> str:
-    return "".join(ch for ch in str(seq).upper() if ch in "ACGTN")
+    return "".join(ch for ch in str(seq).upper() if ch in DNA_ALPHABET)
 
 
 def _cache_trace(trace_record: Dict[str, Any]) -> Dict[str, Any]:
