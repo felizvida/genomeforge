@@ -42,14 +42,21 @@ For the full capability and maturity matrix, see [FEATURE_COVERAGE.md](FEATURE_C
   <tr>
     <td><img alt="Map workflow" src="docs/tutorial/assets/screenshots/flagship_case_a_map.png"></td>
     <td><img alt="Sequence track workflow" src="docs/tutorial/assets/screenshots/flagship_case_d_track.png"></td>
+    <td><img alt="MSA heatmap workflow" src="docs/tutorial/assets/screenshots/flagship_case_h_heatmap.png"></td>
   </tr>
   <tr>
     <td><img alt="Ligation workflow" src="docs/tutorial/assets/screenshots/flagship_case_g_ligation.png"></td>
     <td><img alt="Trace workflow" src="docs/tutorial/assets/screenshots/flagship_case_ah_trace.png"></td>
+    <td><img alt="BLAST-like search workflow" src="docs/tutorial/assets/screenshots/flagship_case_aj_blast.png"></td>
+  </tr>
+  <tr>
+    <td><img alt="Comparison workflow" src="docs/tutorial/assets/screenshots/flagship_case_af_compare.png"></td>
+    <td><img alt="Degenerate primer workflow" src="docs/tutorial/assets/screenshots/flagship_case_al_degenerate_primers.png"></td>
+    <td><img alt="Project history workflow" src="docs/tutorial/assets/screenshots/flagship_case_ab_history.png"></td>
   </tr>
 </table>
 
-More UI examples are embedded in the training tutorial, including comparison, MSA heatmap, BLAST-like search, and project-history workflows.
+The tutorial front matter now reads more like a course reader and includes a broader screenshot atlas, dataset guidance, biological framing, and ambiguity-aware examples built around real records rather than toy strings.
 
 ## Learn With Real Data
 

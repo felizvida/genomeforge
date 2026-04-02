@@ -126,6 +126,40 @@
       background: rgba(255,255,255,0.65);
       border: 1px solid #d8cdb8;
     }
+    .cover-spread {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .cover-shot {
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(247,240,226,0.98));
+      border: 1px solid #d8cdb8;
+      box-shadow: 0 12px 30px rgba(25, 37, 47, 0.08);
+    }
+    .cover-shot img {
+      width: 100%;
+      display: block;
+      aspect-ratio: 1.22 / 1;
+      object-fit: cover;
+      background: #edf4f7;
+    }
+    .cover-shot-text {
+      padding: 10px 12px 12px;
+      display: grid;
+      gap: 4px;
+      font-size: 10.6px;
+      color: var(--muted);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }
+    .cover-shot-text b {
+      color: var(--navy);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
     .section {
       background: var(--paper);
       border: 1px solid var(--line);
@@ -272,6 +306,31 @@
           <p>Each lesson is designed so the numbers point to a real scientific story rather than a generic demo, and the newer ambiguity-aware methods are taught directly instead of being buried as silent implementation details.</p>
         </div>
       </div>
+      <div class="cover-spread"><div class="cover-shot">
+  <img src="assets/screenshots/flagship_case_a_map.png" alt="Restriction-map workflow in the live UI" />
+  <div class="cover-shot-text">
+    <b>Case A</b>
+    <span>Restriction-map workflow in the live UI</span>
+  </div>
+</div><div class="cover-shot">
+  <img src="assets/screenshots/flagship_case_ah_trace.png" alt="Chromatogram-first review workflow" />
+  <div class="cover-shot-text">
+    <b>Case AH</b>
+    <span>Chromatogram-first review workflow</span>
+  </div>
+</div><div class="cover-shot">
+  <img src="assets/screenshots/flagship_case_aj_blast.png" alt="BLAST-like identity search workflow" />
+  <div class="cover-shot-text">
+    <b>Case AJ</b>
+    <span>BLAST-like identity search workflow</span>
+  </div>
+</div><div class="cover-shot">
+  <img src="assets/screenshots/flagship_case_al_degenerate_primers.png" alt="Degenerate-primer assay workflow" />
+  <div class="cover-shot-text">
+    <b>Case AL</b>
+    <span>Degenerate-primer assay workflow</span>
+  </div>
+</div></div>
     </section>
 
     <section class="section">

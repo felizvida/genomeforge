@@ -902,6 +902,23 @@ def render_visual_gallery() -> str:
     return f'<div class="gallery">{figures}</div>'
 
 
+def render_cover_spread() -> str:
+    showcase_ids = ['A', 'AH', 'AJ', 'AL']
+    cards = ''.join(
+        dedent(f'''
+        <div class="cover-shot">
+          <img src="{escape(FLAGSHIP_SCREENSHOTS[case_id]["file"])}" alt="{escape(FLAGSHIP_SCREENSHOTS[case_id]["title"])}" />
+          <div class="cover-shot-text">
+            <b>Case {escape(case_id)}</b>
+            <span>{escape(FLAGSHIP_SCREENSHOTS[case_id]["title"])}</span>
+          </div>
+        </div>
+        ''').strip()
+        for case_id in showcase_ids
+    )
+    return f'<div class="cover-spread">{cards}</div>'
+
+
 def render_iupac_table() -> str:
     rows = ''.join(
         '<tr>'
@@ -1147,6 +1164,40 @@ def render_html() -> str:
       background: rgba(255,255,255,0.65);
       border: 1px solid #d8cdb8;
     }}
+    .cover-spread {{
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }}
+    .cover-shot {{
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(247,240,226,0.98));
+      border: 1px solid #d8cdb8;
+      box-shadow: 0 12px 30px rgba(25, 37, 47, 0.08);
+    }}
+    .cover-shot img {{
+      width: 100%;
+      display: block;
+      aspect-ratio: 1.22 / 1;
+      object-fit: cover;
+      background: #edf4f7;
+    }}
+    .cover-shot-text {{
+      padding: 10px 12px 12px;
+      display: grid;
+      gap: 4px;
+      font-size: 10.6px;
+      color: var(--muted);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
+    .cover-shot-text b {{
+      color: var(--navy);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }}
     .section {{
       background: var(--paper);
       border: 1px solid var(--line);
@@ -1293,6 +1344,7 @@ def render_html() -> str:
           <p>Each lesson is designed so the numbers point to a real scientific story rather than a generic demo, and the newer ambiguity-aware methods are taught directly instead of being buried as silent implementation details.</p>
         </div>
       </div>
+      {render_cover_spread()}
     </section>
 
     <section class="section">
