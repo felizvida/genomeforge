@@ -174,7 +174,7 @@ genomeforge input.fasta info
 
 ## Learn The Product
 
-For structured training:
+For structured training, start with the tutorial textbook edition. It is designed to teach the software and the biological reasoning together, using bundled real-world records and expected-result interpretation:
 
 - [Tutorial HTML](tutorial/user_training_tutorial.html)
 - [Tutorial PDF](tutorial/user_training_tutorial.pdf)

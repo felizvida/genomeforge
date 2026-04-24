@@ -56,7 +56,7 @@ For the full capability and maturity matrix, see [FEATURE_COVERAGE.md](FEATURE_C
   </tr>
 </table>
 
-The tutorial front matter now reads more like a course reader and includes a broader screenshot atlas, dataset guidance, biological framing, and ambiguity-aware examples built around real records rather than toy strings.
+The tutorial now has a publication-style textbook layout with a clearer learning path, a broader screenshot atlas, dataset guidance, biological framing, and ambiguity-aware examples built around real records rather than toy strings.
 
 ## Learn With Real Data
 

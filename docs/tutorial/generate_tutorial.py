@@ -922,6 +922,35 @@ def render_cover_spread() -> str:
     return f'<div class="cover-spread">{cards}</div>'
 
 
+def render_learning_path(case_count: int) -> str:
+    stages = [
+        ('I', 'Read the molecule', 'Map, annotate, translate, and decide what kind of biological object is in front of you.'),
+        ('II', 'Design the experiment', 'Choose primers, enzymes, assemblies, and edits with the failure modes visible.'),
+        ('III', 'Interrogate evidence', 'Use traces, alignments, search, coverage, and ambiguity codes to decide what the data support.'),
+        ('IV', 'Package the work', 'Preserve projects, reviews, share bundles, and explanations so someone else can continue cleanly.'),
+    ]
+    cards = ''.join(
+        dedent(f'''
+        <div class="path-step">
+          <span>{escape(number)}</span>
+          <h3>{escape(title)}</h3>
+          <p>{escape(text)}</p>
+        </div>
+        ''').strip()
+        for number, title, text in stages
+    )
+    return dedent(f'''
+      <div class="learning-path" aria-label="Tutorial learning path">
+        <div class="path-intro">
+          <p class="section-kicker">Course Arc</p>
+          <h3>{case_count} lessons, one practical reasoning loop</h3>
+          <p>Each case is designed to move from software action to biological claim. The point is not button memorization; it is learning how sequence evidence changes an experimental decision.</p>
+        </div>
+        <div class="path-steps">{cards}</div>
+      </div>
+    ''').strip()
+
+
 def render_publication_note(case_count: int) -> str:
     return dedent(f'''
       <section class="section frontmatter">
@@ -1193,45 +1222,46 @@ def render_html() -> str:
       @bottom-right {{ content: none; }}
     }}
     :root {{
-      --ink: #1d2733;
-      --muted: #5c6773;
-      --line: #d8d3c9;
-      --panel: #fbf8f1;
-      --panel-strong: #f3ede1;
-      --navy: #24364b;
-      --teal: #335e63;
-      --gold: #9e6a2e;
-      --rose: #7d4f5d;
-      --paper: #fffdf8;
-      --shadow: 0 12px 34px rgba(52, 55, 57, 0.08);
+      --ink: #17202a;
+      --muted: #526170;
+      --line: #c9d5df;
+      --panel: #f7fafc;
+      --panel-strong: #eef6f7;
+      --navy: #17324a;
+      --teal: #146c72;
+      --gold: #a56b14;
+      --rose: #8c4161;
+      --paper: #ffffff;
+      --shadow: 0 10px 26px rgba(20, 39, 54, 0.07);
       --code-bg: #0b1220;
       --code-ink: #dbeafe;
+      --rule: linear-gradient(90deg, #146c72, #a56b14, #8c4161);
     }}
     * {{ box-sizing: border-box; }}
     html {{ hyphens: auto; }}
     body {{
       margin: 0;
-      background: #f4efe6;
+      background: #edf3f6;
       color: var(--ink);
       font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-      font-size: 11.3px;
-      line-height: 1.64;
+      font-size: 11.5px;
+      line-height: 1.66;
       counter-reset: figure;
     }}
     a {{ color: var(--teal); text-decoration: none; }}
     p, li {{ widows: 3; orphans: 3; }}
     code {{
       font-family: "IBM Plex Mono", Menlo, Consolas, monospace;
-      background: #ece6da;
-      color: #16324f;
+      background: #e9f1f5;
+      color: #14344d;
       padding: 2px 5px;
-      border-radius: 5px;
+      border-radius: 4px;
       font-size: 10.7px;
     }}
     pre {{
       margin: 8px 0 0;
       padding: 10px 12px;
-      border-radius: 12px;
+      border-radius: 8px;
       background: var(--code-bg);
       color: var(--code-ink);
       font-family: "IBM Plex Mono", Menlo, Consolas, monospace;
@@ -1281,24 +1311,21 @@ def render_html() -> str:
       position: relative;
       overflow: hidden;
       padding: 26px 26px 22px;
-      border-radius: 20px;
+      border-radius: 12px;
       background:
-        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248, 242, 230, 0.98)),
-        linear-gradient(135deg, #f6f0e3 0%, #fffdf7 100%);
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247, 251, 252, 0.98)),
+        linear-gradient(135deg, #ffffff 0%, #edf7f8 100%);
       color: var(--ink);
       box-shadow: var(--shadow);
       margin-bottom: 12px;
-      border: 1px solid #d7cfbf;
+      border: 1px solid #cbd9e2;
     }}
-    .cover::after {{
+    .cover::before {{
       content: "";
       position: absolute;
-      right: 24px;
-      top: 22px;
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(36, 54, 75, 0.08), rgba(36, 54, 75, 0.02) 58%, transparent 60%);
+      inset: 0 0 auto 0;
+      height: 6px;
+      background: var(--rule);
     }}
     .cover h1 {{
       margin: 4px 0 10px;
@@ -1326,9 +1353,9 @@ def render_html() -> str:
     }}
     .meta {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }}
     .meta .k {{
-      border: 1px solid #d8cdb8;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.6);
+      border: 1px solid #cbd9e2;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.82);
       padding: 9px 10px;
       font-size: 10px;
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
@@ -1347,8 +1374,8 @@ def render_html() -> str:
       width: 100%;
       max-width: 760px;
       border: 1px solid var(--line);
-      border-radius: 18px;
-      background: linear-gradient(180deg, #fffef9, #f8f2e8);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff, #f3f8fa);
       padding: 18px 20px;
       box-shadow: var(--shadow);
     }}
@@ -1361,7 +1388,7 @@ def render_html() -> str:
     .cover-note {{
       margin-top: 14px;
       padding-top: 10px;
-      border-top: 1px solid rgba(158, 106, 46, 0.22);
+      border-top: 1px solid rgba(20, 108, 114, 0.22);
       max-width: 720px;
       color: #4c5966;
       font-size: 10.7px;
@@ -1374,11 +1401,11 @@ def render_html() -> str:
       gap: 10px;
     }}
     .cover-shot {{
-      border-radius: 16px;
+      border-radius: 8px;
       overflow: hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(247,240,226,0.98));
-      border: 1px solid #d8cdb8;
-      box-shadow: 0 12px 30px rgba(25, 37, 47, 0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,247,249,0.98));
+      border: 1px solid #cbd9e2;
+      box-shadow: 0 10px 22px rgba(20, 39, 54, 0.08);
     }}
     .cover-shot img {{
       width: 100%;
@@ -1412,11 +1439,12 @@ def render_html() -> str:
     .section {{
       background: var(--paper);
       border: 1px solid var(--line);
-      border-radius: 18px;
+      border-radius: 10px;
       padding: 16px 16px 14px;
       margin: 14px 0;
       box-shadow: var(--shadow);
     }}
+    .no-break {{ page-break-inside: avoid; break-inside: avoid-page; }}
     .frontmatter {{ margin-top: 0; }}
     .section h2 {{
       margin: 0 0 8px;
@@ -1444,12 +1472,12 @@ def render_html() -> str:
     .cards.cards-wide {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
     .card {{
       border: 1px solid var(--line);
-      border-radius: 14px;
-      background: linear-gradient(180deg, #fffef9, #f8f2e8);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #ffffff, #f4f8fa);
       padding: 12px;
       page-break-inside: avoid;
     }}
-    .card.alt {{ background: linear-gradient(180deg, #fbf6eb, #fffef9); }}
+    .card.alt {{ background: linear-gradient(180deg, #f6fbfb, #ffffff); }}
     .metric {{
       margin: 6px 0;
       font-size: 15px;
@@ -1461,15 +1489,15 @@ def render_html() -> str:
       margin: 2px 4px 2px 0;
       padding: 3px 8px;
       border-radius: 999px;
-      background: #ece7db;
+      background: #e6f2f3;
       color: #304c52;
       font-size: 10px;
       font-weight: 700;
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     table {{ width: 100%; border-collapse: collapse; font-size: 10.7px; margin-top: 8px; page-break-inside: auto; }}
-    th, td {{ border: 1px solid #d9e4f0; padding: 7px; vertical-align: top; text-align: left; }}
-    th {{ background: #eee7d7; color: #17314b; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
+    th, td {{ border: 1px solid #d7e3eb; padding: 7px; vertical-align: top; text-align: left; }}
+    th {{ background: #eaf3f6; color: #17314b; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     thead {{ display: table-header-group; }}
     tfoot {{ display: table-footer-group; }}
     tr {{ page-break-inside: avoid; page-break-after: auto; }}
@@ -1478,8 +1506,8 @@ def render_html() -> str:
     .toc-groups {{ margin-top: 10px; }}
     .toc-group {{
       border: 1px solid #e3dccf;
-      border-radius: 12px;
-      background: linear-gradient(180deg, #fffef9, #f8f2e8);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #ffffff, #f5fafb);
       padding: 10px 12px;
       margin-bottom: 8px;
       page-break-inside: avoid;
@@ -1512,15 +1540,15 @@ def render_html() -> str:
     }}
     .figure {{
       border: 1px solid #d6cebe;
-      border-radius: 14px;
-      background: #fdfaf2;
+      border-radius: 8px;
+      background: #fbfdfe;
       padding: 8px;
       margin: 10px 0 0;
       text-align: center;
       page-break-inside: avoid;
       counter-increment: figure;
     }}
-    .figure img {{ width: 100%; max-width: 860px; height: auto; border-radius: 8px; display: block; margin: 0 auto; }}
+    .figure img {{ width: 100%; max-width: 860px; height: auto; border-radius: 6px; display: block; margin: 0 auto; }}
     .figure.narrow img {{ max-width: 620px; }}
     .figure.ui-shot img {{ max-width: 940px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12); }}
     .caption {{ margin: 6px 0 0; font-size: 10.2px; color: var(--muted); text-align: left; }}
@@ -1533,8 +1561,8 @@ def render_html() -> str:
     .gallery {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }}
     .figure-card {{
       border: 1px solid var(--line);
-      border-radius: 14px;
-      background: linear-gradient(180deg, #fffef9, #f6efe4);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #ffffff, #f4f8fa);
       padding: 10px;
       display: grid;
       grid-template-columns: 0.95fr 1.05fr;
@@ -1543,7 +1571,7 @@ def render_html() -> str:
       page-break-inside: avoid;
       counter-increment: figure;
     }}
-    .figure-card img {{ width: 100%; height: auto; border-radius: 10px; background: #f8fbff; }}
+    .figure-card img {{ width: 100%; height: auto; border-radius: 6px; background: #f8fbff; }}
     .figure-card h3 {{ margin: 0 0 4px; font-size: 13px; }}
     .figure-card h3::before {{
       content: "Figure " counter(figure) ". ";
@@ -1557,13 +1585,68 @@ def render_html() -> str:
     }}
     .figure-card p {{ margin: 0; font-size: 10.8px; color: var(--muted); }}
     .print-only {{ display: none; }}
+    .learning-path {{
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      gap: 12px;
+      align-items: stretch;
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff, #f4f9fb);
+      padding: 12px;
+      page-break-inside: avoid;
+    }}
+    .path-intro {{
+      border-right: 1px solid #d7e3eb;
+      padding-right: 12px;
+    }}
+    .path-intro h3 {{
+      margin: 0 0 6px;
+      color: var(--navy);
+      font-size: 17px;
+    }}
+    .path-steps {{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }}
+    .path-step {{
+      position: relative;
+      border: 1px solid #d7e3eb;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 10px 10px 10px 40px;
+    }}
+    .path-step span {{
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--teal);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 800;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
+    .path-step h3 {{
+      margin: 0 0 3px;
+      font-size: 12px;
+      color: var(--navy);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
+    .path-step p {{ margin: 0; color: var(--muted); font-size: 10.4px; }}
     .cluster-head {{ display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 12px; align-items: start; margin-bottom: 10px; }}
     .chapter-opener {{
       border: 1px solid var(--line);
-      border-radius: 18px;
+      border-radius: 10px;
       background:
-        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248, 242, 230, 0.98)),
-        linear-gradient(135deg, #f8f2e7 0%, #fffef9 100%);
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(243, 249, 250, 0.98)),
+        linear-gradient(135deg, #ffffff 0%, #edf7f8 100%);
       padding: 18px 20px 16px;
       break-before: page;
       break-after: page;
@@ -1587,7 +1670,7 @@ def render_html() -> str:
     }}
     .chapter-summary {{
       border: 1px solid #e2d9c9;
-      border-radius: 14px;
+      border-radius: 8px;
       background: rgba(255,255,255,0.72);
       padding: 12px 14px;
     }}
@@ -1599,33 +1682,38 @@ def render_html() -> str:
       display: inline-block;
       padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid #d3c7b1;
-      background: #f8f2e5;
+      border: 1px solid #cbd9e2;
+      background: #f3f9fb;
       color: #4b5563;
       font-size: 9.8px;
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     .cluster {{ break-before: auto; }}
-    .case {{ border-top: 1px dashed #c7bba6; padding-top: 12px; margin-top: 12px; page-break-inside: avoid; }}
+    .case {{ border-top: 2px solid #d8e4eb; padding-top: 14px; margin-top: 14px; page-break-inside: avoid; }}
     .case:first-of-type {{ border-top: none; padding-top: 0; margin-top: 0; }}
     .case-head {{ display: grid; grid-template-columns: 1.25fr 0.95fr; gap: 12px; align-items: start; }}
+    .case-title {{
+      margin-top: 0;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #d7e3eb;
+    }}
     .case-meta {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: 10.4px; }}
-    .case-meta > div {{ border: 1px solid var(--line); border-radius: 12px; padding: 8px; background: var(--panel); }}
+    .case-meta > div {{ border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: var(--panel); }}
     .case-meta b {{ display: block; color: var(--muted); margin-bottom: 4px; font-size: 9.8px; text-transform: uppercase; letter-spacing: 0.06em; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     .case-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }}
     .narrative h4 {{ margin: 0 0 4px; font-size: 12px; color: var(--navy); }}
     .study-note, .stepbox, .resultbox, .expected, .interpret, .biology {{
       margin-top: 10px;
-      border-radius: 14px;
+      border-radius: 8px;
       padding: 10px 12px;
       page-break-inside: avoid;
     }}
-    .study-note {{ border: 1px solid #d3c7b1; background: #faf3e8; }}
-    .stepbox {{ border: 1px solid #c9d8dc; background: #f4f9f9; }}
-    .resultbox {{ border: 1px solid #d8d3c9; background: #fbf8f1; }}
-    .expected {{ border: 1px solid #d6dfcf; background: #f8fcf5; }}
-    .interpret {{ border: 1px solid #e4d7ab; background: #fff9eb; }}
-    .biology {{ border: 1px solid #e5cdd6; background: #fcf4f7; }}
+    .study-note {{ border: 1px solid #d6c08d; border-left: 4px solid var(--gold); background: #fffaf0; }}
+    .stepbox {{ border: 1px solid #bcd8dd; border-left: 4px solid var(--teal); background: #f3fafb; }}
+    .resultbox {{ border: 1px solid #cbd9e2; border-left: 4px solid var(--navy); background: #f7fafc; }}
+    .expected {{ border: 1px solid #c8dfcf; border-left: 4px solid #4f8a5b; background: #f6fbf7; }}
+    .interpret {{ border: 1px solid #e4d7ab; border-left: 4px solid var(--gold); background: #fff9eb; }}
+    .biology {{ border: 1px solid #e1cbd6; border-left: 4px solid var(--rose); background: #fdf6f9; }}
     .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b {{ display: block; margin-bottom: 4px; color: var(--navy); font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     .cluster, .case, .card, .figure, pre {{ page-break-inside: avoid; }}
     @media print {{
@@ -1668,7 +1756,14 @@ def render_html() -> str:
 
     {render_publication_note(case_count)}
 
-    <section class="section">
+    <section class="section no-break">
+      <p class="section-kicker">Course Map</p>
+      <h2>Learning Path</h2>
+      <p class="muted">The tutorial is organized as a reasoning sequence: identify the biological object, design the experiment, evaluate the evidence, then package the work so another person can trust it.</p>
+      {render_learning_path(case_count)}
+    </section>
+
+    <section class="section no-break">
       <p class="section-kicker">Using This Edition</p>
       <h2>How to Use This Edition</h2>
       <div class="grid2">
