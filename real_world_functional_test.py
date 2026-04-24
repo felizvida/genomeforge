@@ -695,15 +695,28 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.check(
         "project_permissions_set",
         "Assign reviewer role for project",
-        lambda: r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"reviewer_user": "reviewer"}}),
+        lambda: (
+            r.post(
+                "/api/project-permissions",
+                {"project_name": r.created["project"], "actor": "owner_user", "roles": {"owner_user": "owner"}},
+            ),
+            r.post(
+                "/api/project-permissions",
+                {"project_name": r.created["project"], "actor": "owner_user", "roles": {"reviewer_user": "reviewer"}},
+            ),
+        )[1],
     )
 
     def _permissions_round_trip() -> dict[str, Any]:
-        r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"owner_user": "owner"}})
+        r.post(
+            "/api/project-permissions",
+            {"project_name": r.created["project"], "actor": "owner_user", "roles": {"editor_user": "editor"}},
+        )
         permissions = r.post("/api/project-permissions", {"project_name": r.created["project"]})
         roles = permissions.get("roles", {})
+        assert_condition(roles.get("owner_user") == "owner", "owner role was not preserved")
         assert_condition(roles.get("reviewer_user") == "reviewer", "reviewer role was not preserved")
-        assert_condition(roles.get("owner_user") == "owner", "owner role was not added")
+        assert_condition(roles.get("editor_user") == "editor", "editor role was not added")
         return permissions
 
     r.check(

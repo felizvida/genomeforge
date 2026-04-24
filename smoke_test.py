@@ -98,6 +98,18 @@ def intruder_review_approval_is_blocked(runner: SmokeRunner, project_name: str) 
     raise AssertionError("Expected unauthorized review approval to fail")
 
 
+def audit_forgery_is_blocked(runner: SmokeRunner, project_name: str) -> bool:
+    try:
+        runner.post(
+            "/api/project-audit-log",
+            {"project_name": project_name, "action": "review_approve", "actor": "intruder_user"},
+        )
+    except urllib.error.HTTPError as exc:
+        body = json.loads(exc.read().decode("utf-8"))
+        return exc.code == 400 and "read-only" in str(body.get("error", ""))
+    raise AssertionError("Expected audit log mutation to fail")
+
+
 def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r = SmokeRunner(base_url=base_url, verbose=verbose)
     suffix = uuid.uuid4().hex[:8]
@@ -538,15 +550,28 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     )
     r.check(
         "api_project_permissions_set",
-        lambda: r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"reviewer_user": "reviewer"}})[1].get("saved")
-        is True,
+        lambda: (
+            r.post(
+                "/api/project-permissions",
+                {"project_name": r.created["project"], "actor": "owner_user", "roles": {"owner_user": "owner"}},
+            ),
+            r.post(
+                "/api/project-permissions",
+                {"project_name": r.created["project"], "actor": "owner_user", "roles": {"reviewer_user": "reviewer"}},
+            )[1].get("saved")
+            is True,
+        )[1],
     )
 
     def _permissions_are_merged() -> None:
-        r.post("/api/project-permissions", {"project_name": r.created["project"], "roles": {"owner_user": "owner"}})
+        r.post(
+            "/api/project-permissions",
+            {"project_name": r.created["project"], "actor": "owner_user", "roles": {"editor_user": "editor"}},
+        )
         roles = r.post("/api/project-permissions", {"project_name": r.created["project"]})[1].get("roles", {})
+        assert_condition(roles.get("owner_user") == "owner", "owner role was not preserved")
         assert_condition(roles.get("reviewer_user") == "reviewer", "reviewer role was not preserved")
-        assert_condition(roles.get("owner_user") == "owner", "owner role was not added")
+        assert_condition(roles.get("editor_user") == "editor", "editor role was not added")
 
     r.check(
         "api_project_permissions_get",
@@ -554,7 +579,8 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     )
     r.check(
         "api_project_audit_log",
-        lambda: "events" in r.post("/api/project-audit-log", {"project_name": r.created["project"], "limit": 50})[1],
+        lambda: "events" in r.post("/api/project-audit-log", {"project_name": r.created["project"], "limit": 50})[1]
+        and audit_forgery_is_blocked(r, r.created["project"]),
     )
     r.check(
         "api_project_diff",

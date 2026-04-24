@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import json
 import uuid
 from datetime import datetime, timezone
@@ -25,6 +26,7 @@ COLLECTIONS_DIR = ROOT / "collections"
 SHARES_DIR = ROOT / "shares"
 COLLAB_ROOT = ROOT / "collab_data"
 RecordGetter = Callable[[], SequenceRecord]
+ALLOWED_PROJECT_ROLES = {"viewer", "editor", "reviewer", "owner"}
 
 
 def _parse_embl(text: str) -> SequenceRecord:
@@ -80,6 +82,45 @@ def _parse_embl(text: str) -> SequenceRecord:
 
 def _features_to_dict(features: List[Feature]) -> List[Dict[str, Any]]:
     return [{"key": f.key, "location": f.location, "qualifiers": dict(f.qualifiers)} for f in features]
+
+
+def _clean_role_map(roles: Dict[str, Any]) -> Dict[str, str]:
+    clean: Dict[str, str] = {}
+    for user, role in dict(roles or {}).items():
+        u = str(user).strip()
+        r = str(role).strip().lower()
+        if not u:
+            continue
+        if r not in ALLOWED_PROJECT_ROLES:
+            raise ValueError(f"Unsupported role for {u}: {r}")
+        clean[u] = r
+    return clean
+
+
+def _set_project_permissions_with_actor(project_name: str, actor: str, roles: Dict[str, Any]) -> Dict[str, Any]:
+    actor = str(actor).strip()
+    if not actor:
+        raise ValueError("actor is required to update project permissions")
+    incoming = _clean_role_map(roles)
+    if not incoming:
+        raise ValueError("roles are required to update project permissions")
+    current = get_project_permissions(COLLAB_ROOT, project_name).get("roles", {})
+    if not isinstance(current, dict):
+        current = {}
+    if current:
+        if role_for_user(COLLAB_ROOT, project_name, actor) != "owner":
+            raise ValueError("actor lacks permission (requires owner role)")
+    elif len(incoming) != 1 or incoming.get(actor) != "owner":
+        raise ValueError("initial permissions must assign actor as owner")
+    out = set_project_permissions(COLLAB_ROOT, project_name=project_name, roles=incoming)
+    append_audit_event(
+        COLLAB_ROOT,
+        project_name=project_name,
+        action="project_permissions_update",
+        actor=actor,
+        details={"updated_users": sorted(incoming)},
+    )
+    return out
 
 
 def _record_from_document(doc: Dict[str, Any]) -> SequenceRecord:
@@ -318,8 +359,8 @@ def render_share_view_html(share_id: str) -> str:
     projects = doc.get("projects", [])
     cards = []
     for project in projects:
-        name = str(project.get("project_name", "unnamed"))
-        topology = str(project.get("topology", ""))
+        name = html.escape(str(project.get("project_name", "unnamed")), quote=True)
+        topology = html.escape(str(project.get("topology", "")), quote=True)
         content = str(project.get("content", ""))
         sequence = ""
         try:
@@ -333,22 +374,26 @@ def render_share_view_html(share_id: str) -> str:
                 sequence = "".join(ch for ch in content.upper() if ch in {"A", "C", "G", "T", "N"})
         except Exception:
             sequence = "".join(ch for ch in content.upper() if ch in {"A", "C", "G", "T", "N"})
+        escaped_sequence = html.escape(sequence[:500], quote=False)
         cards.append(
             f"""
             <article style="border:1px solid #d4d4d8;border-radius:10px;padding:10px;background:#fff">
               <h3 style="margin:0 0 6px 0;font-family:Menlo,monospace">{name}</h3>
               <div style="font-size:12px;color:#334155">topology: {topology} | length: {len(sequence)} bp</div>
-              <pre style="font-size:11px;background:#0f172a;color:#e2e8f0;padding:8px;border-radius:8px;overflow:auto">{sequence[:500]}</pre>
+              <pre style="font-size:11px;background:#0f172a;color:#e2e8f0;padding:8px;border-radius:8px;overflow:auto">{escaped_sequence}</pre>
             </article>
             """
         )
+    safe_share_id = html.escape(str(share_id), quote=True)
+    safe_created_at = html.escape(str(doc.get("created_at", "")), quote=True)
+    project_count = doc.get("project_count", len(projects))
     return f"""<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Genome Forge Share {share_id}</title></head>
+<title>Genome Forge Share {safe_share_id}</title></head>
 <body style="margin:0;background:#f8fafc;color:#0f172a;font-family:system-ui,sans-serif">
 <main style="max-width:1000px;margin:24px auto;padding:0 14px">
-<h1 style="margin:0 0 8px 0">Shared Bundle {share_id}</h1>
-<p style="margin:0 0 16px 0;color:#475569">Projects: {doc.get('project_count', len(projects))} | Created: {doc.get('created_at', '')}</p>
+<h1 style="margin:0 0 8px 0">Shared Bundle {safe_share_id}</h1>
+<p style="margin:0 0 16px 0;color:#475569">Projects: {project_count} | Created: {safe_created_at}</p>
 <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">
 {''.join(cards)}
 </section>
@@ -408,10 +453,10 @@ def handle_project_endpoint(path: str, payload: Dict[str, Any], get_record: Reco
         if not project_name:
             raise ValueError("project_name is required")
         if isinstance(payload.get("roles"), dict):
-            return set_project_permissions(
-                COLLAB_ROOT,
+            return _set_project_permissions_with_actor(
                 project_name=project_name,
-                roles={str(k): str(v) for k, v in dict(payload.get("roles", {})).items()},
+                actor=str(payload.get("actor", "")).strip(),
+                roles=dict(payload.get("roles", {})),
             )
         return get_project_permissions(COLLAB_ROOT, project_name)
     if path == "/api/project-audit-log":
@@ -419,14 +464,7 @@ def handle_project_endpoint(path: str, payload: Dict[str, Any], get_record: Reco
         if not project_name:
             raise ValueError("project_name is required")
         if str(payload.get("action", "")).strip():
-            event = append_audit_event(
-                COLLAB_ROOT,
-                project_name=project_name,
-                action=str(payload.get("action", "")),
-                actor=str(payload.get("actor", "system")),
-                details=dict(payload.get("details", {})) if isinstance(payload.get("details"), dict) else {},
-            )
-            return {"logged": True, "event": event}
+            raise ValueError("project audit log is read-only through this endpoint")
         return get_audit_log(COLLAB_ROOT, project_name, limit=int(payload.get("limit", 200)))
     if path == "/api/project-diff":
         if str(payload.get("project_name_a", "")).strip() and str(payload.get("project_name_b", "")).strip():

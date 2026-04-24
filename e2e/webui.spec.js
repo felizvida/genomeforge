@@ -159,6 +159,11 @@ test('runs review and permission workflows from the browser UI', async ({ page }
 
   await page.locator('#permProjectName').fill(projectName);
   await page.locator('#reviewProjectName').fill(projectName);
+  await page.locator('#permActor').fill('owner_user');
+  await page.locator('#permUser').fill('owner_user');
+  await page.locator('#permRole').selectOption('owner');
+  await clickAction(page, '#tab-advanced [data-action="runProjectPermissionsSet"]', '"saved": true');
+  await page.locator('#permUser').fill('reviewer_user');
   await page.locator('#permRole').selectOption('reviewer');
   await clickAction(page, '#tab-advanced [data-action="runProjectPermissionsSet"]', '"saved": true');
 
@@ -182,6 +187,11 @@ test('shows project audit log and diff from the browser UI', async ({ page }) =>
   await page.locator('#reviewProjectName').fill(baseName);
   await page.locator('#reviewSubmitter').fill('editor_user');
   await page.locator('#reviewerName').fill('reviewer_user');
+  await page.locator('#permActor').fill('owner_user');
+  await page.locator('#permUser').fill('owner_user');
+  await page.locator('#permRole').selectOption('owner');
+  await clickAction(page, '#tab-advanced [data-action="runProjectPermissionsSet"]', '"saved": true');
+  await page.locator('#permUser').fill('reviewer_user');
   await page.locator('#permRole').selectOption('reviewer');
   await clickAction(page, '#tab-advanced [data-action="runProjectPermissionsSet"]', '"saved": true');
   await clickAction(page, '#tab-advanced [data-action="runReviewSubmit"]', '"submitted": true');

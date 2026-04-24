@@ -12,9 +12,10 @@ async function runWorkspaceCreate() {
 async function runProjectPermissionsSet() {
   try {
     const project_name = document.getElementById('permProjectName').value;
+    const actor = document.getElementById('permActor').value;
     const user = document.getElementById('permUser').value;
     const role = document.getElementById('permRole').value;
-    show(await callApi('/api/project-permissions', { project_name, roles: { [user]: role } }));
+    show(await callApi('/api/project-permissions', { project_name, actor, roles: { [user]: role } }));
   } catch (e) { show(String(e)); }
 }
 

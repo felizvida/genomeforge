@@ -401,6 +401,40 @@ class BackendDomainTests(unittest.TestCase):
             except Exception:
                 pass
 
+    def test_share_bundle_render_html_escapes_project_metadata(self) -> None:
+        suffix = uuid.uuid4().hex[:8]
+        project_name = f'backend_share_xss_{suffix}<img src=x onerror="alert(1)">'
+        payload = {
+            "project_name": project_name,
+            "name": "Shareable",
+            "content": ">Shareable\nATGGTGAGCAAGGGCGAGGAGCTGTTCACCGG",
+            "topology": 'linear"><script>alert(2)</script>',
+        }
+        get_record = lambda: SequenceRecord(
+            name="Shareable",
+            sequence="ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGG",
+            topology='linear"><script>alert(2)</script>',
+        )
+        share_path: Path | None = None
+        try:
+            saved = handle_project_endpoint("/api/project-save", payload, get_record)
+            assert saved is not None
+            self.assertTrue(saved["saved"])
+
+            share = create_share_bundle([project_name], include_content=True)
+            share_path = share_bundle_path(share["share_id"])
+            html = render_share_view_html(share["share_id"])
+            self.assertNotIn("<img", html)
+            self.assertNotIn("<script>", html)
+            self.assertIn("&lt;img", html)
+        finally:
+            if share_path and share_path.exists():
+                share_path.unlink()
+            try:
+                delete_project(project_name)
+            except Exception:
+                pass
+
     def test_project_permissions_merge_incoming_roles(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -411,6 +445,61 @@ class BackendDomainTests(unittest.TestCase):
             roles = get_project_permissions(root, "merge_project")["roles"]
             self.assertEqual(roles["alice"], "owner")
             self.assertEqual(roles["bob"], "reviewer")
+
+    def test_project_permissions_endpoint_requires_owner_actor(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            temp_root = Path(tmpdir)
+            old_collab_root = project_api_module.COLLAB_ROOT
+            project_api_module.COLLAB_ROOT = temp_root
+            try:
+                with self.assertRaisesRegex(ValueError, "initial permissions"):
+                    handle_project_endpoint(
+                        "/api/project-permissions",
+                        {"project_name": "secure_project", "actor": "intruder_user", "roles": {"reviewer_user": "reviewer"}},
+                        lambda: SequenceRecord(name="unused", sequence="ATGC"),
+                    )
+
+                bootstrapped = handle_project_endpoint(
+                    "/api/project-permissions",
+                    {"project_name": "secure_project", "actor": "owner_user", "roles": {"owner_user": "owner"}},
+                    lambda: SequenceRecord(name="unused", sequence="ATGC"),
+                )
+                assert bootstrapped is not None
+                self.assertTrue(bootstrapped["saved"])
+
+                with self.assertRaisesRegex(ValueError, "actor lacks permission"):
+                    handle_project_endpoint(
+                        "/api/project-permissions",
+                        {"project_name": "secure_project", "actor": "intruder_user", "roles": {"intruder_user": "owner"}},
+                        lambda: SequenceRecord(name="unused", sequence="ATGC"),
+                    )
+
+                updated = handle_project_endpoint(
+                    "/api/project-permissions",
+                    {"project_name": "secure_project", "actor": "owner_user", "roles": {"reviewer_user": "reviewer"}},
+                    lambda: SequenceRecord(name="unused", sequence="ATGC"),
+                )
+                assert updated is not None
+                roles = updated["permissions"]["roles"]
+                self.assertEqual(roles["owner_user"], "owner")
+                self.assertEqual(roles["reviewer_user"], "reviewer")
+            finally:
+                project_api_module.COLLAB_ROOT = old_collab_root
+
+    def test_project_audit_log_endpoint_is_read_only(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            temp_root = Path(tmpdir)
+            old_collab_root = project_api_module.COLLAB_ROOT
+            project_api_module.COLLAB_ROOT = temp_root
+            try:
+                with self.assertRaisesRegex(ValueError, "read-only"):
+                    handle_project_endpoint(
+                        "/api/project-audit-log",
+                        {"project_name": "audit_project", "action": "review_approve", "actor": "intruder_user"},
+                        lambda: SequenceRecord(name="unused", sequence="ATGC"),
+                    )
+            finally:
+                project_api_module.COLLAB_ROOT = old_collab_root
 
     def test_review_approve_uses_review_project_for_permissions(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
