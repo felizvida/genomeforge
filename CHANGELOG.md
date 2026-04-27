@@ -4,6 +4,24 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-04-27
+
+### Added
+
+- Added regression coverage for collaboration trust boundaries, including owner-only ACL updates, read-only audit retrieval, and escaped share-page metadata.
+- Added a refreshed textbook-style tutorial edition with a stronger learning path, polished case hierarchy, and regenerated HTML/PDF artifacts.
+
+### Changed
+
+- Hardened project permission writes so collaborators are merged safely and only a current owner can modify established ACLs.
+- Tightened project review approval and audit behavior so review state now depends on verified project roles and audit events are generated internally.
+- Reworked tutorial typography and page rhythm for a cleaner publication-style reading experience.
+
+### Fixed
+
+- Fixed a stored HTML-injection path in public share pages by escaping project metadata before rendering.
+- Fixed minimap dragging so it no longer overwrites global mouse handlers during repeated track rerenders.
+
 ## [0.1.7] - 2026-04-02
 
 ### Added

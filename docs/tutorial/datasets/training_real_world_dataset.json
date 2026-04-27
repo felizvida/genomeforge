@@ -1,6 +1,6 @@
 {
   "dataset_name": "genomeforge_training_real_world_v2",
-  "created_at": "2026-04-24",
+  "created_at": "2026-04-27",
   "overview": "Real-world teaching bundle for the Genome Forge tutorial, including public-source records and clearly labeled training derivatives.",
   "usage_tips": [
     "Use extract_case_bundle.py to materialize the exact records for one case.",
