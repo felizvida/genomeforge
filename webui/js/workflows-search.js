@@ -10,6 +10,35 @@ async function runBlastSearch() {
   } catch (e) { show(String(e)); }
 }
 
+async function runBlastLaunch() {
+  try {
+    const [start, end] = trackWindow();
+    const r = await callApi('/api/blast-launch', payload({
+      query_sequence: document.getElementById('blastQuery').value,
+      start,
+      end,
+      providers: document.getElementById('blastProvider').value,
+      program: document.getElementById('blastProgram').value,
+      database: document.getElementById('blastDatabase').value,
+    }));
+    const links = (r.launches || []).map((launch) => (
+      `<tr><td>${escapeHtml(launch.provider)}</td>` +
+      `<td>${escapeHtml(launch.program)}</td>` +
+      `<td>${escapeHtml(launch.database)}</td>` +
+      `<td><a href="${escapeHtml(launch.url)}" target="_blank" rel="noopener">open</a></td>` +
+      `<td>${launch.prefill_supported ? 'prefilled' : 'paste FASTA'}</td></tr>`
+    )).join('');
+    document.getElementById('externalBlastViz').innerHTML = `
+      <table class="star-grid">
+        <thead><tr><th>Provider</th><th>Program</th><th>Database</th><th>Launch</th><th>Mode</th></tr></thead>
+        <tbody>${links}</tbody>
+      </table>
+      <pre class="text-map-viz" style="min-height:80px">${escapeHtml(r.copy_fasta || '')}</pre>
+    `;
+    show({ query_length: r.query_length, launch_count: (r.launches || []).length, selection: [r.selection_start_1based, r.selection_end_1based] });
+  } catch (e) { show(String(e)); }
+}
+
 async function runReferenceDbSave() {
   try {
     const elements = JSON.parse(document.getElementById('referenceDbElements').value);
@@ -192,10 +221,61 @@ async function runTraceConsensus() {
 async function runTraceChromatogram() {
   try {
     const trace_id = document.getElementById('traceId').value.trim();
-    const r = await callApi('/api/trace-chromatogram-svg', { trace_id, start: 1, end: 0, max_points: 400 });
+    const start = Number(document.getElementById('traceWindowStart')?.value || 1);
+    const end = Number(document.getElementById('traceWindowEnd')?.value || 0);
+    const r = await callApi('/api/trace-chromatogram-svg', { trace_id, start, end, max_points: 400 });
     document.getElementById('traceChromViz').innerHTML = r.svg || '';
     enhancePanel('traceChromViz');
     show({ trace_id: r.trace_id, range: [r.start_1based, r.end_1based], points: r.points, max_signal: r.max_signal });
+  } catch (e) { show(String(e)); }
+}
+
+function renderTraceLinks(result) {
+  const host = document.getElementById('traceLinkViz');
+  const rows = (result.navigation_links || []).slice(0, 120).map((link, idx) => (
+    `<tr data-trace-link="${idx}">` +
+      `<td>${escapeHtml(link.status)}</td>` +
+      `<td>${escapeHtml(link.trace_pos_1based)}</td>` +
+      `<td>${escapeHtml(link.ref_pos_1based)}</td>` +
+      `<td>${escapeHtml(link.trace_base)} / ${escapeHtml(link.reference_base)}</td>` +
+      `<td>${escapeHtml((link.trace_window || []).join('..'))}</td>` +
+      `<td>${escapeHtml((link.reference_window || []).join('..'))}</td>` +
+    `</tr>`
+  )).join('');
+  host.innerHTML = `
+    <table class="star-grid">
+      <thead><tr><th>Status</th><th>Trace pos</th><th>Ref pos</th><th>Bases</th><th>Trace window</th><th>Reference window</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6">No trace/reference links available.</td></tr>'}</tbody>
+    </table>
+  `;
+  host.querySelectorAll('[data-trace-link]').forEach((row) => {
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', async () => {
+      const link = result.navigation_links[Number(row.getAttribute('data-trace-link'))];
+      if (!link) return;
+      const tw = link.trace_window || [link.trace_pos_1based, link.trace_pos_1based];
+      const rw = link.reference_window || [link.ref_pos_1based, link.ref_pos_1based];
+      document.getElementById('traceEditPos').value = link.trace_pos_1based || 1;
+      document.getElementById('traceWindowStart').value = tw[0] || 1;
+      document.getElementById('traceWindowEnd').value = tw[1] || 0;
+      setTrackWindow(rw[0] || 1, rw[1] || 120);
+      setInspectorText(
+        `Trace/reference link\nTrace: ${link.trace_pos_1based} ${link.trace_base}\n` +
+        `Reference: ${link.ref_pos_1based} ${link.reference_base}\nStatus: ${link.status}`
+      );
+      await runTraceChromatogram();
+      await runSequenceTrack();
+    });
+  });
+}
+
+async function runTraceAlignmentLinks() {
+  try {
+    const trace_id = document.getElementById('traceId').value.trim();
+    const reference_sequence = document.getElementById('traceReference').value;
+    const r = await callApi('/api/trace-alignment-links', { trace_id, reference_sequence, flank: 24, max_rows: 800 });
+    renderTraceLinks(r);
+    show({ identity_pct: r.identity_pct, mismatch_count: r.mismatch_count, navigation_links: r.navigation_link_count });
   } catch (e) { show(String(e)); }
 }
 
@@ -288,4 +368,3 @@ async function runHdrTemplate() {
     })));
   } catch (e) { show(String(e)); }
 }
-

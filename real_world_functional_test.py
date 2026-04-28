@@ -155,6 +155,7 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.created["annot_db"] = f"real_db_{suffix}"
     r.created["enzyme_set"] = f"real_set_{suffix}"
     r.created["reference_db"] = f"real_ref_{suffix}"
+    r.created["gel_ladder"] = f"real_ladder_{suffix}"
 
     egfp_payload = {
         "name": "EGFP_CDS",
@@ -212,6 +213,11 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         "sequence_track_svg",
         "Render sequence track for coding region",
         lambda: r.post("/api/sequence-tracks", {**egfp_payload, "start": 1, "end": 180, "frame": 1}),
+    )
+    r.check(
+        "text_map_view",
+        "Render ApE-style text map linked to sequence features and translation",
+        lambda: r.post("/api/text-map", {**egfp_payload, "start": 1, "end": 180, "width": 90, "frame": 1}),
     )
     r.check(
         "sequence_analytics_svg",
@@ -378,6 +384,16 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
     )
     r.check(
+        "trace_alignment_links",
+        "Generate linked trace-to-reference navigation anchors",
+        lambda: (
+            lambda imp: r.post(
+                "/api/trace-alignment-links",
+                {"trace_id": imp["trace_record"]["trace_id"], "reference_sequence": EGFP_CDS, "flank": 12},
+            )
+        )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
+    )
+    r.check(
         "blast_like_search",
         "Run BLAST-like local similarity search across real sequence panel",
         lambda: (
@@ -400,6 +416,14 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
                     "top_hits": 5,
                 },
             )
+        ),
+    )
+    r.check(
+        "external_blast_launch",
+        "Create direct NCBI/WormBase launch links for selected EGFP sequence",
+        lambda: r.post(
+            "/api/blast-launch",
+            {**egfp_payload, "start": 1, "end": 240, "providers": "ncbi,wormbase,wormbase_parasite", "program": "blastn", "database": "nt"},
         ),
     )
     r.check(
@@ -488,6 +512,16 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.check("anneal_oligos", "Simulate oligo annealing with realistic overhangs", lambda: r.post("/api/anneal-oligos", {"forward": EGFP_CDS[:30], "reverse": EGFP_CDS[10:40], "min_overlap": 12}))
     r.check("gel_sim", "Simulate agarose gel marker + product sizes", lambda: r.post("/api/gel-sim", {"sizes": "720,711,540,300,180", "marker_set": "100bp"}))
     r.check("gel_marker_sets", "List available marker ladder sets", lambda: r.post("/api/gel-marker-sets", {}))
+    r.check(
+        "gel_ladder_save",
+        "Save a user-defined DNA ladder for virtual digest output",
+        lambda: r.post("/api/gel-ladder-save", {"ladder_name": r.created["gel_ladder"], "sizes": "10000,8000,5000,3000,1500,750,500,250,100"}),
+    )
+    r.check(
+        "digest_gel_custom_ladder",
+        "Render pUC19 digest fragments against a user-defined ladder",
+        lambda: r.post("/api/digest-gel", {**puc_payload, "enzymes": "EcoRI,BamHI,HindIII", "marker_set": r.created["gel_ladder"]}),
+    )
     r.check("annotate_auto", "Auto-annotate EGFP sequence motifs", lambda: r.post("/api/annotate-auto", egfp_payload))
     r.check(
         "annotation_db_save",
@@ -561,6 +595,22 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
     r.check("enzyme_set_list", "List custom enzyme panels", lambda: r.post("/api/enzyme-set-list", {}))
     r.check("enzyme_set_load", "Load custom enzyme panel", lambda: r.post("/api/enzyme-set-load", {"set_name": r.created["enzyme_set"]}))
     r.check("enzyme_set_delete", "Delete custom enzyme panel", lambda: r.post("/api/enzyme-set-delete", {"set_name": r.created["enzyme_set"]}))
+    r.check(
+        "restriction_compare_diagnostic_cutters",
+        "Find cutters that discriminate pUC19 MCS from a missing-site variant",
+        lambda: r.post(
+            "/api/restriction-compare",
+            {**puc_payload, "sequence_b": PUC19_MCS.replace("GGATCC", "GGTTCC"), "enzymes": "EcoRI,BamHI,HindIII", "min_delta": 1},
+        ),
+    )
+    r.check(
+        "silent_restriction_sites",
+        "Find translationally silent mutations that introduce a diagnostic BamHI site",
+        lambda: r.post(
+            "/api/silent-restriction-sites",
+            {"name": "silent_bamhi", "topology": "linear", "content": "ATGGGTTCC", "enzymes": "BamHI", "frame": 1, "max_candidates": 20},
+        ),
+    )
 
     r.check(
         "batch_digest",
@@ -772,7 +822,7 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
 
 
 def cleanup_artifacts() -> None:
-    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "collab_data", "reference_db"]:
+    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "gel_ladders", "collab_data", "reference_db"]:
         p = ROOT / d
         if p.exists():
             shutil.rmtree(p)

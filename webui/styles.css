@@ -354,6 +354,33 @@
       margin-top: 8px;
       padding: 8px;
     }
+    .text-map-viz {
+      border: 1px solid #2a475f;
+      border-radius: 12px;
+      min-height: 180px;
+      background: #07111f;
+      color: #d7f3ff;
+      overflow: auto;
+      margin-top: 8px;
+      padding: 12px;
+      font-family: "IBM Plex Mono", Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre;
+    }
+    #traceLinkViz,
+    #externalBlastViz,
+    #restrictionCompareViz,
+    #silentSitesViz {
+      border: 1px solid #2a475f;
+      border-radius: 12px;
+      min-height: 160px;
+      background: linear-gradient(165deg, #f8fbff, #eff7ff);
+      overflow: auto;
+      margin-top: 8px;
+      padding: 8px;
+      color: #0f172a;
+    }
     .star-summary {
       display: grid;
       grid-template-columns: repeat(4, minmax(120px, 1fr));

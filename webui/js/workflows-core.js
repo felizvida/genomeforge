@@ -46,6 +46,20 @@ async function runSequenceTrack() {
   } catch (e) { show(String(e)); }
 }
 
+async function runTextMap() {
+  try {
+    const [start, end] = trackWindow();
+    const r = await callApi('/api/text-map', payload({
+      start,
+      end,
+      width: Number(document.getElementById('textMapWidth').value),
+      frame: Number(document.getElementById('trackFrame').value),
+    }));
+    document.getElementById('textMapViz').innerHTML = `<pre>${escapeHtml(r.text_map || '')}</pre>`;
+    show({ text_map_range: `${r.start_1based}..${r.end_1based}`, chunks: r.chunk_count, features: r.feature_count });
+  } catch (e) { show(String(e)); }
+}
+
 async function runPrimerDesign() {
   try {
     const r = await callApi('/api/primers', payload({

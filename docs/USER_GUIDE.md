@@ -50,6 +50,7 @@ Main tools:
 
 - map rendering
 - sequence track rendering
+- text-map rendering for copyable sequence/translation/feature views
 - translation and ORF inspection
 - analytics lens and comparison lens
 - feature list and entity search
@@ -87,7 +88,10 @@ Main tools:
 
 - restriction digest
 - methylation-aware digest
+- diagnostic restriction-site comparison between related sequences
+- translationally silent restriction-site search for screening assay design
 - enzyme metadata and enzyme sets
+- user-defined DNA ladders for digest gel output
 - cloning compatibility checks
 - Gibson, Golden Gate, Gateway, TOPO, TA/GC, In-Fusion, and overlap-extension workflows
 - ligation simulation and junction diagnostics
@@ -110,6 +114,8 @@ Main tools:
 - AB1 trace import, summary, consensus, and chromatogram review
 - trace-based verification and genotype calling
 - BLAST-like search
+- direct external BLAST launch links for selected sequence against NCBI or WormBase
+- linked trace-to-reference navigation from alignment rows back to chromatogram windows
 
 Typical outcome:
 

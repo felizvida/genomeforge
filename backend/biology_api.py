@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
 from genomeforge_toolkit import (
+    AA_TO_CODONS,
+    CODON_TABLE,
     ENZYMES,
     Feature,
     SequenceRecord,
@@ -21,6 +24,7 @@ from genomeforge_toolkit import (
 
 ROOT = Path(__file__).resolve().parents[1]
 ENZYME_SET_DIR = ROOT / "enzyme_sets"
+GEL_LADDER_DIR = ROOT / "gel_ladders"
 ANNOT_DB_DIR = ROOT / "annotation_db"
 RecordGetter = Callable[[], SequenceRecord]
 
@@ -64,6 +68,115 @@ GEL_MARKER_SETS: Dict[str, List[int]] = {
 
 def _parse_plain_sequence(seq: str) -> str:
     return sanitize_sequence(seq)
+
+
+def _parse_size_list(value: Any) -> List[int]:
+    if isinstance(value, str):
+        raw_items = value.replace("\n", ",").split(",")
+    elif isinstance(value, list):
+        raw_items = value
+    else:
+        raw_items = []
+    sizes: List[int] = []
+    for item in raw_items:
+        try:
+            size = int(str(item).strip())
+        except ValueError:
+            continue
+        if 1 <= size <= 1_000_000:
+            sizes.append(size)
+    return sorted(set(sizes), reverse=True)
+
+
+def gel_ladder_path(name: str) -> Path:
+    safe = "".join(ch for ch in name if ch.isalnum() or ch in ("-", "_")).strip("_-")
+    if not safe:
+        raise ValueError("Invalid gel ladder name")
+    GEL_LADDER_DIR.mkdir(parents=True, exist_ok=True)
+    return GEL_LADDER_DIR / f"{safe}.json"
+
+
+def save_gel_ladder(name: str, sizes: Any, notes: str = "") -> Dict[str, Any]:
+    if name in GEL_MARKER_SETS:
+        raise ValueError("Custom ladder name conflicts with a built-in marker set")
+    parsed = _parse_size_list(sizes)
+    if not parsed:
+        raise ValueError("At least one ladder size is required")
+    path = gel_ladder_path(name)
+    doc = {"name": name, "updated_at": datetime.now(timezone.utc).isoformat(), "sizes": parsed, "notes": notes}
+    path.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    return {"saved": True, "name": name, "count": len(parsed), "sizes": parsed, "path": str(path)}
+
+
+def load_gel_ladder(name: str) -> Dict[str, Any]:
+    if name in GEL_MARKER_SETS:
+        return {"name": name, "updated_at": "builtin", "sizes": list(GEL_MARKER_SETS[name]), "builtin": True}
+    path = gel_ladder_path(name)
+    if not path.exists():
+        raise ValueError("Gel ladder not found")
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        "name": str(doc.get("name", name)),
+        "updated_at": str(doc.get("updated_at", "")),
+        "sizes": _parse_size_list(doc.get("sizes", [])),
+        "notes": str(doc.get("notes", "")),
+        "builtin": False,
+    }
+
+
+def list_gel_ladders() -> Dict[str, Any]:
+    GEL_LADDER_DIR.mkdir(parents=True, exist_ok=True)
+    rows: List[Dict[str, Any]] = []
+    for name, sizes in sorted(GEL_MARKER_SETS.items()):
+        rows.append({"name": name, "updated_at": "builtin", "count": len(sizes), "sizes": list(sizes), "builtin": True})
+    for path in sorted(GEL_LADDER_DIR.glob("*.json")):
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            sizes = _parse_size_list(doc.get("sizes", []))
+            rows.append(
+                {
+                    "name": str(doc.get("name", path.stem)),
+                    "updated_at": str(doc.get("updated_at", "")),
+                    "count": len(sizes),
+                    "sizes": sizes,
+                    "path": str(path),
+                    "builtin": False,
+                }
+            )
+        except Exception:
+            rows.append({"name": path.stem, "updated_at": "", "count": 0, "sizes": [], "path": str(path), "builtin": False})
+    return {"count": len(rows), "ladders": rows}
+
+
+def delete_gel_ladder(name: str) -> Dict[str, Any]:
+    if name in GEL_MARKER_SETS:
+        raise ValueError("Cannot delete built-in marker set")
+    path = gel_ladder_path(name)
+    if not path.exists():
+        raise ValueError("Gel ladder not found")
+    path.unlink()
+    return {"deleted": True, "name": name}
+
+
+def _available_marker_set_names() -> List[str]:
+    custom = []
+    if GEL_LADDER_DIR.exists():
+        custom = [path.stem for path in sorted(GEL_LADDER_DIR.glob("*.json"))]
+    return sorted(set(GEL_MARKER_SETS.keys()) | set(custom))
+
+
+def _resolve_marker_sizes(marker_set: str) -> tuple[str, List[int], bool]:
+    marker_key = str(marker_set or "1kb_plus").strip() or "1kb_plus"
+    if marker_key in GEL_MARKER_SETS:
+        return marker_key, list(GEL_MARKER_SETS[marker_key]), False
+    try:
+        ladder = load_gel_ladder(marker_key)
+        sizes = _parse_size_list(ladder.get("sizes", []))
+        if sizes:
+            return str(ladder.get("name", marker_key)), sizes, True
+    except Exception:
+        pass
+    return "1kb_plus", list(GEL_MARKER_SETS["1kb_plus"]), False
 
 
 def digest_with_methylation(
@@ -265,6 +378,96 @@ def auto_annotate(record: SequenceRecord) -> Dict[str, Any]:
     return {"count": len(rows), "annotations": rows}
 
 
+def _feature_label(feature: Feature) -> str:
+    qualifiers = getattr(feature, "qualifiers", {}) or {}
+    for key in ("label", "gene", "product", "note"):
+        if str(qualifiers.get(key, "")).strip():
+            return str(qualifiers[key]).strip()
+    return str(getattr(feature, "key", "feature") or "feature")
+
+
+def _feature_bounds(location: str, record_length: int) -> tuple[int, int] | None:
+    nums = [int(item) for item in str(location or "").replace("<", "").replace(">", "").split() if item.isdigit()]
+    if len(nums) < 2:
+        nums = [int(item) for item in re.findall(r"\d+", str(location or ""))]
+    if len(nums) < 2:
+        return None
+    start = max(1, min(record_length, nums[0]))
+    end = max(1, min(record_length, nums[-1]))
+    if start > end:
+        start, end = end, start
+    return start, end
+
+
+def build_text_map(record: SequenceRecord, start_1based: int = 1, end_1based: int = 0, width: int = 80, frame: int = 1) -> Dict[str, Any]:
+    seq = record.sequence
+    if not seq:
+        raise ValueError("sequence is empty")
+    n = len(seq)
+    start = max(1, int(start_1based))
+    end = n if int(end_1based) <= 0 else min(n, int(end_1based))
+    if start > end:
+        raise ValueError("Invalid text-map range")
+    width = max(30, min(160, int(width)))
+    frame0 = max(0, min(2, int(frame) - 1))
+    lines: List[str] = [
+        f"Genome Forge text map: {record.name} ({record.topology}, {n} bp)",
+        f"Range {start}..{end}; width {width}; translation frame {frame0 + 1}",
+        "",
+    ]
+    feature_rows = []
+    for idx, feature in enumerate(record.features):
+        bounds = _feature_bounds(str(getattr(feature, "location", "")), n)
+        if not bounds:
+            continue
+        feature_rows.append({"index": idx, "start": bounds[0], "end": bounds[1], "label": _feature_label(feature), "key": feature.key})
+
+    chunk_count = 0
+    for chunk_start in range(start, end + 1, width):
+        chunk_end = min(end, chunk_start + width - 1)
+        chunk = seq[chunk_start - 1 : chunk_end]
+        aa_line = [" "] * len(chunk)
+        for offset in range(len(chunk)):
+            global0 = chunk_start - 1 + offset
+            if global0 < frame0 or (global0 - frame0) % 3 != 0 or global0 + 3 > n:
+                continue
+            codon = seq[global0 : global0 + 3]
+            residue = CODON_TABLE.get(codon, "X")
+            if offset + 1 < len(aa_line):
+                aa_line[offset + 1] = residue
+
+        lines.append(f"{chunk_start:>6}  {chunk}")
+        lines.append(f"        {''.join(aa_line)}")
+        overlapping = [row for row in feature_rows if row["end"] >= chunk_start and row["start"] <= chunk_end]
+        for row in overlapping[:8]:
+            graphic = [" "] * len(chunk)
+            left = max(row["start"], chunk_start) - chunk_start
+            right = min(row["end"], chunk_end) - chunk_start
+            for i in range(max(0, left), min(len(graphic), right + 1)):
+                graphic[i] = "="
+            label = f"[{row['label']}]"
+            label_pos = max(0, min(len(graphic) - len(label), left))
+            for i, ch in enumerate(label):
+                if label_pos + i < len(graphic):
+                    graphic[label_pos + i] = ch
+            lines.append(f"feat{row['index']:<3}  {''.join(graphic)}  {row['key']}")
+        lines.append("")
+        chunk_count += 1
+
+    return {
+        "name": record.name,
+        "length": n,
+        "start_1based": start,
+        "end_1based": end,
+        "width": width,
+        "frame": frame0 + 1,
+        "feature_count": len(feature_rows),
+        "chunk_count": chunk_count,
+        "text_map": "\n".join(lines).rstrip() + "\n",
+        "features": feature_rows,
+    }
+
+
 def features_to_dict(features: List[Feature]) -> List[Dict[str, Any]]:
     return [{"key": feature.key, "location": feature.location, "qualifiers": dict(feature.qualifiers)} for feature in features]
 
@@ -347,6 +550,160 @@ def resolve_enzymes(payload: Dict[str, Any]) -> List[str]:
         doc = load_enzyme_set(use_set)
         enzymes = list(doc.get("enzymes", []))
     return [str(enzyme).strip() for enzyme in enzymes if str(enzyme).strip()]
+
+
+def _enzyme_cut_positions(sequence: str, topology: str, enzyme: str) -> List[int]:
+    seq = sanitize_sequence(sequence)
+    if not seq or enzyme not in ENZYMES:
+        return []
+    site, offset = ENZYMES[enzyme]
+    circular = str(topology).lower() == "circular"
+    positions = []
+    for pos0 in find_all_occurrences(seq, site, circular=circular):
+        cut = ((pos0 + offset) % len(seq)) + 1 if circular else pos0 + offset + 1
+        positions.append(cut)
+    return sorted(positions)
+
+
+def restriction_site_compare(
+    record_a: SequenceRecord,
+    sequence_b: str,
+    enzymes: List[str],
+    topology_b: str = "linear",
+    min_delta: int = 1,
+) -> Dict[str, Any]:
+    seq_b = sanitize_sequence(sequence_b)
+    if not seq_b:
+        raise ValueError("sequence_b is required")
+    names = enzymes or sorted(ENZYMES.keys())
+    rows: List[Dict[str, Any]] = []
+    for enzyme in names:
+        if enzyme not in ENZYMES:
+            continue
+        site, _ = ENZYMES[enzyme]
+        cuts_a = _enzyme_cut_positions(record_a.sequence, record_a.topology, enzyme)
+        cuts_b = _enzyme_cut_positions(seq_b, topology_b, enzyme)
+        delta = len(cuts_a) - len(cuts_b)
+        if delta == 0:
+            category = "same"
+        elif len(cuts_b) == 0:
+            category = "unique_to_a"
+        elif len(cuts_a) == 0:
+            category = "unique_to_b"
+        elif delta > 0:
+            category = "higher_in_a"
+        else:
+            category = "higher_in_b"
+        rows.append(
+            {
+                "enzyme": enzyme,
+                "site": site,
+                "count_a": len(cuts_a),
+                "count_b": len(cuts_b),
+                "delta_a_minus_b": delta,
+                "abs_delta": abs(delta),
+                "category": category,
+                "positions_a_1based": cuts_a[:50],
+                "positions_b_1based": cuts_b[:50],
+                "diagnostic": abs(delta) >= max(1, int(min_delta)),
+            }
+        )
+    rows.sort(key=lambda row: (row["diagnostic"], row["abs_delta"], row["enzyme"]), reverse=True)
+    diagnostic = [row for row in rows if row["diagnostic"]]
+    return {
+        "sequence_a_name": record_a.name,
+        "sequence_a_length": record_a.length,
+        "sequence_b_length": len(seq_b),
+        "enzyme_count": len(rows),
+        "diagnostic_count": len(diagnostic),
+        "diagnostic_candidates": diagnostic,
+        "comparisons": rows,
+    }
+
+
+def silent_restriction_sites(
+    record: SequenceRecord,
+    enzymes: List[str],
+    frame: int = 1,
+    max_candidates: int = 100,
+) -> Dict[str, Any]:
+    seq = record.sequence
+    if not seq:
+        raise ValueError("sequence is empty")
+    names = enzymes or sorted(ENZYMES.keys())
+    frame0 = max(0, min(2, int(frame) - 1))
+    existing = {
+        enzyme: set(find_all_occurrences(seq, ENZYMES[enzyme][0], circular=False))
+        for enzyme in names
+        if enzyme in ENZYMES
+    }
+    candidates: List[Dict[str, Any]] = []
+    seen = set()
+    for codon_start0 in range(frame0, len(seq) - 2, 3):
+        codon = seq[codon_start0 : codon_start0 + 3]
+        aa = CODON_TABLE.get(codon)
+        if not aa or aa == "*":
+            continue
+        for new_codon in AA_TO_CODONS.get(aa, []):
+            if new_codon == codon:
+                continue
+            mutated = seq[:codon_start0] + new_codon + seq[codon_start0 + 3 :]
+            mutation_positions = [
+                {
+                    "position_1based": codon_start0 + i + 1,
+                    "from": codon[i],
+                    "to": new_codon[i],
+                }
+                for i in range(3)
+                if codon[i] != new_codon[i]
+            ]
+            for enzyme in names:
+                if enzyme not in ENZYMES:
+                    continue
+                site, offset = ENZYMES[enzyme]
+                new_hits = set(find_all_occurrences(mutated, site, circular=False)) - existing.get(enzyme, set())
+                for site_start0 in sorted(new_hits):
+                    site_end0 = site_start0 + len(site) - 1
+                    overlaps_codon = site_start0 <= codon_start0 + 2 and site_end0 >= codon_start0
+                    if not overlaps_codon:
+                        continue
+                    key = (enzyme, codon_start0, new_codon, site_start0)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    candidates.append(
+                        {
+                            "enzyme": enzyme,
+                            "site": site,
+                            "site_start_1based": site_start0 + 1,
+                            "site_end_1based": site_end0 + 1,
+                            "cut_position_1based": site_start0 + offset + 1,
+                            "protein_position_1based": ((codon_start0 - frame0) // 3) + 1,
+                            "aa": aa,
+                            "original_codon": codon,
+                            "silent_codon": new_codon,
+                            "mutations": mutation_positions,
+                            "introduced_site": mutated[site_start0 : site_start0 + len(site)],
+                        }
+                    )
+                    if len(candidates) >= int(max_candidates):
+                        return {
+                            "record_name": record.name,
+                            "frame": frame0 + 1,
+                            "enzyme_count": len(names),
+                            "candidate_count": len(candidates),
+                            "candidates": candidates,
+                            "truncated": True,
+                        }
+    candidates.sort(key=lambda row: (row["site_start_1based"], row["enzyme"], row["protein_position_1based"]))
+    return {
+        "record_name": record.name,
+        "frame": frame0 + 1,
+        "enzyme_count": len(names),
+        "candidate_count": len(candidates),
+        "candidates": candidates[: max(1, int(max_candidates))],
+        "truncated": len(candidates) > int(max_candidates),
+    }
 
 
 def annotation_db_path(name: str) -> Path:
@@ -444,13 +801,13 @@ def gel_simulate(fragment_sizes: List[int]) -> List[Dict[str, Any]]:
 
 
 def gel_simulate_lanes(sample_sizes: List[int], marker_set: str = "1kb_plus") -> Dict[str, Any]:
-    marker_key = marker_set if marker_set in GEL_MARKER_SETS else "1kb_plus"
-    marker_sizes = GEL_MARKER_SETS[marker_key]
+    marker_key, marker_sizes, custom_marker = _resolve_marker_sizes(marker_set)
     return {
         "marker_set": marker_key,
+        "custom_marker": custom_marker,
         "marker_bands": gel_simulate(marker_sizes),
         "sample_bands": gel_simulate(sample_sizes),
-        "available_marker_sets": sorted(GEL_MARKER_SETS.keys()),
+        "available_marker_sets": _available_marker_set_names(),
     }
 
 
@@ -487,6 +844,14 @@ def pcr_gel_lanes(
 
 
 def handle_biology_endpoint(path: str, payload: Dict[str, Any], get_record: RecordGetter) -> Dict[str, Any] | None:
+    if path == "/api/text-map":
+        return build_text_map(
+            get_record(),
+            start_1based=int(payload.get("start", 1)),
+            end_1based=int(payload.get("end", 0)),
+            width=int(payload.get("width", 80)),
+            frame=int(payload.get("frame", 1)),
+        )
     if path == "/api/digest":
         return simulate_digest(get_record(), resolve_enzymes(payload))
     if path == "/api/digest-advanced":
@@ -500,6 +865,28 @@ def handle_biology_endpoint(path: str, payload: Dict[str, Any], get_record: Reco
             enzymes=resolve_enzymes(payload),
             star_activity_level=float(payload.get("star_activity_level", 0.0)),
             include_star_cuts=bool(payload.get("include_star_cuts", False)),
+        )
+    if path == "/api/digest-gel":
+        digest = simulate_digest(get_record(), resolve_enzymes(payload))
+        gel = gel_simulate_lanes(
+            [int(size) for size in digest.get("fragments_bp", [])],
+            marker_set=str(payload.get("marker_set", "1kb_plus")),
+        )
+        return {"digest": digest, **gel}
+    if path == "/api/restriction-compare":
+        return restriction_site_compare(
+            get_record(),
+            sequence_b=str(payload.get("sequence_b", payload.get("compare_sequence", ""))),
+            enzymes=resolve_enzymes(payload),
+            topology_b=str(payload.get("topology_b", "linear")),
+            min_delta=int(payload.get("min_delta", 1)),
+        )
+    if path == "/api/silent-restriction-sites":
+        return silent_restriction_sites(
+            get_record(),
+            enzymes=resolve_enzymes(payload),
+            frame=int(payload.get("frame", 1)),
+            max_candidates=int(payload.get("max_candidates", 100)),
         )
     if path == "/api/primer-diagnostics":
         return primer_diagnostics(
@@ -603,12 +990,22 @@ def handle_biology_endpoint(path: str, payload: Dict[str, Any], get_record: Reco
         return delete_enzyme_set(str(payload.get("set_name", "")).strip())
     if path == "/api/gel-sim":
         sizes = payload.get("sizes", [])
-        if isinstance(sizes, str):
-            sizes = [int(item.strip()) for item in sizes.split(",") if item.strip()]
         marker_set = str(payload.get("marker_set", "1kb_plus")).strip() or "1kb_plus"
-        return gel_simulate_lanes([int(item) for item in sizes], marker_set=marker_set)
+        return gel_simulate_lanes(_parse_size_list(sizes), marker_set=marker_set)
     if path == "/api/gel-marker-sets":
-        return {"marker_sets": GEL_MARKER_SETS, "count": len(GEL_MARKER_SETS)}
+        return {"marker_sets": GEL_MARKER_SETS, "available_marker_sets": _available_marker_set_names(), "count": len(GEL_MARKER_SETS)}
+    if path == "/api/gel-ladder-save":
+        return save_gel_ladder(
+            str(payload.get("ladder_name", payload.get("name", ""))).strip(),
+            payload.get("sizes", []),
+            notes=str(payload.get("notes", "")),
+        )
+    if path == "/api/gel-ladder-list":
+        return list_gel_ladders()
+    if path == "/api/gel-ladder-load":
+        return load_gel_ladder(str(payload.get("ladder_name", payload.get("name", ""))).strip())
+    if path == "/api/gel-ladder-delete":
+        return delete_gel_ladder(str(payload.get("ladder_name", payload.get("name", ""))).strip())
     if path == "/api/pcr-gel-lanes":
         pairs = payload.get("primer_pairs", [])
         if isinstance(pairs, dict):

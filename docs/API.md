@@ -17,6 +17,7 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 - `POST /api/trace-consensus`
 - `POST /api/trace-chromatogram-svg`
 - `POST /api/trace-verify`
+- `POST /api/trace-alignment-links`
 
 ## Core Sequence And Translation
 
@@ -35,6 +36,7 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 
 - `POST /api/map`
 - `POST /api/sequence-tracks`
+- `POST /api/text-map`
 - `POST /api/sequence-analytics-svg`
 - `POST /api/comparison-lens-svg`
 - `POST /api/alignment-heatmap-svg`
@@ -44,7 +46,10 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 
 - `POST /api/digest`
 - `POST /api/digest-advanced`
+- `POST /api/digest-gel`
 - `POST /api/star-activity-scan`
+- `POST /api/restriction-compare`
+- `POST /api/silent-restriction-sites`
 - `POST /api/enzyme-scan`
 - `POST /api/enzyme-info`
 - `POST /api/enzyme-set-save`
@@ -76,6 +81,7 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 - `POST /api/contig-assemble`
 - `POST /api/cdna-map`
 - `POST /api/blast-search`
+- `POST /api/blast-launch`
 - `POST /api/search-entities`
 
 ## Annotation, Features, References, And RNAi
@@ -117,6 +123,10 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 
 - `POST /api/gel-sim`
 - `POST /api/gel-marker-sets`
+- `POST /api/gel-ladder-save`
+- `POST /api/gel-ladder-list`
+- `POST /api/gel-ladder-load`
+- `POST /api/gel-ladder-delete`
 
 ## Project, Collections, Sharing, And Review
 

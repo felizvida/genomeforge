@@ -51,6 +51,9 @@ Legend:
 | Star activity analysis | Available | Experimental | Focused | Risk scoring and visualization are available. |
 | Agarose gel simulation | Available | Validated heuristic | Suite | Approximate migration model with digest and PCR lanes. |
 | Marker-set presets | Available | Validated heuristic | Focused | Includes multiple ladder collections. |
+| User-defined DNA ladders | Available | Validated heuristic | Suite | Save/load custom ladder sizes and use them in digest gel output. |
+| Diagnostic restriction-site comparison | Available | Validated heuristic | Suite | Finds cutters that discriminate two related sequences for screening digests or SNP-like assays. |
+| Translationally silent restriction-site search | Available | Experimental | Suite | Suggests synonymous codon edits that introduce selected restriction sites without changing protein sequence. |
 
 ## Annotations, Features, and Translation
 
@@ -81,8 +84,10 @@ Legend:
 | Clone and mutagenesis verification | Available | Validated heuristic | Suite | Pairwise diagnostics and junction integrity checks are implemented. |
 | Trace-based plasmid verification and genotyping | Available | Validated heuristic | Suite | Trace comparison, genotype calling, and chromatogram workflows are present. |
 | Raw Sanger chromatogram visualization | Available | Validated heuristic | Suite | AB1-aware chromatogram rendering now respects sample positions. |
+| Hyperlinked trace-to-reference navigation | Available | Validated heuristic | Suite | Alignment rows can jump between reference windows and trace chromatogram windows. |
 | cDNA-to-genome mapping | Available | Experimental | Focused | Heuristic exon-intron mapping exists and is useful for teaching or quick inspection. |
 | BLAST-like nucleotide database search | Available | Experimental | Suite | Local seed-and-align search helps rank related sequences, but is not a true BLAST replacement. |
+| External BLAST launch links | Available | Validated heuristic | Suite | Selected sequence can be packaged as FASTA and launched to NCBI BLAST or WormBase/WormBase ParaSite. |
 | DNA and protein motif/entity search | Available | Validated heuristic | Focused | Unified search covers motifs, features, primers, and related objects. |
 
 ## CRISPR and RNAi Design
@@ -101,6 +106,7 @@ Legend:
 | --- | --- | --- | --- | --- |
 | Circular map view | Available | Validated heuristic | Suite | Interactive plasmid-style map with zoom and pan. |
 | Sequence track view | Available | Validated heuristic | Suite | Windowed track rendering supports long sequences. |
+| Text-map view | Available | Validated heuristic | Suite | Monospace sequence/translation/feature graphics for copyable inspection and teaching. |
 | Track minimap navigation | Available | Validated heuristic | Suite | Supports fast navigation across large records. |
 | MSA identity heatmap | Available | Validated heuristic | Focused | Available after multiple alignment. |
 | Sequence analytics lens | Available | Experimental | Focused | GC, skew, complexity, and stop-density lens. |

@@ -8,7 +8,7 @@ from pathlib import Path
 import backend.project_api as project_api_module
 from backend.analysis_api import handle_analysis_endpoint
 from backend.assembly_api import handle_assembly_endpoint
-from backend.biology_api import annotation_db_path, enzyme_set_path, handle_biology_endpoint
+from backend.biology_api import annotation_db_path, enzyme_set_path, gel_ladder_path, handle_biology_endpoint
 from backend.core_api import handle_core_endpoint
 from backend.design_api import handle_design_endpoint
 from backend.project_api import (
@@ -22,8 +22,8 @@ from backend.project_api import (
     save_collection,
     share_bundle_path,
 )
-from backend.search_reference_api import blast_local_search, design_sirna_candidates
-from backend.trace_api import handle_trace_endpoint
+from backend.search_reference_api import blast_local_search, design_sirna_candidates, external_blast_launch
+from backend.trace_api import handle_trace_endpoint, trace_alignment_navigation
 from collab.review import submit_review
 from collab.store import get_project_permissions, set_project_permissions
 from genomeforge_toolkit import SequenceRecord
@@ -52,12 +52,36 @@ class BackendDomainTests(unittest.TestCase):
         self.assertEqual(result["hit_count"], 1)
         self.assertGreaterEqual(result["hits"][0]["identity_pct"], 100.0)
 
+    def test_external_blast_launch_returns_ncbi_and_wormbase_links(self) -> None:
+        result = external_blast_launch(
+            query_sequence="ATGGTGAGCAAG",
+            record_name="egfp_selection",
+            providers=["ncbi", "wormbase", "wormbase_parasite"],
+        )
+        self.assertEqual(result["query_length"], 12)
+        self.assertIn(">egfp_selection_1_12", result["copy_fasta"])
+        providers = {row["provider"] for row in result["launches"]}
+        self.assertIn("NCBI BLAST", providers)
+        self.assertIn("WormBase BLAST/BLAT", providers)
+        self.assertIn("WormBase ParaSite BLAST", providers)
+
     def test_trace_endpoint_import_and_summary(self) -> None:
         result = handle_trace_endpoint("/api/import-ab1", {"sequence": "ATGGTGAGCAAG"})
         assert result is not None
         self.assertIn("trace_record", result)
         self.assertIn("summary", result)
         self.assertEqual(result["summary"]["length"], 12)
+
+    def test_trace_alignment_navigation_links_positions(self) -> None:
+        imported = handle_trace_endpoint("/api/import-ab1", {"sequence": "ATGGTGAGCAAG"})
+        assert imported is not None
+        trace = imported["trace_record"]
+        nav = trace_alignment_navigation(trace, "ATGCTGAGCAAG", flank=3)
+        self.assertGreater(nav["navigation_link_count"], 0)
+        self.assertEqual(nav["mismatch_count"], 1)
+        mismatch = [link for link in nav["navigation_links"] if link["status"] == "mismatch"][0]
+        self.assertEqual(mismatch["trace_pos_1based"], 4)
+        self.assertEqual(mismatch["ref_pos_1based"], 4)
 
     def test_sirna_candidates_return_ranked_rows(self) -> None:
         result = design_sirna_candidates("ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGC", top_n=5)
@@ -158,6 +182,60 @@ class BackendDomainTests(unittest.TestCase):
         assert gel is not None
         self.assertEqual(gel["marker_set"], "100bp")
         self.assertEqual(len(gel["sample_bands"]), 3)
+
+    def test_biology_endpoint_ape_inspired_workflows(self) -> None:
+        suffix = uuid.uuid4().hex[:8]
+        ladder_name = f"backend_ladder_{suffix}"
+        record = SequenceRecord(
+            name="ApeInspired",
+            sequence="ATGGAGCTCGGATCCGGTACCTAA",
+            topology="linear",
+        )
+        record.features = [type("FeatureLike", (), {"key": "CDS", "location": "1..24", "qualifiers": {"label": "demo_cds"}})()]
+        try:
+            text_map = handle_biology_endpoint("/api/text-map", {"start": 1, "end": 24, "width": 40, "frame": 1}, lambda: record)
+            assert text_map is not None
+            self.assertIn("Genome Forge text map", text_map["text_map"])
+            self.assertIn("demo_cds", text_map["text_map"])
+
+            ladder = handle_biology_endpoint(
+                "/api/gel-ladder-save",
+                {"ladder_name": ladder_name, "sizes": "5000,3000,1500,750,250"},
+                lambda: record,
+            )
+            assert ladder is not None
+            self.assertTrue(ladder["saved"])
+            digest_gel = handle_biology_endpoint(
+                "/api/digest-gel",
+                {"enzymes": ["BamHI", "KpnI"], "marker_set": ladder_name},
+                lambda: record,
+            )
+            assert digest_gel is not None
+            self.assertEqual(digest_gel["marker_set"], ladder_name)
+            self.assertTrue(digest_gel["custom_marker"])
+            self.assertIn("digest", digest_gel)
+
+            compare = handle_biology_endpoint(
+                "/api/restriction-compare",
+                {"sequence_b": "ATGGAGCTCGGTACCTAA", "enzymes": ["BamHI", "KpnI"], "min_delta": 1},
+                lambda: record,
+            )
+            assert compare is not None
+            self.assertGreaterEqual(compare["diagnostic_count"], 1)
+            self.assertEqual(compare["diagnostic_candidates"][0]["enzyme"], "BamHI")
+
+            silent = handle_biology_endpoint(
+                "/api/silent-restriction-sites",
+                {"enzymes": ["BamHI"], "frame": 1, "max_candidates": 20},
+                lambda: SequenceRecord(name="Silent", sequence="ATGGGTTCC", topology="linear"),
+            )
+            assert silent is not None
+            self.assertGreaterEqual(silent["candidate_count"], 1)
+            self.assertEqual(silent["candidates"][0]["enzyme"], "BamHI")
+        finally:
+            path = gel_ladder_path(ladder_name)
+            if path.exists():
+                path.unlink()
 
     def test_biology_endpoint_features_and_annotation_db(self) -> None:
         suffix = uuid.uuid4().hex[:8]

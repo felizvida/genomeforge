@@ -162,6 +162,112 @@ async function runGelMarkerSets() {
   } catch (e) { show(String(e)); }
 }
 
+async function runGelLadderSave() {
+  try {
+    const r = await callApi('/api/gel-ladder-save', {
+      ladder_name: document.getElementById('gelLadderName').value,
+      sizes: document.getElementById('gelLadderSizes').value,
+    });
+    show(r);
+  } catch (e) { show(String(e)); }
+}
+
+async function runGelLadderLoad() {
+  try {
+    const r = await callApi('/api/gel-ladder-load', {
+      ladder_name: document.getElementById('gelLadderName').value,
+    });
+    document.getElementById('gelLadderSizes').value = (r.sizes || []).join(',');
+    show(r);
+  } catch (e) { show(String(e)); }
+}
+
+async function runGelLadderList() {
+  try {
+    show(await callApi('/api/gel-ladder-list', {}));
+  } catch (e) { show(String(e)); }
+}
+
+async function runDigestGel() {
+  try {
+    show(await callApi('/api/digest-gel', payload({
+      enzymes: document.getElementById('enzymes').value,
+      enzyme_set: document.getElementById('enzymeSetName').value,
+      marker_set: document.getElementById('gelLadderName').value || document.getElementById('gelMarkerSet').value,
+    })));
+  } catch (e) { show(String(e)); }
+}
+
+function renderRestrictionCompare(result) {
+  const rows = (result.diagnostic_candidates || []).slice(0, 40).map((row) => (
+    `<tr><td>${escapeHtml(row.enzyme)}</td><td>${escapeHtml(row.site)}</td>` +
+    `<td>${row.count_a}</td><td>${row.count_b}</td><td>${row.delta_a_minus_b}</td>` +
+    `<td>${escapeHtml(row.category)}</td></tr>`
+  )).join('');
+  document.getElementById('restrictionCompareViz').innerHTML = `
+    <table class="star-grid">
+      <thead><tr><th>Enzyme</th><th>Site</th><th>A cuts</th><th>B cuts</th><th>Delta</th><th>Use case</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6">No discriminatory cutters with current criteria.</td></tr>'}</tbody>
+    </table>
+  `;
+}
+
+async function runRestrictionCompare() {
+  try {
+    const r = await callApi('/api/restriction-compare', payload({
+      sequence_b: document.getElementById('restrictionCompareSeq').value,
+      enzymes: document.getElementById('enzymes').value,
+      enzyme_set: document.getElementById('enzymeSetName').value,
+      min_delta: Number(document.getElementById('restrictionMinDelta').value),
+    }));
+    renderRestrictionCompare(r);
+    show({ diagnostic_count: r.diagnostic_count, enzyme_count: r.enzyme_count, top: (r.diagnostic_candidates || []).slice(0, 5) });
+  } catch (e) { show(String(e)); }
+}
+
+function renderSilentSites(result) {
+  const rows = (result.candidates || []).slice(0, 80).map((row, idx) => (
+    `<tr data-silent-site="${idx}"><td>${escapeHtml(row.enzyme)}</td><td>${escapeHtml(row.site)}</td>` +
+    `<td>${row.site_start_1based}..${row.site_end_1based}</td><td>${row.protein_position_1based}</td>` +
+    `<td>${escapeHtml(row.aa)} ${escapeHtml(row.original_codon)}-&gt;${escapeHtml(row.silent_codon)}</td>` +
+    `<td>${escapeHtml((row.mutations || []).map((m) => `${m.position_1based}:${m.from}>${m.to}`).join(', '))}</td></tr>`
+  )).join('');
+  const host = document.getElementById('silentSitesViz');
+  host.innerHTML = `
+    <table class="star-grid">
+      <thead><tr><th>Enzyme</th><th>Site</th><th>DNA site</th><th>AA #</th><th>Silent codon</th><th>Mutations</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6">No silent restriction sites found for current enzyme set/frame.</td></tr>'}</tbody>
+    </table>
+  `;
+  host.querySelectorAll('[data-silent-site]').forEach((row) => {
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', async () => {
+      const hit = result.candidates[Number(row.getAttribute('data-silent-site'))];
+      if (!hit) return;
+      setTrackWindow(Math.max(1, hit.site_start_1based - 40), hit.site_end_1based + 40);
+      setInspectorText(
+        `Silent restriction candidate\n${hit.enzyme} ${hit.site}\n` +
+        `Site: ${hit.site_start_1based}..${hit.site_end_1based}\n` +
+        `Codon: ${hit.original_codon} -> ${hit.silent_codon} (${hit.aa})`
+      );
+      await runSequenceTrack();
+    });
+  });
+}
+
+async function runSilentRestrictionSites() {
+  try {
+    const r = await callApi('/api/silent-restriction-sites', payload({
+      enzymes: document.getElementById('enzymes').value,
+      enzyme_set: document.getElementById('enzymeSetName').value,
+      frame: Number(document.getElementById('frame').value),
+      max_candidates: Number(document.getElementById('silentMaxCandidates').value),
+    }));
+    renderSilentSites(r);
+    show({ candidate_count: r.candidate_count, frame: r.frame, truncated: r.truncated });
+  } catch (e) { show(String(e)); }
+}
+
 async function runTranslatedFeatures() {
   try {
     show(await callApi('/api/translated-features', payload({
@@ -218,4 +324,3 @@ async function runContigAssemble() {
     }));
   } catch (e) { show(String(e)); }
 }
-

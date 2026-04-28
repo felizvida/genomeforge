@@ -38,6 +38,15 @@
       document.getElementById('out').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
     function panelSvg(panelId) {
       return document.querySelector(`#${panelId} svg`);
     }

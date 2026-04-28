@@ -51,12 +51,46 @@ test('runs trace import, chromatogram, and BLAST-like search', async ({ page }) 
   await page.locator('#tab-trace [data-action="runImportAb1"]').click();
   await expect(page.locator('#traceId')).not.toHaveValue('');
 
+  await page.locator('#tab-trace [data-action="runTraceAlignmentLinks"]').click();
+  await expect(page.locator('#traceLinkViz')).toContainText('Trace pos');
+
   await page.locator('#tab-trace [data-action="runTraceChromatogram"]').click();
   await expect(page.locator('#traceChromViz svg')).toBeVisible();
 
   await activateTab(page, 'tab-advanced');
   await page.locator('#tab-advanced [data-action="runBlastSearch"]').click();
   await expect(page.locator('#out')).toContainText('"hits"');
+});
+
+test('runs ApE-inspired text map, external BLAST, ladders, diagnostic cutters, and silent sites', async ({ page }) => {
+  await page.locator('#enzymeSetName').fill('');
+  await activateTab(page, 'tab-map');
+  await page.locator('#tab-map [data-action="runTextMap"]').click();
+  await expect(page.locator('#textMapViz')).toContainText('Genome Forge text map');
+
+  await activateTab(page, 'tab-advanced');
+  await page.locator('#gelLadderName').fill(`e2e_ladder_${Date.now()}`);
+  await page.locator('#gelLadderSizes').fill('5000,3000,1500,750,250');
+  await page.locator('#tab-advanced [data-action="runGelLadderSave"]').click();
+  await expect(page.locator('#out')).toContainText('"saved": true');
+
+  await page.locator('#tab-advanced [data-action="runDigestGel"]').click();
+  await expect(page.locator('#out')).toContainText('"custom_marker": true');
+
+  await page.locator('#restrictionCompareSeq').fill('GAATTCCATGGCCATTGTAA');
+  await page.locator('#tab-advanced [data-action="runRestrictionCompare"]').click();
+  await expect(page.locator('#restrictionCompareViz')).toContainText('BamHI');
+
+  await page.locator('#content').fill('>silent_bamhi\nATGGGTTCC');
+  await page.locator('#name').fill('silent_bamhi');
+  await page.locator('button[data-action="runInfo"]').first().click();
+  await page.locator('#enzymes').evaluate((el) => { el.value = 'BamHI'; });
+  await page.locator('#tab-advanced [data-action="runSilentRestrictionSites"]').click();
+  await expect(page.locator('#silentSitesViz')).toContainText('BamHI');
+
+  await page.locator('#tab-advanced [data-action="runBlastLaunch"]').click();
+  await expect(page.locator('#externalBlastViz')).toContainText('NCBI BLAST');
+  await expect(page.locator('#externalBlastViz')).toContainText('WormBase');
 });
 
 test('runs analysis and cloning workflows', async ({ page }) => {

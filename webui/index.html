@@ -83,6 +83,11 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
         </div>
         <button data-action="runPredefinedEnzymeSets">Predefined Enzyme Sets</button>
         <button data-action="runEnzymeScan">Scan All Built-in Enzymes</button>
+        <label>Text Map View</label>
+        <div class="row">
+          <input id="textMapWidth" type="number" value="80" />
+          <button data-action="runTextMap">Render Text Map</button>
+        </div>
       </div>
 
       <div id="tab-analysis" class="tabpane">
@@ -171,6 +176,11 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
         <div class="row">
           <button data-action="runTraceAlign">Trace Align</button>
           <button data-action="runTraceConsensus">Trace Consensus</button>
+        </div>
+        <div class="row3">
+          <input id="traceWindowStart" type="number" value="1" />
+          <input id="traceWindowEnd" type="number" value="0" />
+          <button data-action="runTraceAlignmentLinks">Linked Trace Alignment</button>
         </div>
         <div class="row">
           <button data-action="runTraceChromatogram">Trace Chromatogram</button>
@@ -293,6 +303,22 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
         <label>BLAST-like Local Search</label>
         <label>BLAST Query Sequence (optional)</label>
         <input id="blastQuery" placeholder="ATG..." />
+        <label>External BLAST Launch</label>
+        <div class="row3">
+          <select id="blastProvider">
+            <option value="ncbi,wormbase">NCBI + WormBase</option>
+            <option value="ncbi">NCBI only</option>
+            <option value="wormbase">WormBase only</option>
+            <option value="wormbase_parasite">WormBase ParaSite</option>
+          </select>
+          <select id="blastProgram">
+            <option value="blastn">blastn</option>
+            <option value="blastx">blastx</option>
+            <option value="tblastx">tblastx</option>
+          </select>
+          <input id="blastDatabase" value="nt" />
+        </div>
+        <button data-action="runBlastLaunch">Launch Selected Sequence Externally</button>
         <label>BLAST Database (one sequence per line)</label>
         <textarea id="blastDb">ATGGTGAGCAAGGGCGAGGAGCTG
 ATGGTGAGCAAGGGCGAGGAGGAT
@@ -407,6 +433,17 @@ GAATTCCGGTTCCATGGCC</textarea>
           <button data-action="runGelSim">Gel Sim</button>
           <button data-action="runGelMarkerSets">List Marker Sets</button>
         </div>
+        <label>User-Defined DNA Ladder</label>
+        <input id="gelLadderName" value="lab_1kb_custom" />
+        <textarea id="gelLadderSizes">10000,8000,6000,5000,4000,3000,2000,1500,1000,750,500,250,100</textarea>
+        <div class="row">
+          <button data-action="runGelLadderSave">Save Ladder</button>
+          <button data-action="runGelLadderLoad">Load Ladder</button>
+        </div>
+        <div class="row">
+          <button data-action="runGelLadderList">List Ladders</button>
+          <button data-action="runDigestGel">Digest Gel With Ladder</button>
+        </div>
         <label>Translated Features / Slippage</label>
         <div class="row">
           <label><input id="includeSlippage" type="checkbox" /> include ribosomal slippage model</label>
@@ -447,6 +484,17 @@ GAATTCCGGTTCCATGGCC</textarea>
           <button data-action="runDigestAdvanced">Digest (Methylation Aware)</button>
           <button data-action="runStarActivityScan">Star Activity Scan</button>
           <button data-action="runEnzymeInfo">Enzyme Metadata</button>
+        </div>
+        <label>Restriction Comparison / Diagnostic Cutters</label>
+        <textarea id="restrictionCompareSeq">AAAAGAATTCTTTTGGATCCAAAA</textarea>
+        <div class="row">
+          <input id="restrictionMinDelta" type="number" value="1" />
+          <button data-action="runRestrictionCompare">Compare Restriction Sites</button>
+        </div>
+        <label>Silent Restriction Site Search</label>
+        <div class="row">
+          <input id="silentMaxCandidates" type="number" value="40" />
+          <button data-action="runSilentRestrictionSites">Find Silent Restriction Sites</button>
         </div>
         <div class="row">
           <input id="starActivityLevel" type="number" min="0" max="1" step="0.05" value="0.5" />
@@ -650,6 +698,8 @@ TTTCCCGGGAAATTT</textarea>
         <button data-action="setFullTrackWindow">Full Span</button>
         <button data-action="runSequenceTrack">Apply Window</button>
       </div>
+      <label class="panel-title">Text Map</label>
+      <div id="textMapViz" class="text-map-viz">Run "Render Text Map" from the Map tab.</div>
       <label class="panel-title">MSA Heatmap</label>
       <div id="msaHeatmap">Run MSA, then click "MSA Identity Heatmap".</div>
       <label class="panel-title">Sequence Analytics Lens (GC/Skew/Complexity/Stop Density)</label>
@@ -668,6 +718,8 @@ TTTCCCGGGAAATTT</textarea>
         <button data-action="resetPanelView" data-args='["compareLensViz"]'>Compare Reset</button>
         <button data-action="runComparisonLensViz">Re-render Compare</button>
       </div>
+      <label class="panel-title">External BLAST Launchpad</label>
+      <div id="externalBlastViz">Use "Launch Selected Sequence Externally" to open NCBI or WormBase with a copyable FASTA query.</div>
       <label class="panel-title">Sanger Chromatogram</label>
       <div id="traceChromViz" class="interactive-viz">Import AB1 and run "Trace Chromatogram".</div>
       <div class="viz-controls">
@@ -676,10 +728,16 @@ TTTCCCGGGAAATTT</textarea>
         <button data-action="resetPanelView" data-args='["traceChromViz"]'>Trace Reset</button>
         <button data-action="runTraceChromatogram">Re-render Trace</button>
       </div>
+      <label class="panel-title">Trace-to-Reference Links</label>
+      <div id="traceLinkViz">Run "Linked Trace Alignment" to jump between trace peaks and reference positions.</div>
       <label class="panel-title">History Graph</label>
       <div id="historyGraph">Load a project and click "Project History Graph".</div>
       <label class="panel-title">Star Activity Risk View</label>
       <div id="starViz">Run "Star Activity Scan" to visualize off-target cleavage risk.</div>
+      <label class="panel-title">Diagnostic Restriction View</label>
+      <div id="restrictionCompareViz">Run "Compare Restriction Sites" to find discriminatory cutters.</div>
+      <label class="panel-title">Silent Restriction Site View</label>
+      <div id="silentSitesViz">Run "Find Silent Restriction Sites" to discover synonymous cutter-introducing edits.</div>
       <label class="panel-title">Ligation Pathway Graph</label>
       <div id="ligationGraph">Run "Simulate Ligation Products" to render pathway graph.</div>
       <div class="viz-controls">

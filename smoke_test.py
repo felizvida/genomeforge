@@ -118,6 +118,7 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r.created["annot_db"] = f"t_db_{suffix}"
     r.created["enzyme_set"] = f"t_set_{suffix}"
     r.created["reference_db"] = f"t_ref_{suffix}"
+    r.created["gel_ladder"] = f"t_ladder_{suffix}"
 
     seq = "GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA"
     base_payload = {
@@ -235,6 +236,7 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     def _trace_suite() -> None:
         t = r.post("/api/import-ab1", {"sequence": seq})[1]["trace_record"]
         tid = t["trace_id"]
+        r.ctx["trace_id"] = tid
         s = r.post("/api/trace-summary", {"trace_id": tid})[1]["summary"]
         assert s["length"] == len(seq)
         a = r.post("/api/trace-align", {"trace_id": tid, "reference_sequence": seq})[1]
@@ -272,6 +274,13 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
 
     r.check("api_trace_suite", _trace_suite)
     r.check(
+        "api_trace_alignment_links",
+        lambda: r.post("/api/trace-alignment-links", {"trace_id": r.ctx["trace_id"], "reference_sequence": seq, "flank": 5})[1][
+            "navigation_link_count"
+        ]
+        > 0,
+    )
+    r.check(
         "api_blast_search",
         lambda: (
             lambda out: (
@@ -285,6 +294,21 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
                     "query_sequence": seq[:24],
                     "database_sequences": [{"name": "partial", "sequence": "TTTTTTTT" + seq[:24] + "GGGGGGGG"}],
                 },
+            )[1]
+        ),
+    )
+    r.check(
+        "api_blast_launch",
+        lambda: (
+            lambda out: (
+                assert_condition(out["query_length"] == 24, "unexpected launch query length"),
+                assert_condition(any("NCBI" in row["provider"] for row in out["launches"]), "missing NCBI launch"),
+                assert_condition(any("WormBase" in row["provider"] for row in out["launches"]), "missing WormBase launch"),
+            )[-1]
+        )(
+            r.post(
+                "/api/blast-launch",
+                {**base_payload, "start": 1, "end": 24, "providers": "ncbi,wormbase", "program": "blastn", "database": "nt"},
             )[1]
         ),
     )
@@ -499,6 +523,18 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
     r.check("api_gel_sim", lambda: "marker_bands" in r.post("/api/gel-sim", {"sizes": "10000,5000,1000", "marker_set": "100bp"})[1])
     r.check("api_gel_marker_sets", lambda: r.post("/api/gel-marker-sets", {})[1]["count"] >= 1)
     r.check(
+        "api_gel_ladder_save",
+        lambda: r.post("/api/gel-ladder-save", {"ladder_name": r.created["gel_ladder"], "sizes": "5000,2500,1000,500"})[1].get("saved"),
+    )
+    r.check(
+        "api_digest_gel_custom_ladder",
+        lambda: r.post(
+            "/api/digest-gel",
+            {**base_payload, "enzymes": "EcoRI,BamHI", "marker_set": r.created["gel_ladder"]},
+        )[1].get("custom_marker")
+        is True,
+    )
+    r.check(
         "api_pcr_gel_lanes",
         lambda: "lanes"
         in r.post(
@@ -524,6 +560,26 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
             },
         )[1]["count"]
         == 2,
+    )
+    r.check(
+        "api_text_map",
+        lambda: "Genome Forge text map" in r.post("/api/text-map", {**base_payload, "start": 1, "end": 60, "width": 60})[1]["text_map"],
+    )
+    r.check(
+        "api_restriction_compare",
+        lambda: r.post(
+            "/api/restriction-compare",
+            {**base_payload, "sequence_b": "GAATTCCATGGCCATTGTAA", "enzymes": "EcoRI,BamHI", "min_delta": 1},
+        )[1]["diagnostic_count"]
+        >= 1,
+    )
+    r.check(
+        "api_silent_restriction_sites",
+        lambda: r.post(
+            "/api/silent-restriction-sites",
+            {"name": "silent", "topology": "linear", "content": "ATGGGTTCC", "enzymes": "BamHI", "frame": 1},
+        )[1]["candidate_count"]
+        >= 1,
     )
     r.check(
         "api_search_entities",
@@ -703,7 +759,7 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
 
 
 def cleanup_artifacts() -> None:
-    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "collab_data", "reference_db"]:
+    for d in ["projects", "collections", "shares", "annotation_db", "enzyme_sets", "gel_ladders", "collab_data", "reference_db"]:
         p = ROOT / d
         if p.exists():
             shutil.rmtree(p)

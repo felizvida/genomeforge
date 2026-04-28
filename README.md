@@ -28,8 +28,10 @@ Genome Forge is built for practical sequence work across the full “design -> v
 
 - plasmid mapping and feature annotation
 - restriction digest planning and cloning simulation
+- text-map inspection, diagnostic restriction comparison, custom ladders, and silent-site design
 - primer design, PCR, and mutagenesis workflows
 - alignment, trace review, and construct verification
+- external BLAST launch links for selected sequence against NCBI or WormBase
 - CRISPR helper workflows
 - reference libraries, auto-flagging, and siRNA design
 - project persistence, sharing, audit, and lightweight review workflows

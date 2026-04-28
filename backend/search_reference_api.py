@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+from urllib.parse import urlencode
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
@@ -195,6 +196,89 @@ def blast_local_search(
         "kmer": k,
         "hit_count": len(hits),
         "hits": hits[: max(1, int(top_hits))],
+    }
+
+
+def external_blast_launch(
+    query_sequence: str,
+    record_name: str = "selection",
+    start_1based: int = 1,
+    end_1based: int = 0,
+    providers: List[str] | None = None,
+    program: str = "blastn",
+    database: str = "nt",
+) -> Dict[str, Any]:
+    query = _clean_dna_string(query_sequence)
+    if not query:
+        raise ValueError("query_sequence is required")
+    program = str(program or "blastn").strip().lower()
+    if program not in {"blastn", "blastx", "tblastx"}:
+        raise ValueError("DNA launch supports blastn, blastx, or tblastx")
+    database = str(database or "nt").strip() or "nt"
+    selected_providers = [str(item).strip().lower() for item in (providers or ["ncbi", "wormbase"]) if str(item).strip()]
+    label = "".join(ch if ch.isalnum() or ch in ("_", "-", ".") else "_" for ch in str(record_name or "selection")).strip("_")
+    if not label:
+        label = "selection"
+    end = int(end_1based) if int(end_1based) > 0 else int(start_1based) + len(query) - 1
+    fasta = f">{label}_{int(start_1based)}_{end}\n{query}\n"
+    launches: List[Dict[str, Any]] = []
+
+    if "ncbi" in selected_providers:
+        search_params = {
+            "PAGE_TYPE": "BlastSearch",
+            "PROGRAM": program,
+            "BLAST_PROGRAMS": program,
+            "QUERY": fasta,
+            "DATABASE": database,
+        }
+        submit_params = {"CMD": "Put", "PROGRAM": program, "DATABASE": database, "QUERY": fasta}
+        launches.append(
+            {
+                "provider": "NCBI BLAST",
+                "kind": "prefilled_search_page",
+                "url": "https://blast.ncbi.nlm.nih.gov/Blast.cgi?" + urlencode(search_params),
+                "submit_url": "https://blast.ncbi.nlm.nih.gov/Blast.cgi?" + urlencode(submit_params),
+                "program": program,
+                "database": database,
+                "prefill_supported": True,
+            }
+        )
+
+    if "wormbase" in selected_providers:
+        launches.append(
+            {
+                "provider": "WormBase BLAST/BLAT",
+                "kind": "tool_page_with_copyable_fasta",
+                "url": "https://wormbase.org/tools/blast_blat",
+                "program": program,
+                "database": "WormBase genome/protein collections",
+                "prefill_supported": False,
+                "note": "Open WormBase BLAST/BLAT, then paste the FASTA payload from copy_fasta.",
+            }
+        )
+
+    if "wormbase_parasite" in selected_providers or "parasite" in selected_providers:
+        launches.append(
+            {
+                "provider": "WormBase ParaSite BLAST",
+                "kind": "tool_page_with_copyable_fasta",
+                "url": "https://parasite.wormbase.org/Tools/Blast",
+                "program": program,
+                "database": "WormBase ParaSite genomes",
+                "prefill_supported": False,
+                "note": "Open WormBase ParaSite BLAST, then paste the FASTA payload from copy_fasta.",
+            }
+        )
+
+    if not launches:
+        raise ValueError("No supported providers requested")
+    return {
+        "query_length": len(query),
+        "record_name": label,
+        "selection_start_1based": int(start_1based),
+        "selection_end_1based": end,
+        "copy_fasta": fasta,
+        "launches": launches,
     }
 
 
@@ -392,6 +476,36 @@ def map_sirna_sites(sequence: str, sirna_sequence: str) -> Dict[str, Any]:
 
 
 def handle_search_reference_endpoint(path: str, payload: Dict[str, Any], get_record: RecordGetter) -> Dict[str, Any] | None:
+    if path == "/api/blast-launch":
+        record = get_record()
+        raw_query = str(payload.get("query_sequence", payload.get("query", ""))).strip()
+        start = max(1, int(payload.get("start", payload.get("selection_start", 1))))
+        end = int(payload.get("end", payload.get("selection_end", 0)))
+        if raw_query:
+            query = raw_query
+            launch_start = start
+            launch_end = end if end > 0 else start + len(_clean_dna_string(raw_query)) - 1
+        else:
+            if end <= 0:
+                end = record.length
+            start = min(start, record.length)
+            end = max(start, min(end, record.length))
+            query = record.sequence[start - 1 : end]
+            launch_start = start
+            launch_end = end
+        providers = payload.get("providers", ["ncbi", "wormbase"])
+        if isinstance(providers, str):
+            providers = [item.strip() for item in providers.split(",") if item.strip()]
+        return external_blast_launch(
+            query,
+            record_name=str(payload.get("record_name", record.name)),
+            start_1based=launch_start,
+            end_1based=launch_end,
+            providers=[str(item) for item in providers],
+            program=str(payload.get("program", "blastn")),
+            database=str(payload.get("database", "nt")),
+        )
+
     if path == "/api/blast-search":
         query = str(payload.get("query_sequence", payload.get("query", "")))
         if not query.strip():

@@ -236,6 +236,68 @@ def trace_verify_genotype(
     }
 
 
+def trace_alignment_navigation(
+    trace_record: Dict[str, Any],
+    reference_sequence: str,
+    flank: int = 24,
+    max_rows: int = 800,
+) -> Dict[str, Any]:
+    align = align_trace_to_reference(trace_record, reference_sequence)
+    aligned_trace = str(align.get("aligned_trace", ""))
+    aligned_ref = str(align.get("aligned_reference", ""))
+    trace_pos = 0
+    ref_pos = 0
+    rows: List[Dict[str, Any]] = []
+    links: List[Dict[str, Any]] = []
+    for column, (trace_base, ref_base) in enumerate(zip(aligned_trace, aligned_ref), start=1):
+        if trace_base != "-":
+            trace_pos += 1
+        if ref_base != "-":
+            ref_pos += 1
+        status = "gap"
+        if trace_base != "-" and ref_base != "-":
+            status = "match" if trace_base == ref_base else "mismatch"
+        row = {
+            "alignment_column": column,
+            "trace_pos_1based": trace_pos if trace_base != "-" else None,
+            "ref_pos_1based": ref_pos if ref_base != "-" else None,
+            "trace_base": trace_base,
+            "reference_base": ref_base,
+            "status": status,
+        }
+        rows.append(row)
+        if row["trace_pos_1based"] and row["ref_pos_1based"]:
+            t = int(row["trace_pos_1based"])
+            r = int(row["ref_pos_1based"])
+            links.append(
+                {
+                    **row,
+                    "trace_window": [max(1, t - int(flank)), t + int(flank)],
+                    "reference_window": [max(1, r - int(flank)), r + int(flank)],
+                    "anchor": f"trace:{t}|ref:{r}",
+                }
+            )
+    mismatch_links = [link for link in links if link["status"] == "mismatch"]
+    sampled_links = links[:: max(1, len(links) // 120)] if len(links) > 160 else links
+    navigation_links = sorted(
+        {link["anchor"]: link for link in (mismatch_links + sampled_links)}.values(),
+        key=lambda link: (int(link["ref_pos_1based"]), int(link["trace_pos_1based"])),
+    )
+    return {
+        "trace_id": str(trace_record.get("trace_id", "")),
+        "trace_length": align.get("trace_length", 0),
+        "reference_length": align.get("reference_length", 0),
+        "identity_pct": align.get("identity_pct", 0.0),
+        "mismatch_count": align.get("mismatch_count", 0),
+        "alignment_column_count": len(rows),
+        "rows": rows[: max(1, int(max_rows))],
+        "row_count": len(rows),
+        "navigation_links": navigation_links[:300],
+        "navigation_link_count": len(navigation_links),
+        "mismatches": align.get("mismatches", []),
+    }
+
+
 def handle_trace_endpoint(path: str, payload: Dict[str, Any]) -> Dict[str, Any] | None:
     if path == "/api/import-ab1":
         if str(payload.get("ab1_base64", "")).strip():
@@ -259,7 +321,13 @@ def handle_trace_endpoint(path: str, payload: Dict[str, Any]) -> Dict[str, Any] 
             raise ValueError("reference_sequence is required")
         out = align_trace_to_reference(trace, reference)
         trace = _cache_trace(trace)
-        return {"trace_id": trace.get("trace_id"), **out}
+        nav = trace_alignment_navigation(
+            trace,
+            reference,
+            flank=int(payload.get("flank", 24)),
+            max_rows=int(payload.get("max_rows", 200)),
+        )
+        return {"trace_id": trace.get("trace_id"), **out, "navigation_link_count": nav["navigation_link_count"], "navigation_links": nav["navigation_links"]}
 
     if path == "/api/trace-edit-base":
         trace = _resolve_trace(payload)
@@ -283,6 +351,18 @@ def handle_trace_endpoint(path: str, payload: Dict[str, Any]) -> Dict[str, Any] 
             start_1based=int(payload.get("start", 1)),
             end_1based=int(payload.get("end", 0)),
             max_points=int(payload.get("max_points", 400)),
+        )
+
+    if path == "/api/trace-alignment-links":
+        trace = _cache_trace(_resolve_trace(payload))
+        reference = str(payload.get("reference_sequence", payload.get("reference", "")))
+        if not reference.strip():
+            raise ValueError("reference_sequence is required")
+        return trace_alignment_navigation(
+            trace,
+            reference,
+            flank=int(payload.get("flank", 24)),
+            max_rows=int(payload.get("max_rows", 800)),
         )
 
     if path == "/api/trace-verify":
