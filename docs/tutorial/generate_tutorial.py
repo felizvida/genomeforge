@@ -22,6 +22,8 @@ APP_VERSION = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
 COPYRIGHT_YEAR = TODAY[:4]
 REPO_URL = 'https://github.com/felizvida/genomeforge'
 TUTORIAL_AUTHOR = 'Genome Forge contributors'
+TUTORIAL_TITLE = 'Teach Yourself DNA Bioinformatics with Genome Forge'
+TUTORIAL_SUBTITLE = 'A practical guide to sequence analysis, cloning design, molecular evidence, and reproducible lab workflows'
 
 CLUSTERS = [
     {
@@ -183,6 +185,24 @@ FLAGSHIP_SCREENSHOTS = {
         'file': 'assets/screenshots/flagship_case_ab_history.png',
         'title': 'Project-history and reproducibility workflow',
         'caption': 'Real UI screenshot from a saved-project history case. This view matters because sequence work becomes more trustworthy when design state and revision history stay attached.',
+    },
+}
+
+CONCEPT_ILLUSTRATIONS = {
+    'AN': {
+        'file': 'assets/concept_diagnostic_digest.svg',
+        'title': 'Diagnostic digest concept map',
+        'caption': 'This illustration shows why the restriction-comparison workflow matters biologically: a tiny sequence difference becomes a visible gel-band difference when the right cutter is chosen.',
+    },
+    'AQ': {
+        'file': 'assets/concept_silent_site_engineering.svg',
+        'title': 'Silent restriction-site engineering concept map',
+        'caption': 'This illustration shows how genetic-code degeneracy lets a synonymous codon edit create a restriction site while preserving the protein sequence.',
+    },
+    'AR': {
+        'file': 'assets/concept_trace_navigation.svg',
+        'title': 'Linked trace review concept map',
+        'caption': 'This illustration shows how linked trace navigation turns a mismatch row into a route back to chromatogram evidence instead of treating the table as the final verdict.',
     },
 }
 
@@ -388,6 +408,34 @@ CASES = [
          ['A ranked list of possible star-activity sites and their mismatch burden.', 'A spatial interpretation of whether any near-miss cut touches essential cloning features.', 'A conservative recommendation for reducing digest risk.'],
          ['A low total count is not automatically safe if one site lands in a fragile region.', 'Star activity is a risk model, not proof that the event happened; treat it as an opportunity to design out uncertainty.', 'The strongest conclusion combines off-target count, target location, and how much the experimental readout depends on that region.'],
          'changing the mismatch tolerance'),
+    case('AN', 'Diagnostic Cutter Selection Between Related Constructs', 'A', ['pUC19_MCS'], 'Advanced', 'Compare a normal multiple-cloning-site sequence with a missing-site variant and choose enzymes that discriminate the two molecules.', ['/api/restriction-compare'],
+         'If two constructs differ by only a small edit, which restriction enzyme gives the cleanest yes/no diagnostic digest?',
+         'This lesson starts with the pUC19 multiple-cloning site because it is intentionally rich in enzyme motifs, then asks what happens when one motif is missing from a related construct. That makes the workflow feel like a real colony-screening or allele-discrimination problem: the sequences are mostly the same, but one site should change the digest pattern.',
+         'A diagnostic digest is a decision assay. You are not trying to characterize every base; you are trying to choose an enzyme whose cut-count difference turns a hidden sequence change into a visible banding difference. The computational move is to compare cut sites across two related sequences. The biological move is to ask whether that difference would be large and clean enough to trust at the bench.',
+         'Many classic genotyping assays are clever because they convert an invisible one-base or small-motif change into a simple gel question: did this cutter cut or not?',
+         {'sequence_a': 'pUC19_MCS', 'sequence_b': 'MCS variant lacking BamHI', 'diagnostic_enzyme': 'BamHI', 'cuts_in_a': 1, 'cuts_in_b': 0, 'interpretation': 'BamHI distinguishes the parent construct from the missing-site variant'},
+         ['A comparison table listing cut counts for both sequences.', 'At least one diagnostic candidate where the cut count differs between the two records.', 'A written choice of enzyme and an expected banding difference for the diagnostic digest.'],
+         ['The best diagnostic cutter is not necessarily the enzyme with the most sites; it is the enzyme whose pattern changes clearly between the alternatives.', 'A one-cut versus zero-cut difference is easy to reason about, but only if the resulting band sizes are resolvable.', 'Use this workflow before ordering a screen so your wet-lab assay tests the actual difference you care about.'],
+         'changing the comparison sequence or minimum cut-count delta',
+         starter_values=[
+             'Sequence B example: remove the <code>GGATCC</code> BamHI motif from <code>pUC19_MCS</code>.',
+             'Enzyme panel: <code>EcoRI,BamHI,HindIII,KpnI</code>',
+             'Minimum delta: <code>1</code>',
+         ]),
+    case('AO', 'Custom Ladder-Centric Digest Gel Planning', 'A', ['pUC19_MCS'], 'Advanced', 'Define an in-house DNA ladder and render digest fragments against that ladder instead of a generic preset.', ['/api/gel-ladder-save', '/api/gel-ladder-load', '/api/digest-gel'],
+         'Will the gel ladder your lab actually uses make the diagnostic fragments easy to interpret?',
+         'The input molecule is short and enzyme-rich, but the real subject of the case is measurement context. A virtual digest is only useful if the marker lane resembles what the lab will actually load. Custom ladders let you model unusual in-house marker sets, truncated ladders, teaching-lab ladders, or vendor-specific bands.',
+         'Gel interpretation is partly a visualization problem. Two digest plans can be chemically valid but differ dramatically in readability once the marker sizes and agarose resolution enter the picture. By saving a custom ladder, you make the simulated output speak the same visual language as the bench result.',
+         'A ladder is a ruler made of DNA fragments. If you use the wrong ruler in planning, the experiment can be technically correct and still annoying to read.',
+         {'custom_ladder': [10000, 8000, 5000, 3000, 1500, 750, 500, 250, 100], 'marker_set': 'tutorial_in_house_ladder', 'custom_marker': True, 'digest_enzymes': ['EcoRI', 'BamHI', 'HindIII'], 'planning_call': 'fragments are compared against the same ladder expected at the bench'},
+         ['A saved custom ladder with named band sizes.', 'A digest-gel result whose marker lane reports that the custom marker set was used.', 'A conclusion about whether the diagnostic fragments are likely to separate well enough to interpret.'],
+         ['A custom ladder does not change the biology of the digest; it changes how confidently humans can read the output.', 'If important fragments cluster between sparse ladder bands, the result may be harder to call than the enzyme logic suggests.', 'Use ladder-centric planning whenever the wet-lab readout will be a gel rather than a sequence trace.'],
+         'changing the ladder band sizes or marker-set name',
+         starter_values=[
+             'Ladder name: <code>tutorial_in_house_ladder</code>',
+             'Band sizes: <code>10000,8000,5000,3000,1500,750,500,250,100</code>',
+             'Digest enzymes: <code>EcoRI,BamHI,HindIII</code>',
+         ]),
     case('U', 'k-mer Profile for Contamination Suspicion', 'A', ['EGFP_CDS', 'mCherry_CDS', 'pUC19_MCS'], 'Search', 'Use motif/entity search patterns to ask whether a supposed single-template sample smells like a mixed cloning population.', ['/api/motif', '/api/search-entities'],
          'Does the sequence composition look like one coherent construct, or does it hint that two familiar lab molecules were mixed together?',
          'This case deliberately mixes a reporter-centric mental model with a vector-centric one. EGFP, mCherry, and pUC19 are all real lab molecules that often coexist on the same bench, which makes them realistic contamination suspects.',
@@ -406,6 +454,20 @@ CASES = [
          ['A readable track that shows DNA letters, codons, amino acids, and annotations in register.', 'A consequence statement for at least one hypothetical or real base change.', 'A note about which positions are biologically sensitive and why.'],
          ['A change that stays within the same amino acid may still matter less than one that changes the protein sequence.', 'Frame is everything in coding DNA; off-by-one coordinate errors cascade into wrong protein logic.', 'Use the track view to narrate the result in plain language, not just to admire the color coding.'],
          'changing the visible window or frame'),
+    case('AP', 'Text Map Reading for Dense Annotated Sequence', 'B', ['EGFP_CDS'], 'Map', 'Render a text-map view that aligns sequence, translation, coordinates, and feature labels in a compact text-first representation.', ['/api/text-map'],
+         'When a graphical map becomes too broad, can a text map help you inspect the exact bases, codons, and annotations without losing context?',
+         'EGFP is used here because it is a clean coding sequence with a known reading frame. The text map turns that record into a coordinate-aware reading exercise: letters, amino acids, and feature labels become rows in the same local window rather than separate panels.',
+         'Text maps are especially useful for people who think like programmers. They make the sequence feel like an annotated source file: coordinates are line numbers, codons are tokens, and features are semantic overlays. The biological value is that you can inspect the exact bases behind a claim while keeping translation and annotation visible.',
+         'A good text map is almost a bilingual edition of DNA: one line is nucleotide text, another is amino-acid meaning, and the annotations tell you why the region matters.',
+         {'record': 'EGFP_CDS', 'window': '1..180', 'frame': 1, 'text_map_contains': ['coordinates', 'DNA sequence', 'frame-1 translation', 'EGFP feature label'], 'interpretation': 'the same local region can be read as bases, codons, and biological feature context'},
+         ['A rendered text map with visible coordinate blocks and sequence rows.', 'A translation row in the expected frame for the EGFP CDS window.', 'Feature labels aligned to the same local coordinate system as the sequence text.'],
+         ['Text maps are not a replacement for visual maps; they are a different cognitive mode for close reading.', 'If a proposed edit is hard to explain in the text map, you may not yet understand its coordinate or frame consequences.', 'Use text maps when exact local context matters more than whole-plasmid shape.'],
+         'changing the start/end window or translation frame',
+         starter_values=[
+             'Window: <code>1..180</code>',
+             'Width: <code>90</code>',
+             'Frame: <code>1</code>',
+         ]),
     case('M', 'ORF Scan and Coding Potential Triage', 'B', ['BRAF_exon15_fragment', 'EGFP_CDS'], 'ORF/Motif', 'Compare a clean coding sequence and a genomic fragment to learn what ORF scanning can and cannot tell you.', ['/api/orfs'],
          'How do you tell whether a DNA segment should be treated like a protein-coding region or like genomic context that needs more annotation first?',
          'The two records in this case are intentionally different. EGFP is a textbook CDS. The BRAF fragment is genomic and hotspot-rich, which means naive translation generates stop codons. That contrast teaches why ORF scans are triage tools, not oracles.',
@@ -573,6 +635,20 @@ CASES = [
          ['A codon-optimization or codon-bias summary tied to a specific host scenario.', 'A statement about what changed at the nucleotide level and what stayed constant at the protein level.', 'A caution that codon optimization does not solve every expression problem.'],
          ['Codon changes can improve expression without changing the amino-acid sequence, but they can also affect RNA behavior and other features.', 'A portable tutorial answer distinguishes protein identity from nucleotide implementation.', 'Optimization should be justified by a host-specific problem, not used as a reflex.'],
          'changing the target host preference'),
+    case('AQ', 'Silent Restriction-Site Engineering', 'F', ['EGFP_CDS'], 'Advanced', 'Search for synonymous coding-sequence edits that introduce or remove a restriction site without changing the translated protein.', ['/api/silent-restriction-sites'],
+         'Can you add a convenient screening site to a coding sequence while leaving the protein product unchanged?',
+         'This lesson uses EGFP because the coding frame is known and the biological output is easy to understand: if the amino-acid sequence changes unexpectedly, the reporter may stop behaving like EGFP. Silent-site engineering therefore asks for a very specific kind of edit: DNA changes that preserve the protein while adding useful restriction logic.',
+         'The key biological concept is degeneracy of the genetic code. Several codons can encode the same amino acid, so not every DNA change changes the protein. That creates a design space where you can install a diagnostic restriction site, remove an unwanted site, or mark a construct version while keeping the amino-acid sequence stable.',
+         'The genetic code is redundant in a useful way: biology uses that redundancy naturally, and engineers can sometimes borrow it for construct tracking.',
+         {'record': 'EGFP_CDS', 'target_enzyme': 'BamHI', 'frame': 1, 'candidate_type': 'synonymous codon edits', 'protein_preserved': True, 'use_case': 'screening mark or diagnostic digest handle'},
+         ['A candidate list of synonymous edits grouped by enzyme and coordinate.', 'For each candidate, a before/after codon comparison that preserves the amino acid.', 'A recommendation about whether the new site is useful enough and safe enough to include.'],
+         ['Silent means protein-preserving, not biologically irrelevant; codon usage, RNA structure, or regulatory motifs can still matter.', 'A silent restriction site is most useful when it creates a simple downstream verification assay.', 'Always verify the edited coding sequence in translation context before treating the design as safe.'],
+         'changing the enzyme list, frame, or candidate limit',
+         starter_values=[
+             'Target enzymes: <code>BamHI,EcoRI,HindIII</code>',
+             'Frame: <code>1</code>',
+             'Candidate limit: <code>20</code>',
+         ]),
     case('I', 'DNA Container Roundtrip Validation', 'G', ['EGFP_CDS', 'mCherry_CDS', 'pUC19_MCS'], 'Advanced', 'Export and re-import multiple records to verify that file conversion preserves sequence identity and annotations.', ['/api/export-dna', '/api/import-dna', '/api/canonicalize-record'],
          'Can you move records through a file format boundary without silently changing what the molecule means?',
          'The records in this case are deliberately different: two CDS examples and one compact engineered vector fragment. That makes the roundtrip test more realistic than validating only one simple input type.',
@@ -645,6 +721,20 @@ CASES = [
          ['A verification report localizing any mismatches or confirming identity.', 'A decision-ready verdict that says whether the sample matches expectation.', 'Confidence language explaining whether the result is definitive or provisional.'],
          ['A zero-mismatch result is powerful only if the trace quality is also acceptable.', 'A single mismatch at a critical site can be more important than several low-quality mismatches at unimportant edges.', 'Separate biological consequence from signal confidence in your write-up.'],
          'changing the verification target record'),
+    case('AR', 'Linked Trace-to-Reference Navigation', 'G', ['EGFP_CDS'], 'Trace', 'Generate clickable trace/reference navigation anchors so each mismatch or low-confidence call can be inspected in sequence context.', ['/api/import-ab1', '/api/trace-alignment-links', '/api/trace-chromatogram-svg'],
+         'When a sequencing trace disagrees with the expected construct, how do you jump directly from the mismatch summary to the raw local evidence?',
+         'This lesson again uses EGFP as a familiar reference, but the emphasis is navigation rather than alignment scoring. A trace mismatch is only actionable if you can inspect the surrounding peaks and reference context quickly enough to decide whether the disagreement is real.',
+         'Linked navigation turns trace review into an evidence workflow instead of a scavenger hunt. The software localizes each candidate issue, then lets you move between the trace position, reference coordinate, and chromatogram window. Biologically, that matters because a true mutation and a poor base call can look identical in a flat mismatch table until you examine the raw local signal.',
+         'A mismatch table without trace navigation is like a stack trace without file links: technically informative, but slower and easier to misread.',
+         {'trace_record': 'synthetic EGFP trace', 'reference': 'EGFP_CDS', 'navigation_links': 'one row per aligned base or mismatch focus', 'review_goal': 'inspect raw evidence before accepting or rejecting a variant call'},
+         ['A trace import followed by a linked alignment-navigation table.', 'Navigation rows that expose trace position, reference position, local context, and mismatch status.', 'A chromatogram window centered on the position that needs manual review.'],
+         ['Linked trace navigation is strongest when you use it to challenge, not merely confirm, the automatic call.', 'A mismatch supported by clean peaks is more biologically meaningful than a mismatch buried in weak signal.', 'The final interpretation should cite both the sequence-level mismatch and the trace-level evidence quality.'],
+         'changing the reference sequence or flank size',
+         starter_values=[
+             'Reference: <code>EGFP_CDS</code>',
+             'Flank size: <code>24</code>',
+             'Review mode: inspect mismatch and low-quality rows first.',
+         ]),
     case('AJ', 'BLAST-like Similarity Search for Identity, Origin, and Contamination', 'G', ['EGFP_CDS', 'mCherry_CDS', 'lacZ_alpha_fragment', 'BRAF_exon15_fragment'], 'Advanced', 'Run local similarity search against a small real-world panel to identify the most likely source of an unknown sequence.', ['/api/blast-search'],
          'If someone hands you a mystery sequence, which known molecule in your local panel does it most resemble?',
          'The training panel mixes reporter genes, a vector-linked fragment, and a human genomic fragment. That is exactly the kind of mixed local reference set a real lab accumulates over time, which makes the search results practically useful.',
@@ -654,6 +744,20 @@ CASES = [
          ['A ranked hit list with identity and coverage, not just a single best match.', 'A narrative about what the top hit implies for sample identity or origin.', 'A note explaining whether the hit pattern suggests clean identity or mixed origin.'],
          ['Full-length high-identity hits support strong identity claims.', 'Partial hits are clues, not final answers; always inspect coverage.', 'The runner-up hits often help explain contamination or domain sharing.'],
          'changing the query sequence or database panel'),
+    case('AS', 'Selected-Sequence External BLAST Launch', 'G', ['EGFP_CDS'], 'Advanced', 'Package a selected sequence window as FASTA and launch or copy it for external NCBI and WormBase BLAST workflows.', ['/api/blast-launch'],
+         'When local search says a sequence is interesting, how do you send exactly the selected region to a public reference search without losing coordinates or context?',
+         'The case uses the first coding window of EGFP as a selected region. That is deliberate: a short, biologically meaningful query demonstrates why selected-sequence launch matters. You often do not want to BLAST a whole project file; you want the exact region under your cursor, with a FASTA header that preserves where it came from.',
+         'External BLAST is a bridge from local hypothesis to public reference context. Genome Forge does not need to replace every public database. Instead, it should make the handoff precise: selected bases become a clean FASTA payload, the provider launch is explicit, and the user can compare local interpretation with broader NCBI or organism-specific resources.',
+         'A good BLAST launch is a tiny provenance package: not just sequence letters, but a name and coordinate story that remind you what you searched.',
+         {'selected_record': 'EGFP_CDS', 'selection': '1..240', 'providers': ['NCBI BLAST', 'WormBase BLAST/BLAT', 'WormBase ParaSite BLAST'], 'copy_fasta_header': '>EGFP_CDS_1_240', 'interpretation': 'selected query is ready for public-reference follow-up'},
+         ['A copyable FASTA payload for the selected region, not the entire record by accident.', 'Provider-specific launch links or instructions for NCBI and WormBase-style BLAST workflows.', 'A note recording which coordinate window was searched so the result remains auditable.'],
+         ['External BLAST results should refine local interpretation, not erase local context.', 'The most common user error is searching the wrong region; coordinate-aware FASTA headers reduce that risk.', 'For organism-specific workflows, provider choice matters because database scope changes what a top hit means.'],
+         'changing the selected start/end coordinates or provider list',
+         starter_values=[
+             'Selection: <code>1..240</code>',
+             'Providers: <code>ncbi,wormbase,wormbase_parasite</code>',
+             'Record name: <code>EGFP_CDS</code>',
+         ]),
     case('AK', 'Reference Element Auto-Flagging and siRNA Design/Mapping', 'G', ['EGFP_CDS', 'mCherry_CDS'], 'Advanced', 'Reuse saved element libraries to auto-flag familiar sequence elements, then design and map siRNA candidates.', ['/api/reference-db-save', '/api/reference-scan', '/api/sirna-design', '/api/sirna-map'],
          'How do reusable sequence libraries turn repeated manual annotation into a faster and more consistent design workflow?',
          'Reporter CDS records are excellent for this because many labs annotate the same elements repeatedly. Saving reference libraries means the machine can recognize them quickly, and the same sequence can then be repurposed for knockdown-style thinking via siRNA design.',
@@ -853,6 +957,11 @@ def compute_featured_results() -> list[dict[str, str]]:
             'story': 'This tiny region packs a surprising amount of experimental flexibility into a few dozen bases, which is why it became a cloning-era classic.',
         },
         {
+            'title': 'Restriction comparison turns small edits into screenable assays',
+            'value': 'Parent-versus-variant cutter logic now has its own lesson path',
+            'story': 'The tutorial now teaches how to find enzymes that cut one related construct but not the other, then connect that computational difference to a practical diagnostic digest.',
+        },
+        {
             'title': 'A one-codon EGFP derivative can still be biologically dramatic',
             'value': f'EGFP vs Y67H-like variant: {_pairwise_identity(egfp, y67h)}% nucleotide identity',
             'story': 'The tutorial uses this to teach a core lesson in molecular biology: a small sequence delta can carry a large phenotype when it lands in a privileged site.',
@@ -871,6 +980,11 @@ def compute_featured_results() -> list[dict[str, str]]:
             'title': 'Genome Forge now teaches uncertainty as a first-class sequence state',
             'value': f'EGFP ambiguity training record carries {sum(1 for ch in ambiguous if ch not in "ACGT")} explicit unresolved positions',
             'story': 'That matters because real assay design and identity search often start before every position is perfectly resolved. Good workflows preserve uncertainty instead of flattening it away.',
+        },
+        {
+            'title': 'Selected-sequence launch bridges local work to public search',
+            'value': 'NCBI and WormBase launch workflows are covered as explicit training cases',
+            'story': 'The new lesson emphasizes provenance: search exactly the selected region, keep the FASTA header informative, and interpret public hits in the context of the local record.',
         },
     ]
 
@@ -905,6 +1019,22 @@ def render_visual_gallery() -> str:
     return f'<div class="gallery">{figures}</div>'
 
 
+def render_concept_gallery() -> str:
+    figures = ''.join(
+        dedent(f'''
+        <div class="figure-card concept-card">
+          <img src="{escape(row["file"])}" alt="{escape(row["title"])}" />
+          <div>
+            <h3>{escape(row["title"])}</h3>
+            <p>{escape(row["caption"])}</p>
+          </div>
+        </div>
+        ''').strip()
+        for row in CONCEPT_ILLUSTRATIONS.values()
+    )
+    return f'<div class="gallery concept-gallery">{figures}</div>'
+
+
 def render_cover_spread() -> str:
     showcase_ids = ['A', 'AH', 'AJ', 'AL']
     cards = ''.join(
@@ -920,6 +1050,188 @@ def render_cover_spread() -> str:
         for case_id in showcase_ids
     )
     return f'<div class="cover-spread">{cards}</div>'
+
+
+def render_cover_art() -> str:
+    return dedent('''
+      <svg class="cover-art" viewBox="0 0 760 620" role="img" aria-label="Abstract DNA orbit, plasmid circle, and sequence constellation">
+        <defs>
+          <radialGradient id="coverGlow" cx="50%" cy="42%" r="62%">
+            <stop offset="0%" stop-color="#f8e8b0" stop-opacity="0.74" />
+            <stop offset="42%" stop-color="#46d2c6" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#0a1723" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="coverHelix" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f7d28a" />
+            <stop offset="48%" stop-color="#72e0d4" />
+            <stop offset="100%" stop-color="#e99bb6" />
+          </linearGradient>
+          <linearGradient id="coverRing" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#e7c37b" stop-opacity="0.95" />
+            <stop offset="55%" stop-color="#5ed3cb" stop-opacity="0.85" />
+            <stop offset="100%" stop-color="#f1f5f9" stop-opacity="0.70" />
+          </linearGradient>
+          <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#020711" flood-opacity="0.35" />
+          </filter>
+        </defs>
+        <rect x="0" y="0" width="760" height="620" fill="url(#coverGlow)" />
+        <g opacity="0.22" stroke="#b6d7d8" stroke-width="1">
+          <path d="M70 92 C190 38 306 156 444 102 S640 58 720 130" fill="none" />
+          <path d="M54 515 C202 404 314 594 474 466 S640 402 728 480" fill="none" />
+          <path d="M80 178 H692 M112 245 H704 M64 392 H682" stroke-dasharray="2 14" />
+        </g>
+        <g transform="translate(88 68)" filter="url(#softShadow)">
+          <circle cx="296" cy="256" r="182" fill="none" stroke="url(#coverRing)" stroke-width="18" opacity="0.90" />
+          <path d="M296 74 A182 182 0 0 1 478 256" fill="none" stroke="#f3c66f" stroke-width="28" stroke-linecap="round" opacity="0.55" />
+          <path d="M116 272 A182 182 0 0 1 296 74" fill="none" stroke="#4fd0c6" stroke-width="12" stroke-linecap="round" opacity="0.62" />
+          <path d="M296 438 A182 182 0 0 1 126 318" fill="none" stroke="#d97398" stroke-width="10" stroke-linecap="round" opacity="0.64" />
+        </g>
+        <g transform="translate(132 116)" fill="none" stroke="url(#coverHelix)" stroke-width="6" stroke-linecap="round">
+          <path d="M0 160 C80 40 160 40 240 160 S400 280 480 160" />
+          <path d="M0 260 C80 380 160 380 240 260 S400 140 480 260" />
+        </g>
+        <g transform="translate(136 116)" stroke="#f8f3e8" stroke-width="2.4" stroke-linecap="round" opacity="0.78">
+          <path d="M24 170 L24 250" />
+          <path d="M78 114 L78 306" />
+          <path d="M132 86 L132 334" />
+          <path d="M186 110 L186 310" />
+          <path d="M240 170 L240 250" />
+          <path d="M294 226 L294 194" />
+          <path d="M348 300 L348 120" />
+          <path d="M402 328 L402 92" />
+          <path d="M456 298 L456 122" />
+        </g>
+        <g fill="#f8f3e8" opacity="0.94">
+          <circle cx="126" cy="88" r="3.4" />
+          <circle cx="180" cy="468" r="2.8" />
+          <circle cx="614" cy="128" r="3.8" />
+          <circle cx="678" cy="386" r="2.4" />
+          <circle cx="528" cy="512" r="3.2" />
+          <circle cx="84" cy="334" r="2.7" />
+        </g>
+        <g font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="19" fill="#f7ead0" opacity="0.78">
+          <text x="102" y="552">ATG</text>
+          <text x="604" y="92">GFP</text>
+          <text x="640" y="536">BRAF</text>
+          <text x="64" y="250">lacZ</text>
+        </g>
+      </svg>
+    ''').strip()
+
+
+def render_front_cover(case_count: int) -> str:
+    return dedent(f'''
+      <section class="cover book-cover" aria-label="Front cover">
+        <div class="cover-topline">
+          <span>Genome Forge {escape(APP_VERSION)}</span>
+          <span>Textbook Edition</span>
+        </div>
+        <div class="cover-hero">
+          <div class="cover-copy">
+            <p class="cover-kicker">Self-study with real molecular data</p>
+            <h1>{escape(TUTORIAL_TITLE)}</h1>
+            <p class="cover-deck">{escape(TUTORIAL_SUBTITLE)}.</p>
+          </div>
+          <div class="cover-art-wrap">{render_cover_art()}</div>
+        </div>
+        <div class="cover-lower">
+          <p class="cover-thesis">Not button memorization. A guided apprenticeship in reading molecules, designing assays, interrogating evidence, and packaging work someone else can trust.</p>
+          <div class="cover-stats">
+            <div><b>{case_count}</b><span>lessons</span></div>
+            <div><b>Real</b><span>records</span></div>
+            <div><b>Letter</b><span>print edition</span></div>
+          </div>
+        </div>
+        <div class="cover-footer">
+          <span>{escape(TUTORIAL_AUTHOR)}</span>
+          <span>{escape(TODAY)}</span>
+        </div>
+      </section>
+    ''').strip()
+
+
+def render_inside_front_cover(case_count: int) -> str:
+    return dedent(f'''
+      <section class="inside-cover" aria-label="Inside front cover">
+        <div class="inside-cover-orbit" aria-hidden="true">
+          <svg viewBox="0 0 520 520" role="img" aria-label="Subtle molecular study compass">
+            <defs>
+              <linearGradient id="insideOrbit" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f0c36e" stop-opacity="0.72" />
+                <stop offset="52%" stop-color="#47c6bd" stop-opacity="0.72" />
+                <stop offset="100%" stop-color="#d987a5" stop-opacity="0.60" />
+              </linearGradient>
+            </defs>
+            <circle cx="260" cy="260" r="150" fill="none" stroke="url(#insideOrbit)" stroke-width="8" opacity="0.34" />
+            <circle cx="260" cy="260" r="90" fill="none" stroke="#17324a" stroke-width="1.4" opacity="0.18" />
+            <path d="M92 274 C160 170 228 356 306 224 S436 192 480 270" fill="none" stroke="#146c72" stroke-width="4" stroke-linecap="round" opacity="0.32" />
+            <path d="M92 234 C166 336 224 150 308 292 S438 332 480 252" fill="none" stroke="#a56b14" stroke-width="4" stroke-linecap="round" opacity="0.30" />
+          </svg>
+        </div>
+        <div class="inside-cover-copy">
+          <p class="inside-kicker">Duplex Print Edition</p>
+          <h2>A laboratory notebook for the computational imagination.</h2>
+          <p>This volume is designed for two-sided reading: covers outside, generous inner gutters inside, and major clusters opening on recto pages.</p>
+          <div class="inside-cover-grid">
+            <span>Read the molecule before the menu.</span>
+            <span>Ask what decision the output supports.</span>
+            <span>Keep coordinates, evidence, and interpretation together.</span>
+            <span>Leave a trail another scientist can reopen.</span>
+          </div>
+          <p class="inside-cover-note">{case_count} lessons. Real records. Reproducible sample data.</p>
+        </div>
+      </section>
+    ''').strip()
+
+
+def render_back_cover(case_count: int) -> str:
+    return dedent(f'''
+      <section class="back-cover" aria-label="Back cover">
+        <div class="back-cover-mark" aria-hidden="true">
+          <svg viewBox="-24 0 568 520" role="img" aria-label="Abstract molecule compass">
+            <defs>
+              <linearGradient id="backRing" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f0c36e" />
+                <stop offset="56%" stop-color="#47c6bd" />
+                <stop offset="100%" stop-color="#d987a5" />
+              </linearGradient>
+            </defs>
+            <circle cx="260" cy="260" r="174" fill="none" stroke="url(#backRing)" stroke-width="14" opacity="0.36" />
+            <circle cx="260" cy="260" r="118" fill="none" stroke="#d7eceb" stroke-width="1.5" opacity="0.42" />
+            <path d="M84 300 C168 184 250 390 340 214 S468 198 492 274" fill="none" stroke="#f0c36e" stroke-width="5" stroke-linecap="round" opacity="0.58" />
+            <path d="M92 224 C182 352 250 146 346 314 S462 326 492 246" fill="none" stroke="#5ed3cb" stroke-width="5" stroke-linecap="round" opacity="0.62" />
+            <g stroke="#f8f3e8" stroke-width="1.7" opacity="0.44">
+              <path d="M130 250 L130 278" /><path d="M172 242 L172 286" /><path d="M214 224 L214 304" />
+              <path d="M256 244 L256 284" /><path d="M298 226 L298 306" /><path d="M340 238 L340 290" />
+              <path d="M382 244 L382 282" />
+            </g>
+          </svg>
+        </div>
+        <div class="back-copy">
+          <p class="back-kicker">Genome Forge DNA Tutorial</p>
+          <h2>Learn the living logic behind sequence analysis.</h2>
+          <p>This book teaches DNA bioinformatics as a way of thinking: identify the biological object, choose the experiment, inspect the evidence, and make the interpretation reproducible.</p>
+          <p>The lessons use real-world molecular records, including EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. Training derivatives are marked as such and exist to make comparison, ambiguity, and assay-design questions concrete.</p>
+          <div class="back-promises">
+            <span>Map and annotate DNA</span>
+            <span>Design primers, digests, and edits</span>
+            <span>Read traces and alignments</span>
+            <span>Package reproducible evidence</span>
+          </div>
+        </div>
+        <div class="back-bottom">
+          <div>
+            <b>{case_count} lessons · sample data included</b>
+            <span>HTML and PDF generated from repository source.</span>
+          </div>
+          <div class="back-repo">
+            <span>{escape(REPO_URL)}</span>
+            <span>Apache License 2.0 · {escape(APP_VERSION)}</span>
+          </div>
+        </div>
+      </section>
+    ''').strip()
 
 
 def render_learning_path(case_count: int) -> str:
@@ -959,13 +1271,13 @@ def render_publication_note(case_count: int) -> str:
         <div class="pub-grid">
           <div class="card">
             <h3>Abstract</h3>
-            <p>This volume teaches practical bioinformatics with Genome Forge through real biological records, stepwise software workflows, expected outputs, interpretation guidance, and biological explanation in one reproducible text.</p>
+            <p>This volume teaches practical DNA bioinformatics with Genome Forge through real biological records, stepwise software workflows, expected outputs, interpretation guidance, and biological explanation in one reproducible text.</p>
             <p>The current edition contains {case_count} lessons organized into clusters that move from molecular architecture and restriction logic to assay design, assembly, comparative reasoning, ambiguity-aware analysis, and reproducible project delivery.</p>
           </div>
           <div class="card alt">
             <h3>Edition and Citation</h3>
             <p><b>Edition:</b> Genome Forge Textbook Edition, generated from repository source on <code>{escape(TODAY)}</code>.</p>
-            <p><b>Preferred citation:</b> <i>Teach Yourself Bioinformatics with Genome Forge</i>, Genome Forge {escape(APP_VERSION)}, tutorial edition.</p>
+            <p><b>Preferred citation:</b> <i>{escape(TUTORIAL_TITLE)}</i>, Genome Forge {escape(APP_VERSION)}, tutorial edition.</p>
             <p><b>Formats:</b> HTML and PDF are generated from the same source so case numbering, sample data, and screenshots stay aligned.</p>
           </div>
         </div>
@@ -976,9 +1288,9 @@ def render_publication_note(case_count: int) -> str:
 def render_half_title_page() -> str:
     return dedent(f'''
       <section class="half-title-page" aria-label="Half title page">
-        <p class="half-title-kicker">Genome Forge Tutorial</p>
-        <h1 class="half-title">Teach Yourself Bioinformatics with Genome Forge</h1>
-        <p class="half-subtitle">Textbook edition · self-study with real molecular data</p>
+        <p class="half-title-kicker">Genome Forge DNA Tutorial</p>
+        <h1 class="half-title">{escape(TUTORIAL_TITLE)}</h1>
+        <p class="half-subtitle">{escape(TUTORIAL_SUBTITLE)}</p>
       </section>
     ''').strip()
 
@@ -989,13 +1301,13 @@ def render_imprint_page(case_count: int) -> str:
         <div class="imprint-box">
           <p class="section-kicker">Imprint</p>
           <h2 class="imprint-title">Edition and Copyright</h2>
-          <p><b>Title:</b> <i>Teach Yourself Bioinformatics with Genome Forge</i></p>
+          <p><b>Title:</b> <i>{escape(TUTORIAL_TITLE)}</i></p>
           <p><b>Edition:</b> Genome Forge {escape(APP_VERSION)} textbook edition generated on <code>{escape(TODAY)}</code>.</p>
           <p><b>Authoring body:</b> {escape(TUTORIAL_AUTHOR)}</p>
           <p><b>Repository:</b> <a href="{escape(REPO_URL)}">{escape(REPO_URL)}</a></p>
           <p><b>License:</b> Apache License 2.0 for the project source. Public-source records and clearly labelled training derivatives are documented in the bundled dataset metadata.</p>
           <p><b>Scope:</b> This volume contains {case_count} lessons, real-world sample data, and HTML/PDF outputs rebuilt from the same source tutorial.</p>
-          <p><b>Suggested citation:</b> {escape(TUTORIAL_AUTHOR)}. <i>Teach Yourself Bioinformatics with Genome Forge</i>. Genome Forge {escape(APP_VERSION)}. {escape(COPYRIGHT_YEAR)}.</p>
+          <p><b>Suggested citation:</b> {escape(TUTORIAL_AUTHOR)}. <i>{escape(TUTORIAL_TITLE)}</i>. Genome Forge {escape(APP_VERSION)}. {escape(COPYRIGHT_YEAR)}.</p>
           <p class="muted">Copyright © {escape(COPYRIGHT_YEAR)} {escape(TUTORIAL_AUTHOR)}.</p>
         </div>
       </section>
@@ -1051,6 +1363,18 @@ def render_case_screenshot(case_id: str) -> str:
     ''').strip()
 
 
+def render_case_concept_illustration(case_id: str) -> str:
+    shot = CONCEPT_ILLUSTRATIONS.get(case_id)
+    if not shot:
+        return ''
+    return dedent(f'''
+      <div class="figure concept">
+        <img src="{escape(shot["file"])}" alt="{escape(shot["title"])}" />
+        <p class="caption"><b>{escape(shot["title"])}</b>. {escape(shot["caption"])}</p>
+      </div>
+    ''').strip()
+
+
 def render_case(case_info: dict) -> str:
     records = case_info['records']
     record_details = ' '.join(RECORDS[name]['input_details'] for name in records)
@@ -1064,6 +1388,7 @@ def render_case(case_info: dict) -> str:
     ]
     expected = case_info['expected']
     interpretation = case_info['interpretation']
+    concept_html = render_case_concept_illustration(case_info['id'])
     screenshot_html = render_case_screenshot(case_info['id'])
     starter_html = ''
     if starter_values:
@@ -1097,6 +1422,7 @@ def render_case(case_info: dict) -> str:
         </div>
         {starter_html}
         <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol>{format_list(steps, escape_items=False)}</ol></div>
+        {concept_html}
         {screenshot_html}
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{format_json_block(case_info['sample_result'])}</pre></div>
         <div class="expected"><b>Expected Results</b><ul>{format_list(expected)}</ul></div>
@@ -1156,22 +1482,22 @@ def render_html() -> str:
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="{escape(TUTORIAL_AUTHOR)}" />
-  <meta name="description" content="Publication-style self-study bioinformatics tutorial for Genome Forge using real biological records, stepwise workflows, and biological interpretation." />
-  <meta name="keywords" content="bioinformatics, DNA, cloning, plasmid, genome forge, tutorial, molecular biology" />
+  <meta name="description" content="Publication-style self-study DNA bioinformatics tutorial for Genome Forge using real biological records, sequence workflows, cloning design, molecular evidence, and biological interpretation." />
+  <meta name="keywords" content="DNA bioinformatics, sequence analysis, cloning, plasmid, molecular evidence, genome forge, tutorial, molecular biology" />
   <meta name="generator" content="Genome Forge tutorial generator" />
   <meta name="dcterms.created" content="{escape(TODAY)}" />
   <meta name="dcterms.modified" content="{escape(TODAY)}" />
-  <title>Teach Yourself Bioinformatics with Genome Forge ({escape(APP_VERSION)})</title>
+  <title>{escape(TUTORIAL_TITLE)} ({escape(APP_VERSION)})</title>
   <style>
     @page {{
-      size: A4;
-      margin: 17mm 15mm 20mm 15mm;
+      size: Letter;
+      margin: 0.68in 0.60in 0.78in 0.60in;
     }}
     @page :left {{
-      margin-left: 18mm;
-      margin-right: 14mm;
+      margin-left: 0.55in;
+      margin-right: 0.78in;
       @top-left {{
-        content: "Teach Yourself Bioinformatics with Genome Forge";
+        content: "{escape(TUTORIAL_TITLE)}";
         color: #6b7280;
         font-size: 8.5px;
         letter-spacing: 0.06em;
@@ -1183,10 +1509,10 @@ def render_html() -> str:
       }}
     }}
     @page :right {{
-      margin-left: 14mm;
-      margin-right: 18mm;
+      margin-left: 0.78in;
+      margin-right: 0.55in;
       @top-right {{
-        content: "Genome Forge Tutorial";
+        content: "Genome Forge DNA Tutorial";
         color: #6b7280;
         font-size: 8.5px;
         letter-spacing: 0.06em;
@@ -1204,6 +1530,30 @@ def render_html() -> str:
       @bottom-right {{ content: none; }}
     }}
     @page cover {{
+      size: Letter;
+      margin: 0;
+      @top-left {{ content: none; }}
+      @top-right {{ content: none; }}
+      @bottom-left {{ content: none; }}
+      @bottom-right {{ content: none; }}
+    }}
+    @page backcover {{
+      size: Letter;
+      margin: 0;
+      @top-left {{ content: none; }}
+      @top-right {{ content: none; }}
+      @bottom-left {{ content: none; }}
+      @bottom-right {{ content: none; }}
+    }}
+    @page insidecover {{
+      size: Letter;
+      margin: 0;
+      @top-left {{ content: none; }}
+      @top-right {{ content: none; }}
+      @bottom-left {{ content: none; }}
+      @bottom-right {{ content: none; }}
+    }}
+    @page :blank {{
       @top-left {{ content: none; }}
       @top-right {{ content: none; }}
       @bottom-left {{ content: none; }}
@@ -1273,17 +1623,17 @@ def render_html() -> str:
     .doc {{ max-width: 940px; margin: 0 auto; padding: 20px 14px 44px; }}
     .half-title-page {{
       page: pretitle;
-      min-height: 245mm;
+      min-height: 9.05in;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 12mm 10mm;
+      padding: 0.45in 0.40in;
       break-after: page;
     }}
     .half-title-kicker {{
-      margin: 0 0 10mm;
+      margin: 0 0 0.38in;
       color: var(--gold);
       text-transform: uppercase;
       letter-spacing: 0.18em;
@@ -1299,7 +1649,7 @@ def render_html() -> str:
       font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     }}
     .half-subtitle {{
-      margin: 10mm 0 0;
+      margin: 0.38in 0 0;
       max-width: 520px;
       color: var(--muted);
       font-size: 12px;
@@ -1363,11 +1713,11 @@ def render_html() -> str:
     .meta .k b {{ display: block; margin-top: 4px; font-size: 12px; color: var(--navy); }}
     .imprint-page {{
       page: imprint;
-      min-height: 245mm;
+      min-height: 9.05in;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10mm 0;
+      padding: 0.38in 0;
       break-after: page;
     }}
     .imprint-box {{
@@ -1427,6 +1777,358 @@ def render_html() -> str:
       font-size: 10px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+    }}
+    .book-cover {{
+      min-height: 11in;
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0.62in 0.70in 0.54in;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #f7f1df;
+      background:
+        radial-gradient(circle at 76% 24%, rgba(80, 210, 198, 0.24), rgba(80, 210, 198, 0) 34%),
+        radial-gradient(circle at 15% 82%, rgba(217, 115, 152, 0.22), rgba(217, 115, 152, 0) 32%),
+        linear-gradient(142deg, #07131f 0%, #0f2635 48%, #13383b 100%);
+      box-shadow: none;
+    }}
+    .book-cover * {{
+      hyphens: none;
+    }}
+    .book-cover::before {{
+      content: "";
+      position: absolute;
+      inset: 0.28in auto 0.28in 0.28in;
+      width: 0.08in;
+      height: auto;
+      background: linear-gradient(180deg, #f0c36e, #50d2c6, #d97398);
+      border-radius: 999px;
+      opacity: 0.92;
+    }}
+    .book-cover::after {{
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,0.040) 1px, transparent 1px);
+      background-size: 0.48in 0.48in;
+      mask-image: linear-gradient(120deg, transparent 0%, black 22%, black 72%, transparent 100%);
+      opacity: 0.34;
+    }}
+    .cover-topline, .cover-footer {{
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: rgba(247, 241, 223, 0.78);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }}
+    .cover-hero {{
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 0.94fr 1.06fr;
+      gap: 0.34in;
+      align-items: center;
+      margin-top: 0.20in;
+    }}
+    .cover-copy {{
+      align-self: center;
+    }}
+    .cover-kicker {{
+      margin: 0 0 0.18in;
+      color: #f0c36e;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+    }}
+    .book-cover h1 {{
+      margin: 0;
+      max-width: 4.3in;
+      color: #fffaf0;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-size: 48px;
+      line-height: 0.98;
+      letter-spacing: -0.035em;
+    }}
+    .cover-deck {{
+      margin: 0.22in 0 0;
+      max-width: 3.95in;
+      color: rgba(247, 241, 223, 0.84);
+      font-size: 14px;
+      line-height: 1.55;
+    }}
+    .cover-art-wrap {{
+      min-height: 4.7in;
+      display: grid;
+      place-items: center;
+    }}
+    .cover-art {{
+      width: 100%;
+      max-width: 4.42in;
+      height: auto;
+      display: block;
+    }}
+    .cover-lower {{
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin-top: 0.18in;
+      padding-top: 0.24in;
+      border-top: 1px solid rgba(247, 241, 223, 0.26);
+    }}
+    .cover-thesis {{
+      margin: 0;
+      max-width: 6.35in;
+      color: rgba(247, 241, 223, 0.78);
+      font-size: 11.6px;
+      line-height: 1.55;
+    }}
+    .cover-stats {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.18in;
+      margin-top: 0.20in;
+    }}
+    .cover-stats div {{
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.07in;
+      border: 0;
+      border-left: 0.035in solid rgba(80, 210, 198, 0.75);
+      background: transparent;
+      padding: 0 0 0 0.09in;
+    }}
+    .cover-stats b {{
+      display: block;
+      color: #fffaf0;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.05;
+      white-space: nowrap;
+    }}
+    .cover-stats span {{
+      display: inline;
+      margin-top: 0;
+      color: rgba(247, 241, 223, 0.66);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 8.4px;
+      line-height: 1.25;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      overflow-wrap: normal;
+      word-break: normal;
+      white-space: nowrap;
+    }}
+    .back-cover {{
+      page: backcover;
+      break-before: left;
+      position: relative;
+      overflow: hidden;
+      min-height: 11in;
+      padding: 0.66in 0.72in 0.56in;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #f7f1df;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(240, 195, 110, 0.20), rgba(240, 195, 110, 0) 30%),
+        radial-gradient(circle at 84% 70%, rgba(80, 210, 198, 0.18), rgba(80, 210, 198, 0) 32%),
+        linear-gradient(160deg, #06111c 0%, #0a1f2d 54%, #142f32 100%);
+    }}
+    .inside-cover {{
+      page: insidecover;
+      break-after: page;
+      position: relative;
+      overflow: hidden;
+      min-height: 11in;
+      padding: 0.78in 0.82in;
+      display: flex;
+      align-items: center;
+      color: var(--navy);
+      background:
+        radial-gradient(circle at 82% 26%, rgba(20, 108, 114, 0.13), rgba(20, 108, 114, 0) 34%),
+        radial-gradient(circle at 14% 84%, rgba(165, 107, 20, 0.12), rgba(165, 107, 20, 0) 32%),
+        linear-gradient(135deg, #f9f4e8 0%, #f4f8f8 58%, #edf5f2 100%);
+    }}
+    .inside-cover * {{
+      hyphens: none;
+      overflow-wrap: normal;
+    }}
+    .inside-cover::before {{
+      content: "";
+      position: absolute;
+      inset: 0.42in;
+      border: 1px solid rgba(23, 50, 74, 0.13);
+      pointer-events: none;
+    }}
+    .inside-cover-orbit {{
+      position: absolute;
+      right: -0.45in;
+      top: 0.55in;
+      width: 4.15in;
+      opacity: 0.85;
+    }}
+    .inside-cover-orbit svg {{
+      width: 100%;
+      height: auto;
+      display: block;
+    }}
+    .inside-cover-copy {{
+      position: relative;
+      z-index: 1;
+      max-width: 4.92in;
+    }}
+    .inside-kicker {{
+      margin: 0 0 0.16in;
+      color: var(--gold);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }}
+    .inside-cover h2 {{
+      margin: 0 0 0.24in;
+      max-width: 4.6in;
+      color: var(--navy);
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-size: 32px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }}
+    .inside-cover p {{
+      margin: 0 0 0.18in;
+      color: #405463;
+      font-size: 12.3px;
+      line-height: 1.6;
+    }}
+    .inside-cover-grid {{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.10in;
+      margin: 0.30in 0;
+      max-width: 4.85in;
+    }}
+    .inside-cover-grid span {{
+      border-left: 0.035in solid var(--teal);
+      background: rgba(255,255,255,0.55);
+      padding: 0.12in 0.14in;
+      color: #17324a;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 10.7px;
+      font-weight: 700;
+      line-height: 1.35;
+    }}
+    .inside-cover-note {{
+      margin-top: 0.28in;
+      color: #6b5c3f;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }}
+    .back-cover::before {{
+      content: "";
+      position: absolute;
+      inset: 0.42in 0.42in;
+      border: 1px solid rgba(247, 241, 223, 0.20);
+      pointer-events: none;
+      display: none;
+    }}
+    .back-cover-mark {{
+      position: absolute;
+      right: 0.42in;
+      top: 0.55in;
+      width: 3.12in;
+      opacity: 0.82;
+    }}
+    .back-cover-mark svg {{
+      width: 100%;
+      height: auto;
+      display: block;
+    }}
+    .back-copy {{
+      position: relative;
+      z-index: 1;
+      max-width: 5.15in;
+      margin-top: 1.04in;
+    }}
+    .back-kicker {{
+      margin: 0 0 0.18in;
+      color: #f0c36e;
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+    }}
+    .back-cover h2 {{
+      margin: 0 0 0.22in;
+      max-width: 4.70in;
+      color: #fffaf0;
+      font-family: "Baskerville", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      font-size: 31px;
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+    }}
+    .back-cover p {{
+      margin: 0 0 0.15in;
+      max-width: 4.95in;
+      color: rgba(247, 241, 223, 0.82);
+      font-size: 12.2px;
+      line-height: 1.58;
+    }}
+    .back-promises {{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.10in;
+      max-width: 5.1in;
+      margin-top: 0.26in;
+    }}
+    .back-promises span {{
+      border-left: 0.04in solid #50d2c6;
+      background: rgba(255,255,255,0.055);
+      padding: 0.09in 0.12in;
+      color: rgba(247, 241, 223, 0.84);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 10.2px;
+      font-weight: 700;
+    }}
+    .back-bottom {{
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.36in;
+      align-items: end;
+      padding-top: 0.24in;
+      border-top: 1px solid rgba(247, 241, 223, 0.22);
+      color: rgba(247, 241, 223, 0.72);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+      font-size: 9.6px;
+      line-height: 1.45;
+    }}
+    .back-bottom b, .back-bottom span {{
+      display: block;
+    }}
+    .back-bottom b {{
+      color: #fffaf0;
+      font-size: 10.8px;
+    }}
+    .back-repo {{
+      text-align: right;
+      max-width: 2.6in;
     }}
     .section-kicker {{
       margin: 0 0 4px;
@@ -1551,6 +2253,7 @@ def render_html() -> str:
     .figure img {{ width: 100%; max-width: 860px; height: auto; border-radius: 6px; display: block; margin: 0 auto; }}
     .figure.narrow img {{ max-width: 620px; }}
     .figure.ui-shot img {{ max-width: 940px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12); }}
+    .figure.concept img {{ max-width: 900px; background: #f8fbff; }}
     .caption {{ margin: 6px 0 0; font-size: 10.2px; color: var(--muted); text-align: left; }}
     .caption::before {{
       content: "Figure " counter(figure) ". ";
@@ -1559,6 +2262,7 @@ def render_html() -> str:
       font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
     }}
     .gallery {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }}
+    .concept-gallery {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
     .figure-card {{
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -1572,6 +2276,7 @@ def render_html() -> str:
       counter-increment: figure;
     }}
     .figure-card img {{ width: 100%; height: auto; border-radius: 6px; background: #f8fbff; }}
+    .concept-card {{ grid-template-columns: 1fr; }}
     .figure-card h3 {{ margin: 0 0 4px; font-size: 13px; }}
     .figure-card h3::before {{
       content: "Figure " counter(figure) ". ";
@@ -1715,18 +2420,216 @@ def render_html() -> str:
     .interpret {{ border: 1px solid #e4d7ab; border-left: 4px solid var(--gold); background: #fff9eb; }}
     .biology {{ border: 1px solid #e1cbd6; border-left: 4px solid var(--rose); background: #fdf6f9; }}
     .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b {{ display: block; margin-bottom: 4px; color: var(--navy); font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
-    .cluster, .case, .card, .figure, pre {{ page-break-inside: avoid; }}
+    h2, h3, h4 {{ break-after: avoid-page; page-break-after: avoid; }}
+    .card, .figure {{ break-inside: avoid-page; page-break-inside: avoid; }}
     @media print {{
-      body {{ background: #ffffff; }}
-      .doc {{ max-width: none; margin: 0; padding: 0; }}
+      body {{
+        background: #ffffff;
+        font-size: 10.9px;
+        line-height: 1.58;
+      }}
+      .doc {{
+        max-width: none;
+        margin: 0;
+        padding: 0;
+      }}
       .section, .cover, .card, .figure, .figure-card, .cover-shot, .imprint-box {{
         box-shadow: none;
       }}
       .section {{
-        border-radius: 14px;
+        break-before: page;
+        break-inside: auto;
+        page-break-inside: auto;
+        margin: 0 0 7mm;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+      }}
+      .section.no-break {{
+        break-before: page;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }}
+      .section > h2 {{
+        padding-bottom: 2.5mm;
+        border-bottom: 0.35mm solid #d7e3eb;
+        margin-bottom: 4mm;
+      }}
+      .section-kicker {{
+        margin-top: 0;
+        break-after: avoid-page;
+        page-break-after: avoid;
+      }}
+      .frontmatter {{
+        break-before: page;
+      }}
+      .grid2, .pub-grid, .cards, .cards.cards-wide {{
+        display: block;
+      }}
+      .grid2 > *, .pub-grid > *, .cards > * {{
+        margin-bottom: 4mm;
+      }}
+      .card, .toc-group, .learning-path, .path-step, .figure-card {{
+        border-radius: 0;
+        background: #ffffff;
+      }}
+      .card {{
+        padding: 4mm;
+      }}
+      .learning-path {{
+        display: block;
+        margin-top: 4mm;
+        padding: 4mm;
+      }}
+      .path-intro {{
+        border-right: 0;
+        border-bottom: 1px solid #d7e3eb;
+        padding-right: 0;
+        padding-bottom: 3mm;
+        margin-bottom: 3mm;
+      }}
+      .path-steps {{
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 3mm;
+      }}
+      .figure {{
+        margin: 5mm 0 4mm;
+        padding: 3mm;
+        border-radius: 0;
+        break-inside: avoid-page;
+      }}
+      .figure img {{
+        max-width: 100%;
+        max-height: 150mm;
+        object-fit: contain;
+      }}
+      .figure.ui-shot img {{
+        max-height: 132mm;
+        box-shadow: none;
+      }}
+      .figure.concept img {{
+        max-height: 140mm;
+      }}
+      .gallery, .concept-gallery {{
+        display: block;
+      }}
+      .figure-card {{
+        display: block;
+        margin-bottom: 6mm;
+        padding: 4mm;
+      }}
+      .figure-card img {{
+        max-height: 132mm;
+        object-fit: contain;
       }}
       .print-only {{ display: block; }}
       .cluster-head {{ display: none; }}
+      .cluster {{
+        break-before: right;
+        margin: 0;
+        padding: 0;
+      }}
+      .chapter-opener {{
+        min-height: 8.95in;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        break-before: right;
+        break-after: page;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        padding: 0;
+      }}
+      .chapter-title {{
+        max-width: 150mm;
+        font-size: 31px;
+      }}
+      .chapter-theme {{
+        max-width: 142mm;
+        font-size: 13.5px;
+      }}
+      .chapter-summary {{
+        margin-top: 8mm;
+        border-radius: 0;
+        background: #ffffff;
+      }}
+      .chapter-figure {{
+        max-width: 118mm;
+        margin-top: 8mm;
+      }}
+      .chapter-figure img {{
+        max-height: 76mm;
+        object-fit: contain;
+      }}
+      .case {{
+        break-before: page;
+        break-inside: auto;
+        page-break-inside: auto;
+        margin: 0;
+        padding-top: 0;
+        border-top: 0;
+      }}
+      .case-head {{
+        display: block;
+        break-inside: avoid-page;
+        padding-bottom: 3mm;
+        margin-bottom: 4mm;
+        border-bottom: 0.4mm solid #d8e4eb;
+      }}
+      .case-title {{
+        border-bottom: 0;
+        margin-bottom: 2mm;
+        padding-bottom: 0;
+        font-size: 18px;
+      }}
+      .case-meta {{
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 3mm;
+        margin-top: 4mm;
+        break-inside: avoid-page;
+      }}
+      .case-meta > div {{
+        border-radius: 0;
+        padding: 2.6mm;
+      }}
+      .case-grid {{
+        display: block;
+        margin-top: 0;
+      }}
+      .case-grid .card {{
+        break-inside: auto;
+        page-break-inside: auto;
+        margin-bottom: 4mm;
+      }}
+      .study-note, .stepbox, .expected, .interpret, .biology {{
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }}
+      .resultbox {{
+        break-inside: auto;
+        page-break-inside: auto;
+      }}
+      .study-note, .stepbox, .resultbox, .expected, .interpret, .biology {{
+        border-radius: 0;
+        margin-top: 4mm;
+        padding: 3.2mm 3.8mm;
+      }}
+      pre {{
+        break-inside: auto;
+        page-break-inside: auto;
+        font-size: 9.1px;
+        line-height: 1.36;
+      }}
+      table {{
+        font-size: 9.7px;
+      }}
+      th, td {{
+        padding: 2.4mm;
+      }}
     }}
     @media screen {{
       .print-only {{ display: none !important; }}
@@ -1735,22 +2638,11 @@ def render_html() -> str:
 </head>
 <body>
   <main class="doc">
-    {render_half_title_page()}
+    {render_front_cover(case_count)}
 
-    <section class="cover">
-      <p class="eyebrow">Genome Forge {escape(APP_VERSION)} · Textbook Edition</p>
-      <h1>Teach Yourself Bioinformatics with Genome Forge</h1>
-      <p class="deck">A self-study bioinformatics text for engineers, analysts, and scientists who want to learn from real laboratory molecules rather than toy examples.</p>
-      <p>The course uses public-source records such as EGFP, mCherry, pUC19/lacZ logic, and a BRAF exon 15 hotspot fragment. Clearly labelled training derivatives appear only when they sharpen a teaching goal, such as variant interpretation, family-wide assay design, or ambiguity-aware search.</p>
-      <div class="meta">
-        <div class="k">Mode<b>Self-study course</b></div>
-        <div class="k">Cases<b>{case_count} total lessons</b></div>
-        <div class="k">Audience<b>CS to biology bridge</b></div>
-        <div class="k">Release<b>{escape(TODAY)}</b></div>
-      </div>
-      {render_cover_spread()}
-      <p class="cover-note">Each lesson combines procedure, expected results, biological interpretation, and a clear statement of why the data matter in practice.</p>
-    </section>
+    {render_inside_front_cover(case_count)}
+
+    {render_half_title_page()}
 
     {render_imprint_page(case_count)}
 
@@ -1849,6 +2741,13 @@ def render_html() -> str:
     </section>
 
     <section class="section">
+      <p class="section-kicker">Biology Background</p>
+      <h2>Three Concepts That Deserve Pictures</h2>
+      <p class="muted">A review of the expanded tutorial found three places where a reader with limited biology background benefits from an explanatory illustration before touching the software: diagnostic digest logic, silent restriction-site design, and Sanger trace evidence review.</p>
+      {render_concept_gallery()}
+    </section>
+
+    <section class="section">
       <p class="section-kicker">Biological Objects</p>
       <h2>Real-World Record Field Guide</h2>
       <p>These are the biological objects that power the tutorial. Some are public-source sequences bundled directly in the FASTA file. Others are clearly labelled training derivatives created so specific comparison cases have an answer key.</p>
@@ -1881,6 +2780,8 @@ def render_html() -> str:
     </section>
 
     {cluster_sections}
+
+    {render_back_cover(case_count)}
   </main>
 </body>
 </html>

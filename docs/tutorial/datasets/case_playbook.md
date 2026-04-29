@@ -34,6 +34,26 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case C --out ./tmp/genomeforge_case_c `
 - Key expected signal: A ranked list of possible star-activity sites and their mismatch burden.
 
+## Case AN: Diagnostic Cutter Selection Between Related Constructs
+
+- Cluster: Molecule Architecture and Restriction Logic
+- Focus: If two constructs differ by only a small edit, which restriction enzyme gives the cleanest yes/no diagnostic digest?
+- Records: pUC19_MCS
+- Workflow: Compare a normal multiple-cloning-site sequence with a missing-site variant and choose enzymes that discriminate the two molecules.
+- APIs: /api/restriction-compare
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AN --out ./tmp/genomeforge_case_an `
+- Key expected signal: A comparison table listing cut counts for both sequences.
+
+## Case AO: Custom Ladder-Centric Digest Gel Planning
+
+- Cluster: Molecule Architecture and Restriction Logic
+- Focus: Will the gel ladder your lab actually uses make the diagnostic fragments easy to interpret?
+- Records: pUC19_MCS
+- Workflow: Define an in-house DNA ladder and render digest fragments against that ladder instead of a generic preset.
+- APIs: /api/gel-ladder-save, /api/gel-ladder-load, /api/digest-gel
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AO --out ./tmp/genomeforge_case_ao `
+- Key expected signal: A saved custom ladder with named band sizes.
+
 ## Case U: k-mer Profile for Contamination Suspicion
 
 - Cluster: Molecule Architecture and Restriction Logic
@@ -55,6 +75,16 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - APIs: /api/sequence-tracks
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case D --out ./tmp/genomeforge_case_d `
 - Key expected signal: A readable track that shows DNA letters, codons, amino acids, and annotations in register.
+
+## Case AP: Text Map Reading for Dense Annotated Sequence
+
+- Cluster: Sequence Meaning and Functional Annotation
+- Focus: When a graphical map becomes too broad, can a text map help you inspect the exact bases, codons, and annotations without losing context?
+- Records: EGFP_CDS
+- Workflow: Render a text-map view that aligns sequence, translation, coordinates, and feature labels in a compact text-first representation.
+- APIs: /api/text-map
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AP --out ./tmp/genomeforge_case_ap `
+- Key expected signal: A rendered text map with visible coordinate blocks and sequence rows.
 
 ## Case M: ORF Scan and Coding Potential Triage
 
@@ -244,6 +274,16 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case V --out ./tmp/genomeforge_case_v `
 - Key expected signal: A codon-optimization or codon-bias summary tied to a specific host scenario.
 
+## Case AQ: Silent Restriction-Site Engineering
+
+- Cluster: Editing and Design for Intervention
+- Focus: Can you add a convenient screening site to a coding sequence while leaving the protein product unchanged?
+- Records: EGFP_CDS
+- Workflow: Search for synonymous coding-sequence edits that introduce or remove a restriction site without changing the translated protein.
+- APIs: /api/silent-restriction-sites
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AQ --out ./tmp/genomeforge_case_aq `
+- Key expected signal: A candidate list of synonymous edits grouped by enzyme and coordinate.
+
 ## Cluster G: Data Fidelity and Interoperability
 
 ## Case I: DNA Container Roundtrip Validation
@@ -326,6 +366,16 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AI --out ./tmp/genomeforge_case_ai `
 - Key expected signal: A verification report localizing any mismatches or confirming identity.
 
+## Case AR: Linked Trace-to-Reference Navigation
+
+- Cluster: Data Fidelity and Interoperability
+- Focus: When a sequencing trace disagrees with the expected construct, how do you jump directly from the mismatch summary to the raw local evidence?
+- Records: EGFP_CDS
+- Workflow: Generate clickable trace/reference navigation anchors so each mismatch or low-confidence call can be inspected in sequence context.
+- APIs: /api/import-ab1, /api/trace-alignment-links, /api/trace-chromatogram-svg
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AR --out ./tmp/genomeforge_case_ar `
+- Key expected signal: A trace import followed by a linked alignment-navigation table.
+
 ## Case AJ: BLAST-like Similarity Search for Identity, Origin, and Contamination
 
 - Cluster: Data Fidelity and Interoperability
@@ -335,6 +385,16 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - APIs: /api/blast-search
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AJ --out ./tmp/genomeforge_case_aj `
 - Key expected signal: A ranked hit list with identity and coverage, not just a single best match.
+
+## Case AS: Selected-Sequence External BLAST Launch
+
+- Cluster: Data Fidelity and Interoperability
+- Focus: When local search says a sequence is interesting, how do you send exactly the selected region to a public reference search without losing coordinates or context?
+- Records: EGFP_CDS
+- Workflow: Package a selected sequence window as FASTA and launch or copy it for external NCBI and WormBase BLAST workflows.
+- APIs: /api/blast-launch
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AS --out ./tmp/genomeforge_case_as `
+- Key expected signal: A copyable FASTA payload for the selected region, not the entire record by accident.
 
 ## Case AK: Reference Element Auto-Flagging and siRNA Design/Mapping
 

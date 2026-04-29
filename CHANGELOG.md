@@ -4,6 +4,25 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-04-29
+
+### Added
+
+- Added ApE-inspired DNA workflows to the training tutorial, including diagnostic cutter comparison, custom ladder planning, text-map inspection, silent restriction-site engineering, linked trace navigation, and selected-sequence external BLAST launch.
+- Added concept illustrations for diagnostic digests, silent restriction-site engineering, and trace-to-reference evidence review.
+- Added ready-to-load tutorial case bundles for the six new lessons.
+
+### Changed
+
+- Retitled the course to **Teach Yourself DNA Bioinformatics with Genome Forge** for a more precise scope.
+- Rebuilt the tutorial as a US Letter, duplex-oriented print edition with a designed front cover, inside front cover, mirrored gutters, and an even-page back cover.
+- Expanded the generated tutorial dataset, playbook, HTML, and PDF to 45 lessons.
+
+### Validation
+
+- Regenerated the tutorial HTML/PDF and dataset artifacts from source.
+- Re-ran documentation validation, Python compile checks, PDF geometry checks, and whitespace checks.
+
 ## [0.1.8] - 2026-04-27
 
 ### Added

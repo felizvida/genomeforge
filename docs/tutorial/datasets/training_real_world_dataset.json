@@ -1,6 +1,6 @@
 {
   "dataset_name": "genomeforge_training_real_world_v2",
-  "created_at": "2026-04-27",
+  "created_at": "2026-04-29",
   "overview": "Real-world teaching bundle for the Genome Forge tutorial, including public-source records and clearly labeled training derivatives.",
   "usage_tips": [
     "Use extract_case_bundle.py to materialize the exact records for one case.",
@@ -302,6 +302,38 @@
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_c"
     },
     {
+      "case_id": "AN",
+      "title": "Diagnostic Cutter Selection Between Related Constructs",
+      "cluster": "A",
+      "records": [
+        "pUC19_MCS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Compare a normal multiple-cloning-site sequence with a missing-site variant and choose enzymes that discriminate the two molecules.",
+      "apis": [
+        "/api/restriction-compare"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AN --out ./tmp/genomeforge_case_an",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_an"
+    },
+    {
+      "case_id": "AO",
+      "title": "Custom Ladder-Centric Digest Gel Planning",
+      "cluster": "A",
+      "records": [
+        "pUC19_MCS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Define an in-house DNA ladder and render digest fragments against that ladder instead of a generic preset.",
+      "apis": [
+        "/api/gel-ladder-save",
+        "/api/gel-ladder-load",
+        "/api/digest-gel"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AO --out ./tmp/genomeforge_case_ao",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ao"
+    },
+    {
       "case_id": "U",
       "title": "k-mer Profile for Contamination Suspicion",
       "cluster": "A",
@@ -333,6 +365,21 @@
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case D --out ./tmp/genomeforge_case_d",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_d"
+    },
+    {
+      "case_id": "AP",
+      "title": "Text Map Reading for Dense Annotated Sequence",
+      "cluster": "B",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Map",
+      "workflow": "Render a text-map view that aligns sequence, translation, coordinates, and feature labels in a compact text-first representation.",
+      "apis": [
+        "/api/text-map"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AP --out ./tmp/genomeforge_case_ap",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ap"
     },
     {
       "case_id": "M",
@@ -646,6 +693,21 @@
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_v"
     },
     {
+      "case_id": "AQ",
+      "title": "Silent Restriction-Site Engineering",
+      "cluster": "F",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Search for synonymous coding-sequence edits that introduce or remove a restriction site without changing the translated protein.",
+      "apis": [
+        "/api/silent-restriction-sites"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AQ --out ./tmp/genomeforge_case_aq",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_aq"
+    },
+    {
       "case_id": "I",
       "title": "DNA Container Roundtrip Validation",
       "cluster": "G",
@@ -782,6 +844,23 @@
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ai"
     },
     {
+      "case_id": "AR",
+      "title": "Linked Trace-to-Reference Navigation",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Trace",
+      "workflow": "Generate clickable trace/reference navigation anchors so each mismatch or low-confidence call can be inspected in sequence context.",
+      "apis": [
+        "/api/import-ab1",
+        "/api/trace-alignment-links",
+        "/api/trace-chromatogram-svg"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AR --out ./tmp/genomeforge_case_ar",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ar"
+    },
+    {
       "case_id": "AJ",
       "title": "BLAST-like Similarity Search for Identity, Origin, and Contamination",
       "cluster": "G",
@@ -798,6 +877,21 @@
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AJ --out ./tmp/genomeforge_case_aj",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_aj"
+    },
+    {
+      "case_id": "AS",
+      "title": "Selected-Sequence External BLAST Launch",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "Advanced",
+      "workflow": "Package a selected sequence window as FASTA and launch or copy it for external NCBI and WormBase BLAST workflows.",
+      "apis": [
+        "/api/blast-launch"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AS --out ./tmp/genomeforge_case_as",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_as"
     },
     {
       "case_id": "AK",

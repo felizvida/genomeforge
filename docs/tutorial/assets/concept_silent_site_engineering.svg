@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="556" viewBox="0 0 1100 680" role="img" aria-labelledby="title desc">
+  <title id="title">Silent restriction-site engineering by synonymous codon change</title>
+  <desc id="desc">A conceptual diagram showing how a synonymous codon edit can create a BamHI restriction site while preserving the encoded Gly-Ser amino-acid sequence.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fffaf1"/>
+      <stop offset="0.45" stop-color="#f6fbfd"/>
+      <stop offset="1" stop-color="#eef8f6"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f3f8fa"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#18334a" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c72"/>
+    </marker>
+    <style>
+      .title { font-family: Georgia, serif; font-size: 34px; font-weight: 700; fill: #17324a; }
+      .subtitle { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 500; fill: #526170; }
+      .label { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 700; fill: #17324a; }
+      .small { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500; fill: #526170; }
+      .tiny { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; fill: #526170; }
+      .mono { font-family: IBM Plex Mono, Menlo, Consolas, monospace; font-size: 24px; font-weight: 800; fill: #17202a; letter-spacing: 1px; }
+      .codon { fill: #ffffff; stroke: #c9d5df; stroke-width: 1.5; }
+      .codonHot { fill: #fff1d9; stroke: #a56b14; stroke-width: 2; }
+      .aa { fill: #e8f4f5; stroke: #9ecbd0; stroke-width: 1.5; }
+      .panel { fill: url(#panel); stroke: #c9d5df; stroke-width: 1.4; filter: url(#softShadow); }
+      .callout { fill: #fff8ed; stroke: #d8b470; stroke-width: 1.4; }
+      .motif { fill: #f6dbe7; stroke: #8c4161; stroke-width: 2; }
+      .ok { fill: #146c72; }
+    </style>
+  </defs>
+  <rect width="1100" height="680" fill="url(#bg)"/>
+  <circle cx="995" cy="104" r="170" fill="#e6f3f4" opacity="0.55"/>
+  <circle cx="90" cy="620" r="210" fill="#fff0d6" opacity="0.48"/>
+  <text class="title" x="62" y="64">Silent-site engineering: change DNA, preserve protein</text>
+  <text class="subtitle" x="64" y="95">A synonymous edit can create a useful restriction site without changing the amino-acid sequence.</text>
+
+  <rect class="panel" x="60" y="132" width="480" height="220" rx="18"/>
+  <text class="label" x="90" y="169">Before: no BamHI motif</text>
+  <text class="small" x="90" y="196">The protein-coding meaning is Met-Gly-Ser-Stop.</text>
+  <g transform="translate(88 226)">
+    <rect class="codon" x="0" y="0" width="92" height="58" rx="12"/>
+    <rect class="codonHot" x="102" y="0" width="92" height="58" rx="12"/>
+    <rect class="codonHot" x="204" y="0" width="92" height="58" rx="12"/>
+    <rect class="codon" x="306" y="0" width="92" height="58" rx="12"/>
+    <text class="mono" x="19" y="38">ATG</text>
+    <text class="mono" x="121" y="38">GGT</text>
+    <text class="mono" x="223" y="38">TCC</text>
+    <text class="mono" x="325" y="38">TAA</text>
+    <rect class="aa" x="0" y="76" width="92" height="40" rx="10"/>
+    <rect class="aa" x="102" y="76" width="92" height="40" rx="10"/>
+    <rect class="aa" x="204" y="76" width="92" height="40" rx="10"/>
+    <rect class="aa" x="306" y="76" width="92" height="40" rx="10"/>
+    <text class="label" x="25" y="103">Met</text>
+    <text class="label" x="130" y="103">Gly</text>
+    <text class="label" x="234" y="103">Ser</text>
+    <text class="label" x="328" y="103">Stop</text>
+  </g>
+
+  <path d="M 560 244 C 606 244 620 244 666 244" fill="none" stroke="#146c72" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect class="panel" x="690" y="132" width="350" height="220" rx="18"/>
+  <text class="label" x="720" y="169">After: BamHI site created</text>
+  <text class="small" x="720" y="196">One base edit: GGT becomes GGA.</text>
+  <g transform="translate(724 226)">
+    <rect class="codon" x="0" y="0" width="74" height="58" rx="12"/>
+    <rect class="motif" x="84" y="0" width="154" height="58" rx="12"/>
+    <rect class="codon" x="248" y="0" width="74" height="58" rx="12"/>
+    <text class="mono" x="9" y="38" font-size="19">ATG</text>
+    <text class="mono" x="101" y="38" font-size="19">GGA</text>
+    <text class="mono" x="174" y="38" font-size="19">TCC</text>
+    <text class="mono" x="257" y="38" font-size="19">TAA</text>
+    <text class="tiny" x="112" y="78">BamHI: GGATCC</text>
+    <rect class="aa" x="0" y="94" width="74" height="36" rx="10"/>
+    <rect class="aa" x="84" y="94" width="74" height="36" rx="10"/>
+    <rect class="aa" x="164" y="94" width="74" height="36" rx="10"/>
+    <rect class="aa" x="248" y="94" width="74" height="36" rx="10"/>
+    <text class="tiny" x="24" y="118">Met</text>
+    <text class="tiny" x="108" y="118">Gly</text>
+    <text class="tiny" x="188" y="118">Ser</text>
+    <text class="tiny" x="270" y="118">Stop</text>
+  </g>
+
+  <rect class="panel" x="62" y="396" width="442" height="186" rx="18"/>
+  <text class="label" x="90" y="434">Biology idea: genetic-code degeneracy</text>
+  <text class="small" x="90" y="462">Several codons can encode the same amino acid.</text>
+  <text class="small" x="90" y="486">That redundancy gives engineers room to add a</text>
+  <text class="small" x="90" y="510">screening handle without changing the protein.</text>
+  <g transform="translate(90 535)">
+    <rect class="aa" x="0" y="0" width="80" height="32" rx="9"/>
+    <rect class="aa" x="88" y="0" width="80" height="32" rx="9"/>
+    <rect class="aa" x="176" y="0" width="80" height="32" rx="9"/>
+    <rect class="aa" x="264" y="0" width="80" height="32" rx="9"/>
+    <text class="tiny" x="23" y="21">GGT</text>
+    <text class="tiny" x="111" y="21">GGC</text>
+    <text class="tiny" x="199" y="21">GGA</text>
+    <text class="tiny" x="287" y="21">GGG</text>
+    <text class="tiny" x="354" y="21">all Gly</text>
+  </g>
+
+  <rect class="panel" x="548" y="396" width="490" height="186" rx="18"/>
+  <text class="label" x="576" y="434">Interpretation checklist</text>
+  <circle class="ok" cx="588" cy="466" r="6"/>
+  <text class="small" x="606" y="471">Protein sequence unchanged: Met-Gly-Ser-Stop</text>
+  <circle class="ok" cx="588" cy="500" r="6"/>
+  <text class="small" x="606" y="505">New restriction motif: GGATCC</text>
+  <circle class="ok" cx="588" cy="534" r="6"/>
+  <text class="small" x="606" y="539">Useful downstream screen: BamHI diagnostic digest</text>
+</svg>

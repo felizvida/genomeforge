@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="556" viewBox="0 0 1100 680" role="img" aria-labelledby="title desc">
+  <title id="title">Diagnostic digest design between two related constructs</title>
+  <desc id="desc">A conceptual diagram showing how a restriction enzyme can cut one construct but not a related variant, producing a visible gel-band difference against a custom ladder.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f8fcff"/>
+      <stop offset="0.55" stop-color="#eef8f6"/>
+      <stop offset="1" stop-color="#fff8ed"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f4f9fb"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#18334a" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c72"/>
+    </marker>
+    <style>
+      .title { font-family: Georgia, serif; font-size: 34px; font-weight: 700; fill: #17324a; }
+      .subtitle { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 500; fill: #526170; }
+      .label { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 700; fill: #17324a; }
+      .small { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500; fill: #526170; }
+      .mono { font-family: IBM Plex Mono, Menlo, Consolas, monospace; font-size: 17px; font-weight: 700; fill: #17202a; }
+      .tiny { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; fill: #526170; }
+      .card { fill: url(#card); stroke: #c9d5df; stroke-width: 1.4; filter: url(#softShadow); }
+      .dna { fill: none; stroke: #17324a; stroke-width: 8; stroke-linecap: round; }
+      .site { fill: #f8d9ad; stroke: #a56b14; stroke-width: 2; }
+      .siteMissing { fill: #f3f6f8; stroke: #8c4161; stroke-width: 2; stroke-dasharray: 8 7; }
+      .cut { stroke: #8c4161; stroke-width: 4; stroke-linecap: round; }
+      .band { fill: #17324a; opacity: 0.88; }
+      .lane { fill: #f8fbff; stroke: #ccd9e2; stroke-width: 1.2; }
+      .gel { fill: #dff3f4; stroke: #9ecbd0; stroke-width: 1.6; }
+      .callout { fill: #fff8ed; stroke: #d8b470; stroke-width: 1.4; }
+    </style>
+  </defs>
+  <rect width="1100" height="680" fill="url(#bg)"/>
+  <circle cx="1010" cy="75" r="160" fill="#e7f4f5" opacity="0.55"/>
+  <circle cx="95" cy="610" r="190" fill="#fff0d6" opacity="0.45"/>
+  <text class="title" x="62" y="64">Diagnostic digest: make one hidden difference visible</text>
+  <text class="subtitle" x="64" y="95">Compare related sequences, choose a discriminatory cutter, then predict the gel readout.</text>
+
+  <rect class="card" x="58" y="130" width="606" height="222" rx="18"/>
+  <text class="label" x="86" y="166">1. Related constructs or alleles</text>
+  <text class="small" x="86" y="192">The molecules are almost identical, but one motif is missing.</text>
+
+  <text class="label" x="88" y="236">Parent A</text>
+  <path class="dna" d="M 190 232 H 612"/>
+  <rect class="site" x="342" y="209" width="124" height="46" rx="10"/>
+  <text class="mono" x="205" y="238">GAATTC</text>
+  <text class="mono" x="359" y="238">GGATCC</text>
+  <text class="mono" x="500" y="238">AAGCTT</text>
+  <path class="cut" d="M 399 198 L 390 264"/>
+  <path class="cut" d="M 414 198 L 405 264"/>
+  <text class="tiny" x="363" y="280">BamHI site present</text>
+
+  <text class="label" x="88" y="319">Variant B</text>
+  <path class="dna" d="M 190 315 H 612"/>
+  <rect class="siteMissing" x="342" y="292" width="124" height="46" rx="10"/>
+  <text class="mono" x="205" y="321">GAATTC</text>
+  <text class="mono" x="356" y="321">GGA---</text>
+  <text class="mono" x="500" y="321">AAGCTT</text>
+  <text class="tiny" x="358" y="363">BamHI site absent</text>
+
+  <path d="M 682 242 C 716 242 734 242 768 242" fill="none" stroke="#146c72" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect class="card" x="762" y="130" width="280" height="420" rx="18"/>
+  <text class="label" x="790" y="166">2. Predicted gel readout</text>
+  <text class="small" x="790" y="192">BamHI cuts A but not B, so the</text>
+  <text class="small" x="790" y="212">band pattern becomes diagnostic.</text>
+  <rect class="gel" x="792" y="238" width="220" height="260" rx="12"/>
+  <rect class="lane" x="815" y="263" width="42" height="208" rx="8"/>
+  <rect class="lane" x="879" y="263" width="42" height="208" rx="8"/>
+  <rect class="lane" x="943" y="263" width="42" height="208" rx="8"/>
+  <text class="tiny" x="816" y="252">Ladder</text>
+  <text class="tiny" x="886" y="252">A</text>
+  <text class="tiny" x="950" y="252">B</text>
+  <rect class="band" x="823" y="289" width="26" height="5" rx="2"/>
+  <rect class="band" x="823" y="323" width="26" height="5" rx="2"/>
+  <rect class="band" x="823" y="362" width="26" height="5" rx="2"/>
+  <rect class="band" x="823" y="405" width="26" height="5" rx="2"/>
+  <rect class="band" x="823" y="448" width="26" height="5" rx="2"/>
+  <rect class="band" x="886" y="330" width="28" height="7" rx="3"/>
+  <rect class="band" x="886" y="421" width="28" height="7" rx="3"/>
+  <rect class="band" x="950" y="375" width="28" height="8" rx="3"/>
+  <text class="tiny" x="798" y="526">A: BamHI cuts, two fragments</text>
+  <text class="tiny" x="798" y="546">B: no BamHI cut, one fragment</text>
+
+  <rect class="callout" x="58" y="398" width="606" height="130" rx="16"/>
+  <text class="label" x="86" y="432">Biology idea</text>
+  <text class="small" x="86" y="459">The sequence difference is microscopic, but the enzyme converts it into a</text>
+  <text class="small" x="86" y="481">macroscopic observation: a band pattern you can see on an agarose gel.</text>
+  <text class="small" x="86" y="506">That is why diagnostic digests are useful for clone screening and allele checks.</text>
+</svg>

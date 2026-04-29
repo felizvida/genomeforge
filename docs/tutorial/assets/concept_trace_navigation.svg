@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="556" viewBox="0 0 1100 680" role="img" aria-labelledby="title desc">
+  <title id="title">Linked trace-to-reference navigation for Sanger review</title>
+  <desc id="desc">A conceptual diagram showing how a mismatch row links a reference coordinate to raw chromatogram evidence so the reviewer can distinguish a true variant from a weak base call.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f6fbfd"/>
+      <stop offset="0.55" stop-color="#eef8f6"/>
+      <stop offset="1" stop-color="#fff8ed"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f3f8fa"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#18334a" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#146c72"/>
+    </marker>
+    <style>
+      .title { font-family: Georgia, serif; font-size: 34px; font-weight: 700; fill: #17324a; }
+      .subtitle { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 500; fill: #526170; }
+      .label { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 700; fill: #17324a; }
+      .small { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500; fill: #526170; }
+      .tiny { font-family: Avenir Next, Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 600; fill: #526170; }
+      .mono { font-family: IBM Plex Mono, Menlo, Consolas, monospace; font-size: 18px; font-weight: 800; fill: #17202a; }
+      .panel { fill: url(#panel); stroke: #c9d5df; stroke-width: 1.4; filter: url(#softShadow); }
+      .row { fill: #ffffff; stroke: #d6e2ea; stroke-width: 1.3; }
+      .hot { fill: #fff1d9; stroke: #a56b14; stroke-width: 2; }
+      .bad { fill: #f6dbe7; stroke: #8c4161; stroke-width: 2; }
+      .callout { fill: #fff8ed; stroke: #d8b470; stroke-width: 1.4; }
+      .a { stroke: #2f9e44; fill: none; }
+      .c { stroke: #1971c2; fill: none; }
+      .g { stroke: #f08c00; fill: none; }
+      .t { stroke: #c92a2a; fill: none; }
+    </style>
+  </defs>
+  <rect width="1100" height="680" fill="url(#bg)"/>
+  <circle cx="1000" cy="110" r="180" fill="#e6f3f4" opacity="0.58"/>
+  <circle cx="90" cy="620" r="210" fill="#fff0d6" opacity="0.42"/>
+  <text class="title" x="62" y="64">Trace review: jump from mismatch to evidence</text>
+  <text class="subtitle" x="64" y="95">Linked navigation keeps base calls, reference coordinates, and chromatogram peaks in one reasoning loop.</text>
+
+  <rect class="panel" x="58" y="132" width="484" height="236" rx="18"/>
+  <text class="label" x="88" y="169">1. Reference and trace alignment</text>
+  <text class="small" x="88" y="196">One row is suspicious: the called base differs from the expected reference.</text>
+  <g transform="translate(92 226)">
+    <text class="tiny" x="0" y="-12">Reference coordinate</text>
+    <rect class="row" x="0" y="0" width="58" height="42" rx="9"/>
+    <rect class="row" x="66" y="0" width="58" height="42" rx="9"/>
+    <rect class="row" x="132" y="0" width="58" height="42" rx="9"/>
+    <rect class="hot" x="198" y="0" width="58" height="42" rx="9"/>
+    <rect class="row" x="264" y="0" width="58" height="42" rx="9"/>
+    <rect class="row" x="330" y="0" width="58" height="42" rx="9"/>
+    <text class="mono" x="20" y="28">A</text>
+    <text class="mono" x="86" y="28">T</text>
+    <text class="mono" x="152" y="28">G</text>
+    <text class="mono" x="218" y="28">C</text>
+    <text class="mono" x="284" y="28">T</text>
+    <text class="mono" x="350" y="28">G</text>
+    <text class="tiny" x="199" y="62">ref 121</text>
+    <text class="tiny" x="0" y="96">Trace call</text>
+    <rect class="row" x="0" y="110" width="58" height="42" rx="9"/>
+    <rect class="row" x="66" y="110" width="58" height="42" rx="9"/>
+    <rect class="row" x="132" y="110" width="58" height="42" rx="9"/>
+    <rect class="bad" x="198" y="110" width="58" height="42" rx="9"/>
+    <rect class="row" x="264" y="110" width="58" height="42" rx="9"/>
+    <rect class="row" x="330" y="110" width="58" height="42" rx="9"/>
+    <text class="mono" x="20" y="138">A</text>
+    <text class="mono" x="86" y="138">T</text>
+    <text class="mono" x="152" y="138">G</text>
+    <text class="mono" x="218" y="138">T</text>
+    <text class="mono" x="284" y="138">T</text>
+    <text class="mono" x="350" y="138">G</text>
+    <text class="tiny" x="197" y="172">trace 121</text>
+  </g>
+
+  <path d="M 544 250 C 600 250 618 250 672 250" fill="none" stroke="#146c72" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect class="callout" x="572" y="278" width="220" height="88" rx="14"/>
+  <text class="label" x="596" y="310">Navigation link</text>
+  <text class="small" x="596" y="334">Trace pos 121</text>
+  <text class="small" x="596" y="354">opens the local peaks.</text>
+
+  <rect class="panel" x="690" y="132" width="350" height="236" rx="18"/>
+  <text class="label" x="720" y="169">2. Review table</text>
+  <text class="small" x="720" y="196">The row is a pointer, not a verdict.</text>
+  <g transform="translate(720 222)">
+    <rect class="row" x="0" y="0" width="290" height="36" rx="8"/>
+    <text class="tiny" x="14" y="23">ref</text>
+    <text class="tiny" x="72" y="23">trace</text>
+    <text class="tiny" x="140" y="23">call</text>
+    <text class="tiny" x="202" y="23">status</text>
+    <rect class="row" x="0" y="44" width="290" height="40" rx="8"/>
+    <text class="mono" x="14" y="70">120</text>
+    <text class="mono" x="76" y="70">120</text>
+    <text class="mono" x="146" y="70">G</text>
+    <text class="tiny" x="204" y="68">match</text>
+    <rect class="bad" x="0" y="92" width="290" height="42" rx="8"/>
+    <text class="mono" x="14" y="119">121</text>
+    <text class="mono" x="76" y="119">121</text>
+    <text class="mono" x="146" y="119">T</text>
+    <text class="tiny" x="204" y="117">inspect</text>
+  </g>
+
+  <rect class="panel" x="58" y="414" width="982" height="184" rx="18"/>
+  <text class="label" x="88" y="450">3. Chromatogram window around the linked position</text>
+  <text class="small" x="88" y="475">Peak shape decides whether the mismatch is likely a real variant, a mixed signal, or a weak call.</text>
+  <g transform="translate(92 508)">
+    <line x1="0" y1="80" x2="892" y2="80" stroke="#c9d5df" stroke-width="2"/>
+    <path class="a" d="M 0 80 C 20 70 35 20 52 80 C 70 124 88 100 105 80" stroke-width="4"/>
+    <path class="t" d="M 102 80 C 120 72 136 28 154 80 C 170 116 190 104 206 80" stroke-width="4"/>
+    <path class="g" d="M 206 80 C 225 62 238 18 258 80 C 276 126 294 102 312 80" stroke-width="4"/>
+    <path class="c" d="M 312 80 C 332 64 348 26 368 80 C 386 116 406 102 424 80" stroke-width="4"/>
+    <path class="t" d="M 424 80 C 444 58 460 18 480 80 C 500 126 518 104 536 80" stroke-width="4"/>
+    <path class="g" d="M 536 80 C 558 64 574 24 594 80 C 612 116 630 102 650 80" stroke-width="4"/>
+    <rect x="426" y="2" width="110" height="122" rx="14" fill="#fff1d9" stroke="#a56b14" stroke-width="2" opacity="0.76"/>
+    <text class="tiny" x="436" y="22">linked window</text>
+    <text class="tiny" x="20" y="116">A</text>
+    <text class="tiny" x="132" y="116">T</text>
+    <text class="tiny" x="244" y="116">G</text>
+    <text class="tiny" x="352" y="116">C?</text>
+    <text class="tiny" x="466" y="116">T</text>
+    <text class="tiny" x="578" y="116">G</text>
+    <text class="tiny" x="690" y="62" fill="#526170">Decision: inspect signal before accepting the mismatch.</text>
+  </g>
+</svg>
