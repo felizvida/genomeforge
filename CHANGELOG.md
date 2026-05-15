@@ -4,6 +4,28 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.12] - 2026-05-15
+
+### Added
+
+- Added a documented local-first security model with deployment boundaries, browser-hardening headers, data-trust assumptions, and explicit non-goals.
+- Added integration coverage for local HTTP security headers on root-page and API responses.
+
+### Changed
+
+- The local web server now emits CSP, frame-denial, content-type, referrer, opener, and permissions-policy headers on every response.
+
+### Validation
+
+- `python3 docs/validate_docs.py`
+- `python3 -m py_compile web_ui.py tests/test_web_ui_security.py docs/validate_docs.py`
+- `for f in webui/js/*.js; do node --check "$f" || exit 1; done`
+- `./.venv-docs/bin/python -m pytest`
+- `python3 -m unittest discover -s tests -p 'test_*.py'`
+- `python3 smoke_test.py`
+- `python3 real_world_functional_test.py`
+- `npm run test:e2e`
+
 ## [0.1.11] - 2026-05-15
 
 ### Fixed

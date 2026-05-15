@@ -25,7 +25,33 @@ INDEX_PATH = WEBUI_ROOT / "index.html"
 COLLAB_ROOT = ROOT / "collab_data"
 
 
+SECURITY_HEADERS = {
+    "Content-Security-Policy": (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; "
+        "connect-src 'self'; "
+        "font-src 'self'; "
+        "object-src 'none'; "
+        "base-uri 'none'; "
+        "form-action 'none'; "
+        "frame-ancestors 'none'"
+    ),
+    "Referrer-Policy": "no-referrer",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+}
+
+
 class Handler(BaseHTTPRequestHandler):
+    def end_headers(self) -> None:
+        for name, value in SECURITY_HEADERS.items():
+            self.send_header(name, value)
+        super().end_headers()
+
     def _send_json(self, data: Dict[str, Any], status: int = 200) -> None:
         body = json.dumps(data).encode("utf-8")
         self.send_response(status)

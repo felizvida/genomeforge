@@ -23,6 +23,7 @@ Primary docs:
 - [docs/README.md](/Users/liux17/Documents/Playground/docs/README.md)
 - [docs/API.md](/Users/liux17/Documents/Playground/docs/API.md)
 - [docs/ARCHITECTURE.md](/Users/liux17/Documents/Playground/docs/ARCHITECTURE.md)
+- [docs/SECURITY_MODEL.md](/Users/liux17/Documents/Playground/docs/SECURITY_MODEL.md)
 - [docs/MODERNIZATION_PLAN.md](/Users/liux17/Documents/Playground/docs/MODERNIZATION_PLAN.md)
 
 ## 2. Current State
@@ -32,7 +33,7 @@ What matters operationally:
 - The product already has broad feature coverage.
 - Backend decomposition has started: record I/O/core workflows, design-assist workflows, trace, BLAST-like search, reference-library, siRNA, project/share/history, cloning/assembly, analysis/alignment, and biology-support workflows now live in `backend/`.
 - Current known local regression baseline is:
-  - `python3 -m unittest discover -s tests -p 'test_*.py'`: `39` passing tests
+  - `python3 -m unittest discover -s tests -p 'test_*.py'`: `41` passing tests
   - `smoke_test.py`: `115` passing checks
   - `real_world_functional_test.py`: `104` passing steps
   - `npm run test:e2e`: `15` passing browser tests

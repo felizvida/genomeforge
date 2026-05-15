@@ -70,6 +70,12 @@ Strength:
 
 - lightweight local server entry point with compatibility-preserving dispatch
 
+Security boundary:
+
+- binds to `127.0.0.1` by default
+- emits CSP, frame-denial, referrer, content-type, opener, and permissions-policy headers on every response
+- is intended for trusted local workstation use, not untrusted network exposure
+
 Current limitation:
 
 - still owns HTTP serving and top-level route delegation
