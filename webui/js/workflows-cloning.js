@@ -131,7 +131,7 @@ function renderLigationGraph(result) {
   const sourceSvg = sourceNodes.map((n) => (
     `<g class="lig-node" data-lig-node="${n.id}">` +
       `<rect x="${n.x-56}" y="${n.y-26}" width="112" height="40" rx="12" fill="${n.color}" opacity="0.93"></rect>` +
-      `<text x="${n.x}" y="${n.y}" text-anchor="middle" font-size="13" font-family="Menlo, monospace" fill="white">${n.label}</text>` +
+      `<text x="${n.x}" y="${n.y}" text-anchor="middle" font-size="13" font-family="Menlo, monospace" fill="white">${escapeHtml(n.label)}</text>` +
     `</g>`
   )).join('');
 
@@ -143,8 +143,8 @@ function renderLigationGraph(result) {
     return (
       `<g class="lig-node" data-lig-product="${idx}">` +
         `<rect x="${n.x-90}" y="${n.y-32}" width="210" height="64" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"></rect>` +
-        `<text x="${n.x-76}" y="${n.y-10}" font-size="11" font-family="Menlo, monospace" fill="#0f172a">${p.class}</text>` +
-        `<text x="${n.x-76}" y="${n.y+6}" font-size="10" font-family="Menlo, monospace" fill="#334155">${p.orientation}</text>` +
+        `<text x="${n.x-76}" y="${n.y-10}" font-size="11" font-family="Menlo, monospace" fill="#0f172a">${escapeHtml(p.class)}</text>` +
+        `<text x="${n.x-76}" y="${n.y+6}" font-size="10" font-family="Menlo, monospace" fill="#334155">${escapeHtml(p.orientation)}</text>` +
         `<text x="${n.x+112}" y="${n.y-10}" text-anchor="end" font-size="10" font-family="Menlo, monospace" fill="#334155">${p.length} bp</text>` +
         `<rect x="${n.x-76}" y="${n.y+12}" width="160" height="8" rx="4" fill="#e2e8f0"></rect>` +
         `<rect x="${n.x-76}" y="${n.y+12}" width="${barW}" height="8" rx="4" fill="${fill}"></rect>` +

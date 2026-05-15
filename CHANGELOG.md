@@ -4,6 +4,22 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Escaped user-controlled record names and feature labels before rendering server-generated SVG maps and sequence tracks.
+- Escaped additional client-rendered SVG/table labels in cloning and star-activity visualizations.
+- Added regression tests for SVG injection attempts through record and feature metadata.
+
+### Validation
+
+- `python3 docs/validate_docs.py`
+- `python3 -m py_compile genomeforge_toolkit.py backend/analysis_api.py backend/trace_api.py tests/test_backend_domains.py tests/test_core_algorithms.py`
+- `node --check webui/js/workflows-core.js && node --check webui/js/workflows-cloning.js`
+- `python3 -m unittest discover -s tests -p 'test_*.py'`
+- `python3 smoke_test.py`
+- `python3 real_world_functional_test.py`
+- `npm run test:e2e`
+
 ## [0.1.10] - 2026-05-15
 
 ### Added

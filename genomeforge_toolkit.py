@@ -20,6 +20,7 @@ import json
 import math
 import re
 from dataclasses import dataclass, field
+from html import escape as html_escape
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -828,6 +829,10 @@ def arc_path(cx: float, cy: float, r: float, start_angle: float, end_angle: floa
     return f"M {sx:.2f} {sy:.2f} A {r:.2f} {r:.2f} 0 {large} 1 {ex:.2f} {ey:.2f}"
 
 
+def svg_text(value: object) -> str:
+    return html_escape(str(value), quote=False)
+
+
 def build_svg_map(record: SequenceRecord, enzyme_names: Optional[Sequence[str]] = None) -> str:
     w = h = 900
     cx = cy = 450
@@ -854,7 +859,7 @@ def build_svg_map(record: SequenceRecord, enzyme_names: Optional[Sequence[str]] 
                 f'<line x1="{fx1:.2f}" y1="{y}" x2="{fx2:.2f}" y2="{y}" stroke="{color}" '
                 f'stroke-width="10" data-feature-index="{i}" class="feature-segment"/>'
             )
-        lines.append(f'<text x="{cx}" y="{cy - 50}" text-anchor="middle" font-family="Menlo, monospace" font-size="26" fill="#111827">{record.name} ({record.length} bp, linear)</text>')
+        lines.append(f'<text x="{cx}" y="{cy - 50}" text-anchor="middle" font-family="Menlo, monospace" font-size="26" fill="#111827">{svg_text(record.name)} ({record.length} bp, linear)</text>')
     else:
         for i, feat in enumerate(record.features):
             interval = parse_feature_interval(feat.location)
@@ -875,7 +880,7 @@ def build_svg_map(record: SequenceRecord, enzyme_names: Optional[Sequence[str]] 
             lx, ly = polar(cx, cy, radius + 50, (a1 + a2) / 2)
             lines.append(
                 f'<text x="{lx:.2f}" y="{ly:.2f}" text-anchor="middle" font-family="Menlo, monospace" '
-                f'font-size="16" fill="#111827" data-feature-index="{i}" class="feature-label">{label}</text>'
+                f'font-size="16" fill="#111827" data-feature-index="{i}" class="feature-label">{svg_text(label)}</text>'
             )
 
         if enzyme_names:
@@ -895,7 +900,7 @@ def build_svg_map(record: SequenceRecord, enzyme_names: Optional[Sequence[str]] 
                     f'fill="#0f172a" data-cut-enzyme="{cut["enzyme"]}" data-cut-position="{pos}" class="cut-label">{cut["enzyme"]}</text>'
                 )
 
-        lines.append(f'<text x="{cx}" y="{cy - 10}" text-anchor="middle" font-family="Menlo, monospace" font-size="30" fill="#111827">{record.name}</text>')
+        lines.append(f'<text x="{cx}" y="{cy - 10}" text-anchor="middle" font-family="Menlo, monospace" font-size="30" fill="#111827">{svg_text(record.name)}</text>')
         lines.append(f'<text x="{cx}" y="{cy + 24}" text-anchor="middle" font-family="Menlo, monospace" font-size="22" fill="#334155">{record.length} bp</text>')
         lines.append(f'<text x="{cx}" y="{cy + 54}" text-anchor="middle" font-family="Menlo, monospace" font-size="18" fill="#475569">circular</text>')
 

@@ -13,6 +13,7 @@ from genomeforge_toolkit import (
     sanitize_sequence,
     simulate_pcr,
     simulate_digest,
+    build_svg_map,
 )
 from compat.ab1_format import synthetic_trace_from_sequence
 
@@ -72,6 +73,25 @@ class CoreAlgorithmTests(unittest.TestCase):
         result = simulate_digest(record, ["EcoRI", "BamHI"])
         self.assertEqual(result["unique_cut_positions_1based"], [2, 9])
         self.assertEqual(result["fragments_bp"], [7, 5, 1])
+
+    def test_svg_map_escapes_record_and_feature_labels(self) -> None:
+        record = SequenceRecord(
+            name='pDemo <script>alert("name")</script>',
+            sequence="GAATTCCGGATCC",
+            topology="circular",
+        )
+        record.features = [
+            type(
+                "FeatureLike",
+                (),
+                {"key": "misc_feature", "location": "1..6", "qualifiers": {"label": 'feat <img src=x onerror="alert(1)">'}},
+            )()
+        ]
+        svg = build_svg_map(record, ["EcoRI"])
+        self.assertNotIn("<script>", svg)
+        self.assertNotIn("<img", svg)
+        self.assertIn("&lt;script&gt;", svg)
+        self.assertIn("&lt;img", svg)
 
     def test_optimize_coding_sequence_preserves_protein_length(self) -> None:
         result = optimize_coding_sequence("ATGGCCGAACTGTAA", host="ecoli")

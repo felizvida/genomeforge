@@ -161,6 +161,30 @@ class BackendDomainTests(unittest.TestCase):
         assert translated is not None
         self.assertEqual(translated["count"], 1)
 
+    def test_sequence_track_svg_escapes_record_and_feature_labels(self) -> None:
+        record = SequenceRecord(
+            name='Track <script>alert("name")</script>',
+            sequence="ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG",
+            topology="linear",
+        )
+        record.features = [
+            type(
+                "FeatureLike",
+                (),
+                {"key": "CDS", "location": "1..39", "qualifiers": {"label": 'demo <img src=x onerror="alert(1)">'}},
+            )()
+        ]
+        track = handle_analysis_endpoint(
+            "/api/sequence-tracks",
+            {"start": 1, "end": 39, "frame": 1},
+            lambda: record,
+        )
+        assert track is not None
+        self.assertNotIn("<script>", track["svg"])
+        self.assertNotIn("<img", track["svg"])
+        self.assertIn("&lt;script&gt;", track["svg"])
+        self.assertIn("&lt;img", track["svg"])
+
     def test_biology_endpoint_digest_and_gel(self) -> None:
         record = SequenceRecord(name="Digestible", sequence="AAAAGAATTCTTTTGGATCCAAAA", topology="linear")
         digest = handle_biology_endpoint(

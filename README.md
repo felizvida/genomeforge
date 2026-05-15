@@ -112,7 +112,7 @@ genomeforge input.fasta info
 
 Current shipped baseline:
 
-- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `37/37` passed
+- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `39/39` passed
 - `python3 smoke_test.py` -> `115/115` passed
 - `python3 real_world_functional_test.py` -> `104/104` passed
 - `npm run test:e2e` -> `14/14` passed

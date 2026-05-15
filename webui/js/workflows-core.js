@@ -196,7 +196,7 @@ function renderStarViz(scan) {
   const rows = rank.length
     ? rank.map(([enzyme, count]) => {
         const width = Math.max(2, Math.round((count / maxCount) * 100));
-        return `<tr><td>${enzyme}</td><td>${count}</td><td><div class="bar" style="width:${width}%"></div></td></tr>`;
+        return `<tr><td>${escapeHtml(enzyme)}</td><td>${count}</td><td><div class="bar" style="width:${width}%"></div></td></tr>`;
       }).join('')
     : '<tr><td colspan="3">No off-target cuts detected for current level.</td></tr>';
   const table = `
@@ -208,7 +208,7 @@ function renderStarViz(scan) {
   host.innerHTML = summary + table;
   const topHits = hits.slice(0, 12).map((h) => (
     `<tr data-star-cut="${h.cut_position_1based}" title="Jump to ${h.cut_position_1based}">` +
-    `<td>${h.enzyme}</td><td>${h.cut_position_1based}</td><td>${h.mismatches}</td><td>${h.matched}</td></tr>`
+    `<td>${escapeHtml(h.enzyme)}</td><td>${h.cut_position_1based}</td><td>${h.mismatches}</td><td>${escapeHtml(h.matched)}</td></tr>`
   )).join('');
   if (topHits) {
     host.innerHTML += `

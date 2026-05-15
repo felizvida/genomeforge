@@ -4,6 +4,7 @@ import math
 import shutil
 import subprocess
 import tempfile
+from html import escape as html_escape
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -11,6 +12,10 @@ from genomeforge_toolkit import CODON_TABLE, DNA_ALPHABET, SequenceRecord, find_
 
 
 RecordGetter = Callable[[], SequenceRecord]
+
+
+def _svg_text(value: object) -> str:
+    return html_escape(str(value), quote=False)
 
 
 def _parse_plain_sequence(seq: str) -> str:
@@ -459,7 +464,7 @@ def sequence_track_svg(
 
     lines = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">']
     lines.append('<rect width="100%" height="100%" fill="#f8fafc"/>')
-    lines.append(f'<text x="{left}" y="24" font-size="14" font-family="Menlo, monospace" fill="#0f172a">{record.name}  {start_1based}..{end_1based}</text>')
+    lines.append(f'<text x="{left}" y="24" font-size="14" font-family="Menlo, monospace" fill="#0f172a">{_svg_text(record.name)}  {start_1based}..{end_1based}</text>')
     lines.append(f'<line x1="{left}" y1="{y_axis}" x2="{width-left}" y2="{y_axis}" stroke="#0f172a" stroke-width="2"/>')
 
     feature_colors = {
@@ -516,7 +521,7 @@ def sequence_track_svg(
             extra = f" phase={phase}"
         lines.append(
             f'<text x="{x1:.2f}" y="{y_axis-28}" font-size="10" font-family="Menlo, monospace" fill="#111827" '
-            f'data-feature-index="{idx}" class="feature-label">{label}{extra}</text>'
+            f'data-feature-index="{idx}" class="feature-label">{_svg_text(label)}{_svg_text(extra)}</text>'
         )
 
     frame_offset = frame - 1
@@ -544,9 +549,9 @@ def sequence_track_svg(
         lines.append(
             f'<rect x="{x1:.2f}" y="{y_aa}" width="{max(4.0, x2-x1):.2f}" height="18" rx="2" fill="{fill}" stroke="#93c5fd" stroke-width="0.5" '
             f'data-codon-start="{codon_start}" data-codon-end="{codon_end}" data-residue="{residue}" class="codon-cell">'
-            f'<title>codon {codon_start}-{codon_end}: {codon} -> {residue}</title></rect>'
+            f'<title>codon {codon_start}-{codon_end}: {_svg_text(codon)} -> {_svg_text(residue)}</title></rect>'
         )
-        lines.append(f'<text x="{mid:.2f}" y="{y_aa+13}" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">{residue}</text>')
+        lines.append(f'<text x="{mid:.2f}" y="{y_aa+13}" text-anchor="middle" font-size="10" font-family="Menlo, monospace" fill="#0f172a">{_svg_text(residue)}</text>')
 
     y_nt = 210
     step = max(10, (end_1based - start_1based + 1) // 12)

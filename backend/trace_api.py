@@ -4,6 +4,7 @@ import base64
 import json
 import math
 import uuid
+from html import escape as html_escape
 from typing import Any, Dict, List
 
 from bio.trace_tools import align_trace_to_reference, edit_trace_base, trace_consensus, trace_summary
@@ -12,6 +13,10 @@ from genomeforge_toolkit import DNA_ALPHABET
 
 
 TRACE_CACHE: Dict[str, Dict[str, Any]] = {}
+
+
+def _svg_text(value: object) -> str:
+    return html_escape(str(value), quote=False)
 
 
 def _decode_b64_field(value: str, label: str) -> bytes:
@@ -111,7 +116,7 @@ def trace_chromatogram_svg(
     lines.append('<rect width="100%" height="100%" fill="#f8fafc"/>')
     lines.append(
         f'<text x="{margin_l}" y="18" font-size="13" font-family="Menlo, monospace" fill="#0f172a">'
-        f'Trace chromatogram: {trace_record.get("trace_id", "trace")}  {start_1based}..{end_1based} (step={step})</text>'
+        f'Trace chromatogram: {_svg_text(trace_record.get("trace_id", "trace"))}  {start_1based}..{end_1based} (step={step})</text>'
     )
     lines.append(f'<rect x="{margin_l}" y="{margin_t}" width="{plot_w}" height="{plot_h}" fill="#ffffff" stroke="#dbe5f3"/>')
     for base in "ACGT":

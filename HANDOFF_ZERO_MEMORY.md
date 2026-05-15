@@ -32,7 +32,7 @@ What matters operationally:
 - The product already has broad feature coverage.
 - Backend decomposition has started: record I/O/core workflows, design-assist workflows, trace, BLAST-like search, reference-library, siRNA, project/share/history, cloning/assembly, analysis/alignment, and biology-support workflows now live in `backend/`.
 - Current known local regression baseline is:
-  - `python3 -m unittest discover -s tests -p 'test_*.py'`: `37` passing tests
+  - `python3 -m unittest discover -s tests -p 'test_*.py'`: `39` passing tests
   - `smoke_test.py`: `115` passing checks
   - `real_world_functional_test.py`: `104` passing steps
   - `npm run test:e2e`: `14` passing browser tests
