@@ -46,6 +46,41 @@ test('track minimap rerender does not overwrite global mouse handlers', async ({
   expect(preserved.up).toBe(true);
 });
 
+test('sanitizes SVG markup before rendering server-generated visualizations', async ({ page }) => {
+  const result = await page.evaluate(() => {
+    const clean = sanitizeSvgForDisplay(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="100" height="40">
+        <script>window.__svgXss = true</script>
+        <foreignObject><div onclick="window.__svgXss = true">bad</div></foreignObject>
+        <rect width="20" height="20" onload="window.__svgXss = true" href="javascript:alert(1)" fill="url(javascript:alert(1))"></rect>
+        <text x="4" y="16">safe label</text>
+      </svg>
+    `);
+    const host = document.createElement('div');
+    host.id = 'svg-sanitizer-test';
+    host.innerHTML = clean;
+    document.body.appendChild(host);
+    const rect = host.querySelector('rect');
+    return {
+      hasSvg: Boolean(host.querySelector('svg')),
+      blockedNodes: host.querySelectorAll('script, foreignObject').length,
+      eventAttr: rect?.getAttribute('onload') || '',
+      hrefAttr: rect?.getAttribute('href') || '',
+      fillAttr: rect?.getAttribute('fill') || '',
+      text: host.textContent,
+      executed: Boolean(window.__svgXss),
+    };
+  });
+
+  expect(result.hasSvg).toBe(true);
+  expect(result.blockedNodes).toBe(0);
+  expect(result.eventAttr).toBe('');
+  expect(result.hrefAttr).toBe('');
+  expect(result.fillAttr).toBe('');
+  expect(result.text).toContain('safe label');
+  expect(result.executed).toBe(false);
+});
+
 test('guides users through Learning Mode and updates the decision card', async ({ page }) => {
   await page.locator('.topbar button[data-action="toggleLearningMode"]').click();
   await expect(page.locator('#learningModePanel')).toBeVisible();

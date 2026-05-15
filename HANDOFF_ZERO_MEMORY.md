@@ -35,7 +35,7 @@ What matters operationally:
   - `python3 -m unittest discover -s tests -p 'test_*.py'`: `39` passing tests
   - `smoke_test.py`: `115` passing checks
   - `real_world_functional_test.py`: `104` passing steps
-  - `npm run test:e2e`: `14` passing browser tests
+  - `npm run test:e2e`: `15` passing browser tests
 - The API surface currently includes `112` `/api/*` endpoints plus `GET /share/<share_id>`.
 - The biggest engineering constraint is structural: the frontend is now split into domain-oriented assets under `webui/js/`, but it still relies on plain browser globals rather than typed components or a dedicated frontend framework, and `web_ui.py` is still the HTTP entry point plus compatibility-preserving dispatcher.
 

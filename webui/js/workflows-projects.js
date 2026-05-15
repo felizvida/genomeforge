@@ -182,7 +182,7 @@ async function runProjectHistoryGraph() {
     const r = await callApi('/api/project-history-svg', {
       project_name: document.getElementById('projectName').value,
     });
-    document.getElementById('historyGraph').innerHTML = r.svg || '';
+    setSvgContent('historyGraph', r.svg || '');
     setDecisionCard('project', r, {
       evidence: 'Project history graph rendered from saved state.',
       next: 'Use the graph to confirm the decision trail is visible before sharing the project.',

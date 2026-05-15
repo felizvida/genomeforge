@@ -33,7 +33,7 @@ async function runDigest() {
 async function runMap() {
   try {
     const r = await callApi('/api/map', payload({ enzymes: document.getElementById('enzymes').value }));
-    document.getElementById('map').innerHTML = r.svg;
+    setSvgContent('map', r.svg);
     enhancePanel('map');
     setDecisionCard('map');
     show('Map rendered.');
@@ -49,7 +49,7 @@ async function runSequenceTrack() {
       end,
       frame: Number(document.getElementById('trackFrame').value),
     }));
-    document.getElementById('seqTrack').innerHTML = r.svg;
+    setSvgContent('seqTrack', r.svg);
     enhancePanel('seqTrack');
     show({ track_window: `${r.start_1based}..${r.end_1based}`, frame: r.frame });
   } catch (e) { show(String(e)); }

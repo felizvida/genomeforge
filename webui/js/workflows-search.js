@@ -122,7 +122,7 @@ async function runSequenceAnalyticsViz() {
       window: Number(document.getElementById('analyticsWindow').value),
       step: Number(document.getElementById('analyticsStep').value),
     }));
-    document.getElementById('seqAnalyticsViz').innerHTML = r.svg || '';
+    setSvgContent('seqAnalyticsViz', r.svg || '');
     enhancePanel('seqAnalyticsViz');
     show({
       analytics_points: r.point_count,
@@ -143,7 +143,7 @@ async function runComparisonLensViz() {
       seq_b: seqB,
       window: Number(document.getElementById('compareWindow').value),
     }));
-    document.getElementById('compareLensViz').innerHTML = r.svg || '';
+    setSvgContent('compareLensViz', r.svg || '');
     enhancePanel('compareLensViz');
     show({
       identity_pct: r.identity_pct,
@@ -234,7 +234,7 @@ async function runTraceChromatogram() {
     const start = Number(document.getElementById('traceWindowStart')?.value || 1);
     const end = Number(document.getElementById('traceWindowEnd')?.value || 0);
     const r = await callApi('/api/trace-chromatogram-svg', { trace_id, start, end, max_points: 400 });
-    document.getElementById('traceChromViz').innerHTML = r.svg || '';
+    setSvgContent('traceChromViz', r.svg || '');
     enhancePanel('traceChromViz');
     setDecisionCard('trace', r, {
       evidence: `Chromatogram rendered for ${r.start_1based}..${r.end_1based} with ${r.points} point(s).`,

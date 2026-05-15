@@ -833,6 +833,10 @@ def svg_text(value: object) -> str:
     return html_escape(str(value), quote=False)
 
 
+def svg_attr(value: object) -> str:
+    return html_escape(str(value), quote=True)
+
+
 def build_svg_map(record: SequenceRecord, enzyme_names: Optional[Sequence[str]] = None) -> str:
     w = h = 900
     cx = cy = 450
@@ -887,17 +891,18 @@ def build_svg_map(record: SequenceRecord, enzyme_names: Optional[Sequence[str]] 
             digest = simulate_digest(record, enzyme_names)
             for cut in digest["cuts"]:
                 pos = int(cut["position_1based"])
+                enzyme = svg_attr(cut["enzyme"])
                 ang = angle_for_pos(pos, record.length)
                 x1, y1 = polar(cx, cy, radius - 20, ang)
                 x2, y2 = polar(cx, cy, radius + 30, ang)
                 tx, ty = polar(cx, cy, radius + 52, ang)
                 lines.append(
                     f'<line x1="{x1:.2f}" y1="{y1:.2f}" x2="{x2:.2f}" y2="{y2:.2f}" stroke="#0f172a" stroke-width="3" '
-                    f'data-cut-enzyme="{cut["enzyme"]}" data-cut-position="{pos}" class="cut-marker"/>'
+                    f'data-cut-enzyme="{enzyme}" data-cut-position="{pos}" class="cut-marker"/>'
                 )
                 lines.append(
                     f'<text x="{tx:.2f}" y="{ty:.2f}" text-anchor="middle" font-family="Menlo, monospace" font-size="12" '
-                    f'fill="#0f172a" data-cut-enzyme="{cut["enzyme"]}" data-cut-position="{pos}" class="cut-label">{cut["enzyme"]}</text>'
+                    f'fill="#0f172a" data-cut-enzyme="{enzyme}" data-cut-position="{pos}" class="cut-label">{enzyme}</text>'
                 )
 
         lines.append(f'<text x="{cx}" y="{cy - 10}" text-anchor="middle" font-family="Menlo, monospace" font-size="30" fill="#111827">{svg_text(record.name)}</text>')

@@ -163,6 +163,67 @@
         .replaceAll("'", '&#39;');
     }
 
+    function sanitizeSvgForDisplay(markup) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(String(markup || ''), 'image/svg+xml');
+      if (doc.querySelector('parsererror')) return '';
+      const root = doc.documentElement;
+      if (!root || root.localName.toLowerCase() !== 'svg') return '';
+
+      const allowedElements = new Set([
+        'svg', 'g', 'defs', 'lineargradient', 'stop', 'rect', 'circle', 'ellipse',
+        'line', 'path', 'polyline', 'polygon', 'text', 'title',
+      ]);
+      const allowedAttrs = new Set([
+        'xmlns', 'id', 'class', 'width', 'height', 'viewBox', 'viewbox',
+        'preserveAspectRatio', 'preserveaspectratio', 'x', 'y', 'x1', 'y1',
+        'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'points', 'fill',
+        'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin',
+        'stroke-dasharray', 'opacity', 'fill-opacity', 'stroke-opacity',
+        'text-anchor', 'font-family', 'font-size', 'offset', 'stop-color',
+      ]);
+
+      const nodes = [root, ...root.querySelectorAll('*')];
+      for (const el of nodes) {
+        if (!el.parentNode && el !== root) continue;
+        if (!allowedElements.has(el.localName.toLowerCase())) {
+          el.remove();
+          continue;
+        }
+        for (const attr of Array.from(el.attributes)) {
+          const name = attr.name;
+          const lower = name.toLowerCase();
+          const value = String(attr.value || '').trim();
+          const allowed = allowedAttrs.has(name) || allowedAttrs.has(lower) || lower.startsWith('data-');
+          const urlValue = /\burl\s*\(/i.test(value);
+          const safeLocalUrl = /\burl\s*\(\s*#[A-Za-z][\w:.-]*\s*\)/i.test(value);
+          if (
+            !allowed ||
+            lower.startsWith('on') ||
+            lower === 'style' ||
+            lower === 'href' ||
+            lower === 'xlink:href' ||
+            /(?:javascript|vbscript|data):/i.test(value) ||
+            (urlValue && !safeLocalUrl)
+          ) {
+            el.removeAttribute(name);
+          }
+        }
+      }
+      return new XMLSerializer().serializeToString(root);
+    }
+
+    function setSvgContent(hostId, markup) {
+      const host = document.getElementById(hostId);
+      if (!host) return;
+      const svg = sanitizeSvgForDisplay(markup);
+      if (!svg) {
+        host.textContent = 'SVG could not be rendered because it failed safety validation.';
+        return;
+      }
+      host.innerHTML = svg;
+    }
+
     function clearLearningHighlight() {
       if (learningState.highlighted) {
         learningState.highlighted.classList.remove('learning-highlight');

@@ -186,7 +186,7 @@ def main() -> int:
             )
 
     handoff_text = HANDOFF.read_text(encoding="utf-8")
-    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "115", "104", "14", "112", "45", "Learning Mode", "generate_tutorial.py", "case_bundles"]:
+    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "115", "104", "15", "112", "45", "Learning Mode", "generate_tutorial.py", "case_bundles"]:
         if needle not in handoff_text:
             errors.append(f"HANDOFF_ZERO_MEMORY.md does not include expected marker '{needle}'")
 

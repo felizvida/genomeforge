@@ -20,7 +20,7 @@ It combines:
 
 Latest release:
 
-- [Genome Forge v0.1.10](https://github.com/felizvida/genomeforge/releases/tag/v0.1.10)
+- [Genome Forge v0.1.11](https://github.com/felizvida/genomeforge/releases/tag/v0.1.11)
 
 ## Why Genome Forge
 
@@ -115,7 +115,7 @@ Current shipped baseline:
 - `python3 -m unittest discover -s tests -p 'test_*.py'` -> `39/39` passed
 - `python3 smoke_test.py` -> `115/115` passed
 - `python3 real_world_functional_test.py` -> `104/104` passed
-- `npm run test:e2e` -> `14/14` passed
+- `npm run test:e2e` -> `15/15` passed
 
 ## Documentation
 

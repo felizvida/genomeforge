@@ -63,7 +63,7 @@ async function runMSAHeatmap() {
       lastMSAAlignment = alignment;
     }
     const r = await callApi('/api/alignment-heatmap-svg', { alignment });
-    document.getElementById('msaHeatmap').innerHTML = r.svg || '';
+    setSvgContent('msaHeatmap', r.svg || '');
     show({ row_count: r.row_count, heatmap_rendered: true });
   } catch (e) { show(String(e)); }
 }
