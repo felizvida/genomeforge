@@ -1,12 +1,18 @@
 async function runBlastSearch() {
   try {
     const dbRows = splitSeqLines('blastDb').map((sequence, i) => ({ name: `subject_${i+1}`, sequence }));
-    show(await callApi('/api/blast-search', payload({
+    const r = await callApi('/api/blast-search', payload({
       query_sequence: document.getElementById('blastQuery').value,
       database_sequences: dbRows,
       kmer: Number(document.getElementById('blastKmer').value),
       top_hits: Number(document.getElementById('blastTopHits').value),
-    })));
+    }));
+    const top = (r.hits || [])[0];
+    setDecisionCard('blast', r, {
+      evidence: top ? `Top local similarity hit: ${top.name || top.subject || 'subject'} with ${top.identity_pct ?? '?'}% identity.` : 'No local similarity hit passed the current settings.',
+      next: top ? 'Use the top hit as a hypothesis, then confirm coverage and sample provenance.' : 'Broaden the database, lengthen the query, or check whether the input sequence is correct.',
+    });
+    show(r);
   } catch (e) { show(String(e)); }
 }
 
@@ -35,6 +41,10 @@ async function runBlastLaunch() {
       </table>
       <pre class="text-map-viz" style="min-height:80px">${escapeHtml(r.copy_fasta || '')}</pre>
     `;
+    setDecisionCard('blast', r, {
+      evidence: `Prepared ${r.query_length} bp query for ${(r.launches || []).length} external provider launch(es).`,
+      next: `Run the public search, then record provider, query ${r.selection_start_1based}..${r.selection_end_1based}, coverage, and top-hit interpretation.`,
+    });
     show({ query_length: r.query_length, launch_count: (r.launches || []).length, selection: [r.selection_start_1based, r.selection_end_1based] });
   } catch (e) { show(String(e)); }
 }
@@ -226,6 +236,9 @@ async function runTraceChromatogram() {
     const r = await callApi('/api/trace-chromatogram-svg', { trace_id, start, end, max_points: 400 });
     document.getElementById('traceChromViz').innerHTML = r.svg || '';
     enhancePanel('traceChromViz');
+    setDecisionCard('trace', r, {
+      evidence: `Chromatogram rendered for ${r.start_1based}..${r.end_1based} with ${r.points} point(s).`,
+    });
     show({ trace_id: r.trace_id, range: [r.start_1based, r.end_1based], points: r.points, max_signal: r.max_signal });
   } catch (e) { show(String(e)); }
 }
@@ -275,6 +288,10 @@ async function runTraceAlignmentLinks() {
     const reference_sequence = document.getElementById('traceReference').value;
     const r = await callApi('/api/trace-alignment-links', { trace_id, reference_sequence, flank: 24, max_rows: 800 });
     renderTraceLinks(r);
+    setDecisionCard('trace', r, {
+      evidence: `Trace/reference alignment identity ${r.identity_pct ?? '?'}% with ${r.mismatch_count ?? 0} mismatch(es).`,
+      next: 'Click mismatch rows, inspect chromatogram peaks, and decide whether to accept, repeat, or add opposite-strand evidence.',
+    });
     show({ identity_pct: r.identity_pct, mismatch_count: r.mismatch_count, navigation_links: r.navigation_link_count });
   } catch (e) { show(String(e)); }
 }
@@ -290,7 +307,7 @@ async function runTraceVerify() {
     let expected_bases = {};
     const raw = document.getElementById('traceExpectedBases').value.trim();
     if (raw) expected_bases = JSON.parse(raw);
-    show(await callApi('/api/trace-verify', {
+    const r = await callApi('/api/trace-verify', {
       trace_id,
       reference_sequence,
       min_quality: 20,
@@ -298,7 +315,12 @@ async function runTraceVerify() {
       expected_bases,
       identity_threshold_pct: 98.0,
       max_mismatches: 5,
-    }));
+    });
+    setDecisionCard('trace', r, {
+      evidence: `Trace verification verdict: ${r.verdict || r.status || 'review required'}.`,
+      next: 'Use the verdict only after checking whether decision-critical positions had acceptable trace quality.',
+    });
+    show(r);
   } catch (e) { show(String(e)); }
 }
 

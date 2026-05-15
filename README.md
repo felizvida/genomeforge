@@ -3,7 +3,7 @@
 <p align="center">
   <img alt="Release" src="https://img.shields.io/github/v/release/felizvida/genomeforge?display_name=tag">
   <img alt="License" src="https://img.shields.io/github/license/felizvida/genomeforge">
-  <img alt="Tutorial" src="https://img.shields.io/badge/tutorial-39%20real--world%20lessons-0ea5e9">
+  <img alt="Tutorial" src="https://img.shields.io/badge/tutorial-45%20real--world%20lessons-0ea5e9">
   <img alt="Web UI" src="https://img.shields.io/badge/interface-modern%20web%20UI-14b8a6">
 </p>
 
@@ -16,11 +16,11 @@ It combines:
 - primer, PCR, trace, and verification workflows
 - CRISPR/design-assist tooling
 - project history, sharing, and lightweight review
-- a 39-lesson self-study tutorial built on real biological examples
+- a 45-lesson self-study tutorial built on real biological examples
 
 Latest release:
 
-- [Genome Forge v0.1.8](https://github.com/felizvida/genomeforge/releases/tag/v0.1.8)
+- [Genome Forge v0.1.10](https://github.com/felizvida/genomeforge/releases/tag/v0.1.10)
 
 ## Why Genome Forge
 
@@ -112,10 +112,10 @@ genomeforge input.fasta info
 
 Current shipped baseline:
 
-- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `34/34` passed
-- `python3 smoke_test.py` -> `108/108` passed
-- `python3 real_world_functional_test.py` -> `97/97` passed
-- `npm run test:e2e` -> `12/12` passed
+- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `37/37` passed
+- `python3 smoke_test.py` -> `115/115` passed
+- `python3 real_world_functional_test.py` -> `104/104` passed
+- `npm run test:e2e` -> `14/14` passed
 
 ## Documentation
 

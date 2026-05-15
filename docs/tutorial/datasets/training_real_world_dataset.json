@@ -1,6 +1,6 @@
 {
   "dataset_name": "genomeforge_training_real_world_v2",
-  "created_at": "2026-04-29",
+  "created_at": "2026-05-15",
   "overview": "Real-world teaching bundle for the Genome Forge tutorial, including public-source records and clearly labeled training derivatives.",
   "usage_tips": [
     "Use extract_case_bundle.py to materialize the exact records for one case.",
@@ -267,6 +267,27 @@
         "/api/map",
         "/api/digest"
       ],
+      "ui_walkthrough": {
+        "tab": "Map",
+        "button": "Render the pUC19 map and compare unique restriction choices before adding a reporter insert.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "restriction site",
+        "methylation"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case A --out ./tmp/genomeforge_case_a",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_a"
     },
@@ -281,6 +302,27 @@
       "workflow": "Compare standard digest output with methylation-aware digest logic on a real cloning vector motif set.",
       "apis": [
         "/api/digest-advanced"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Compare standard digest output with methylation-aware digest logic on a real cloning vector motif set.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "methylation",
+        "restriction site"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case B --out ./tmp/genomeforge_case_b",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_b"
@@ -298,6 +340,24 @@
       "apis": [
         "/api/star-activity-scan"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Scan relaxed-matching cut risk to understand how star activity can create off-target restriction events.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case C --out ./tmp/genomeforge_case_c",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_c"
     },
@@ -312,6 +372,27 @@
       "workflow": "Compare a normal multiple-cloning-site sequence with a missing-site variant and choose enzymes that discriminate the two molecules.",
       "apis": [
         "/api/restriction-compare"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Compare Restriction Sites",
+        "panel": "Diagnostic Restriction View",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Enzymes",
+          "Enzyme Set Name",
+          "Restriction Comparison / Diagnostic Cutters",
+          "Minimum Delta"
+        ]
+      },
+      "decision_card": {
+        "decision": "Choose the enzyme only if it creates a readable difference between the related molecules.",
+        "bench": "Run a small diagnostic digest and compare the observed gel bands with the predicted parent/variant patterns.",
+        "caution": "Do not prefer a cutter merely because it cuts often; prefer the cutter that answers the discrimination question cleanly."
+      },
+      "glossary_terms": [
+        "restriction site",
+        "methylation"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AN --out ./tmp/genomeforge_case_an",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_an"
@@ -330,6 +411,23 @@
         "/api/gel-ladder-load",
         "/api/digest-gel"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Digest Gel With Ladder",
+        "panel": "Results",
+        "fields": [
+          "Gel Band Sizes",
+          "User-Defined DNA Ladder",
+          "Enzymes",
+          "Enzyme Set Name"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AO --out ./tmp/genomeforge_case_ao",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ao"
     },
@@ -348,6 +446,26 @@
         "/api/motif",
         "/api/search-entities"
       ],
+      "ui_walkthrough": {
+        "tab": "Search",
+        "button": "Use motif/entity search patterns to ask whether a supposed single-template sample smells like a mixed cloning population.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case U --out ./tmp/genomeforge_case_u",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_u"
     },
@@ -362,6 +480,27 @@
       "workflow": "Inspect EGFP with sequence tracks so base coordinates, codons, amino acids, and features can be read together.",
       "apis": [
         "/api/sequence-tracks"
+      ],
+      "ui_walkthrough": {
+        "tab": "Map",
+        "button": "Inspect EGFP with sequence tracks so base coordinates, codons, amino acids, and features can be read together.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "codon"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case D --out ./tmp/genomeforge_case_d",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_d"
@@ -378,6 +517,26 @@
       "apis": [
         "/api/text-map"
       ],
+      "ui_walkthrough": {
+        "tab": "Map",
+        "button": "Render Text Map",
+        "panel": "Text Map",
+        "fields": [
+          "Track Start",
+          "Track End",
+          "Frame",
+          "Text Map Width"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "codon"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AP --out ./tmp/genomeforge_case_ap",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ap"
     },
@@ -393,6 +552,29 @@
       "workflow": "Compare a clean coding sequence and a genomic fragment to learn what ORF scanning can and cannot tell you.",
       "apis": [
         "/api/orfs"
+      ],
+      "ui_walkthrough": {
+        "tab": "ORF/Motif",
+        "button": "Compare a clean coding sequence and a genomic fragment to learn what ORF scanning can and cannot tell you.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "ORF",
+        "frame",
+        "codon"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case M --out ./tmp/genomeforge_case_m",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_m"
@@ -411,6 +593,27 @@
         "/api/pairwise-align",
         "/api/translated-features"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Align a public reporter CDS to a derived chromophore variant and explain the difference in protein terms.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "codon"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case P --out ./tmp/genomeforge_case_p",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_p"
     },
@@ -427,6 +630,29 @@
       "apis": [
         "/api/translate"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Translate two real reporter proteins and compare what the sequence suggests about size, composition, and practical use.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "ORF",
+        "frame",
+        "codon"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case W --out ./tmp/genomeforge_case_w",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_w"
     },
@@ -441,6 +667,26 @@
       "workflow": "Design primers around the BRAF hotspot region and screen them for temperature and composition sanity.",
       "apis": [
         "/api/primer-design"
+      ],
+      "ui_walkthrough": {
+        "tab": "Primer/PCR",
+        "button": "Design primers around the BRAF hotspot region and screen them for temperature and composition sanity.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "frame"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case E --out ./tmp/genomeforge_case_e",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_e"
@@ -461,6 +707,27 @@
         "/api/pcr",
         "/api/gel-sim"
       ],
+      "ui_walkthrough": {
+        "tab": "Primer/PCR",
+        "button": "Rank candidate primer pairs against a realistic background panel and inspect the predicted gel outcome.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Use the primer pair only if specificity, size, Tm, and interpretation all support the assay goal.",
+        "bench": "Run the predicted product with appropriate positive and negative controls.",
+        "caution": "A primer that binds somewhere is not necessarily a primer that produces an interpretable experiment."
+      },
+      "glossary_terms": [
+        "CDS",
+        "amplicon"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case F --out ./tmp/genomeforge_case_f",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_f"
     },
@@ -479,6 +746,28 @@
         "/api/primer-diagnostics",
         "/api/primer-specificity",
         "/api/pcr"
+      ],
+      "ui_walkthrough": {
+        "tab": "Primer/PCR",
+        "button": "Use an ambiguity-coded primer to keep one assay useful across a small reporter family and an uncertainty-bearing consensus sequence.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Use the primer pair only if specificity, size, Tm, and interpretation all support the assay goal.",
+        "bench": "Run the predicted product with appropriate positive and negative controls.",
+        "caution": "A primer that binds somewhere is not necessarily a primer that produces an interpretable experiment."
+      },
+      "glossary_terms": [
+        "CDS",
+        "consensus",
+        "amplicon"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AL --out ./tmp/genomeforge_case_al",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_al"
@@ -499,6 +788,27 @@
         "/api/primer-specificity",
         "/api/pcr"
       ],
+      "ui_walkthrough": {
+        "tab": "Primer/PCR",
+        "button": "Compare multiple assay targets and ask whether they can coexist in one panel without obvious conflict.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Use the primer pair only if specificity, size, Tm, and interpretation all support the assay goal.",
+        "bench": "Run the predicted product with appropriate positive and negative controls.",
+        "caution": "A primer that binds somewhere is not necessarily a primer that produces an interpretable experiment."
+      },
+      "glossary_terms": [
+        "CDS",
+        "amplicon"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case Q --out ./tmp/genomeforge_case_q",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_q"
     },
@@ -517,6 +827,27 @@
         "/api/primer-specificity",
         "/api/pcr"
       ],
+      "ui_walkthrough": {
+        "tab": "Primer/PCR",
+        "button": "Design an assay package that includes controls proving both signal presence and signal absence.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Use the primer pair only if specificity, size, Tm, and interpretation all support the assay goal.",
+        "bench": "Run the predicted product with appropriate positive and negative controls.",
+        "caution": "A primer that binds somewhere is not necessarily a primer that produces an interpretable experiment."
+      },
+      "glossary_terms": [
+        "CDS",
+        "amplicon"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AA --out ./tmp/genomeforge_case_aa",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_aa"
     },
@@ -533,6 +864,26 @@
       "apis": [
         "/api/cloning-check",
         "/api/ligation-sim"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Check whether the vector and insert support a coherent directional cloning plan and inspect likely ligation products.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case G --out ./tmp/genomeforge_case_g",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_g"
@@ -551,6 +902,27 @@
         "/api/gibson-assemble",
         "/api/project-diff"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Validate a circularized construct by focusing on junctions, scars, and reading-frame continuity.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "frame"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case S --out ./tmp/genomeforge_case_s",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_s"
     },
@@ -567,6 +939,28 @@
         "/api/import-ab1",
         "/api/trace-align",
         "/api/trace-consensus"
+      ],
+      "ui_walkthrough": {
+        "tab": "Trace",
+        "button": "Combine multiple trace-derived views into one final verdict about a reporter construct.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Accept the construct only where trace peaks support the called sequence at decision-critical bases.",
+        "bench": "Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.",
+        "caution": "A clean-looking consensus is not stronger than the raw trace evidence behind it."
+      },
+      "glossary_terms": [
+        "CDS",
+        "consensus",
+        "Sanger trace"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case Z --out ./tmp/genomeforge_case_z",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_z"
@@ -588,6 +982,26 @@
         "/api/heatmap",
         "/api/phylo"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Compare a small reporter family panel to see what is conserved, what is engineered, and what is genuinely distant.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case H --out ./tmp/genomeforge_case_h",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_h"
     },
@@ -603,6 +1017,26 @@
       "workflow": "Use analytics tracks to identify composition features that may complicate PCR, synthesis, or sequencing.",
       "apis": [
         "/api/sequence-analytics"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Use analytics tracks to identify composition features that may complicate PCR, synthesis, or sequencing.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case N --out ./tmp/genomeforge_case_n",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_n"
@@ -621,6 +1055,24 @@
         "/api/search-entities",
         "/api/sequence-analytics"
       ],
+      "ui_walkthrough": {
+        "tab": "Search",
+        "button": "Flag simple-sequence patches that often produce weak confidence in sequencing or synthesis workflows.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case O --out ./tmp/genomeforge_case_o",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_o"
     },
@@ -639,6 +1091,26 @@
         "/api/motif",
         "/api/search-entities"
       ],
+      "ui_walkthrough": {
+        "tab": "Search",
+        "button": "Compare motif density across engineered vector DNA and reporter CDS records to learn when motif count is meaningful.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case X --out ./tmp/genomeforge_case_x",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_x"
     },
@@ -656,6 +1128,24 @@
         "/api/crispr-offtargets",
         "/api/hdr-template"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Design guide RNAs and an HDR donor around a medically meaningful BRAF hotspot region.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case K --out ./tmp/genomeforge_case_k",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_k"
     },
@@ -673,6 +1163,26 @@
         "/api/auto-annotate",
         "/api/sequence-tracks"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Use annotation and translation context to discuss why expression output depends on more than the CDS alone.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case R --out ./tmp/genomeforge_case_r",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_r"
     },
@@ -689,6 +1199,29 @@
       "apis": [
         "/api/codon-optimize"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Discuss how two common reporter CDS records might look to different host translation systems.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "codon",
+        "ORF",
+        "frame"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case V --out ./tmp/genomeforge_case_v",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_v"
     },
@@ -703,6 +1236,29 @@
       "workflow": "Search for synonymous coding-sequence edits that introduce or remove a restriction site without changing the translated protein.",
       "apis": [
         "/api/silent-restriction-sites"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Find Silent Restriction Sites",
+        "panel": "Silent Restriction Site View",
+        "fields": [
+          "Frame",
+          "Enzymes",
+          "Enzyme Set Name",
+          "Silent Max Candidates"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed only after confirming the edit preserves translation and does not create an unwanted local feature.",
+        "bench": "Order or clone the silent-edit design, then verify with both sequencing and the new digest handle.",
+        "caution": "Silent means amino-acid-preserving, not automatically consequence-free."
+      },
+      "glossary_terms": [
+        "CDS",
+        "codon",
+        "restriction site",
+        "ORF",
+        "frame"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AQ --out ./tmp/genomeforge_case_aq",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_aq"
@@ -723,6 +1279,27 @@
         "/api/import-dna",
         "/api/canonicalize-record"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Export and re-import multiple records to verify that file conversion preserves sequence identity and annotations.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "topology"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case I --out ./tmp/genomeforge_case_i",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_i"
     },
@@ -741,6 +1318,28 @@
         "/api/trace-edit",
         "/api/trace-consensus"
       ],
+      "ui_walkthrough": {
+        "tab": "Trace",
+        "button": "Import a Sanger-style trace, align it to EGFP, perform an edit, and recompute consensus.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Accept the construct only where trace peaks support the called sequence at decision-critical bases.",
+        "bench": "Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.",
+        "caution": "A clean-looking consensus is not stronger than the raw trace evidence behind it."
+      },
+      "glossary_terms": [
+        "CDS",
+        "consensus",
+        "Sanger trace"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case J --out ./tmp/genomeforge_case_j",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_j"
     },
@@ -758,6 +1357,28 @@
         "/api/trace-consensus",
         "/api/sequence-analytics"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Use realistic target regions to think about how much sequencing evidence is enough for a confident call.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Accept the construct only where trace peaks support the called sequence at decision-critical bases.",
+        "bench": "Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.",
+        "caution": "A clean-looking consensus is not stronger than the raw trace evidence behind it."
+      },
+      "glossary_terms": [
+        "CDS",
+        "consensus",
+        "Sanger trace"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case Y --out ./tmp/genomeforge_case_y",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_y"
     },
@@ -774,6 +1395,26 @@
       "apis": [
         "/api/sequence-analytics"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Use the analytics lens on a clean CDS and a genomic fragment to see how sequence context changes interpretation.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AE --out ./tmp/genomeforge_case_ae",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ae"
     },
@@ -789,6 +1430,26 @@
       "workflow": "Visualize where two nearly identical sequences diverge and decide whether the divergence matters.",
       "apis": [
         "/api/comparison-lens"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Visualize where two nearly identical sequences diverge and decide whether the divergence matters.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AF --out ./tmp/genomeforge_case_af",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_af"
@@ -808,6 +1469,26 @@
         "/api/convert",
         "/api/canonicalize-record"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Demonstrate that a real record can move through multiple formats and come back interpretable.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AG --out ./tmp/genomeforge_case_ag",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ag"
     },
@@ -823,6 +1504,26 @@
       "apis": [
         "/api/import-ab1",
         "/api/trace-chromatogram-svg"
+      ],
+      "ui_walkthrough": {
+        "tab": "Trace/Interop",
+        "button": "Trace Chromatogram",
+        "panel": "Sanger Chromatogram",
+        "fields": [
+          "Trace ID",
+          "Trace Window Start",
+          "Trace Window End"
+        ]
+      },
+      "decision_card": {
+        "decision": "Accept the construct only where trace peaks support the called sequence at decision-critical bases.",
+        "bench": "Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.",
+        "caution": "A clean-looking consensus is not stronger than the raw trace evidence behind it."
+      },
+      "glossary_terms": [
+        "CDS",
+        "Sanger trace",
+        "consensus"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AH --out ./tmp/genomeforge_case_ah",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ah"
@@ -840,6 +1541,28 @@
       "apis": [
         "/api/trace-verify"
       ],
+      "ui_walkthrough": {
+        "tab": "Trace",
+        "button": "Use trace evidence to make either a hotspot genotype call or a plasmid verification call.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Accept the construct only where trace peaks support the called sequence at decision-critical bases.",
+        "bench": "Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.",
+        "caution": "A clean-looking consensus is not stronger than the raw trace evidence behind it."
+      },
+      "glossary_terms": [
+        "CDS",
+        "Sanger trace",
+        "consensus"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AI --out ./tmp/genomeforge_case_ai",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ai"
     },
@@ -856,6 +1579,27 @@
         "/api/import-ab1",
         "/api/trace-alignment-links",
         "/api/trace-chromatogram-svg"
+      ],
+      "ui_walkthrough": {
+        "tab": "Trace/Interop",
+        "button": "Linked Trace Alignment",
+        "panel": "Trace-to-Reference Links",
+        "fields": [
+          "Trace ID",
+          "Reference Sequence For Trace Alignment",
+          "Trace Window Start",
+          "Trace Window End"
+        ]
+      },
+      "decision_card": {
+        "decision": "Accept the construct only where trace peaks support the called sequence at decision-critical bases.",
+        "bench": "Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.",
+        "caution": "A clean-looking consensus is not stronger than the raw trace evidence behind it."
+      },
+      "glossary_terms": [
+        "CDS",
+        "Sanger trace",
+        "consensus"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AR --out ./tmp/genomeforge_case_ar",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ar"
@@ -875,6 +1619,26 @@
       "apis": [
         "/api/blast-search"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Run local similarity search against a small real-world panel to identify the most likely source of an unknown sequence.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Use public-search hits to refine identity hypotheses, not to erase local coordinate context.",
+        "bench": "Follow up surprising hits by checking contamination, query length, coverage, and database scope.",
+        "caution": "Top hit, high identity, and biological identity are related but not identical claims."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AJ --out ./tmp/genomeforge_case_aj",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_aj"
     },
@@ -889,6 +1653,25 @@
       "workflow": "Package a selected sequence window as FASTA and launch or copy it for external NCBI and WormBase BLAST workflows.",
       "apis": [
         "/api/blast-launch"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Launch Selected Sequence Externally",
+        "panel": "External BLAST Launchpad",
+        "fields": [
+          "BLAST Query Sequence",
+          "External BLAST Launch",
+          "BLAST Program",
+          "BLAST Database"
+        ]
+      },
+      "decision_card": {
+        "decision": "Use public-search hits to refine identity hypotheses, not to erase local coordinate context.",
+        "bench": "Follow up surprising hits by checking contamination, query length, coverage, and database scope.",
+        "caution": "Top hit, high identity, and biological identity are related but not identical claims."
+      },
+      "glossary_terms": [
+        "CDS"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AS --out ./tmp/genomeforge_case_as",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_as"
@@ -909,6 +1692,26 @@
         "/api/sirna-design",
         "/api/sirna-map"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Reuse saved element libraries to auto-flag familiar sequence elements, then design and map siRNA candidates.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AK --out ./tmp/genomeforge_case_ak",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ak"
     },
@@ -928,6 +1731,27 @@
         "/api/blast-search",
         "/api/search-entities"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Treat an ambiguity-bearing consensus record as a real query and verify that identity search and motif logic still recover the correct biological family.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Use public-search hits to refine identity hypotheses, not to erase local coordinate context.",
+        "bench": "Follow up surprising hits by checking contamination, query length, coverage, and database scope.",
+        "caution": "Top hit, high identity, and biological identity are related but not identical claims."
+      },
+      "glossary_terms": [
+        "CDS",
+        "consensus"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AM --out ./tmp/genomeforge_case_am",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_am"
     },
@@ -945,6 +1769,26 @@
         "/api/project-permissions",
         "/api/review-submit",
         "/api/review-approve"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Create a workspace, assign roles, and run a simple review flow on a saved construct project.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Treat the saved project as acceptable only if another person can reopen the data, evidence, and reasoning.",
+        "bench": "Use the handoff package for review, repetition, or continuation by another team member.",
+        "caution": "Screenshots are not reproducibility; saved state plus provenance is closer."
+      },
+      "glossary_terms": [
+        "CDS"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case L --out ./tmp/genomeforge_case_l",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_l"
@@ -965,6 +1809,23 @@
         "/api/sequence-analytics",
         "/api/batch-digest"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Save Project",
+        "panel": "History Graph / Results",
+        "fields": [
+          "Project Name",
+          "Workspace/Review fields if relevant"
+        ]
+      },
+      "decision_card": {
+        "decision": "Treat the saved project as acceptable only if another person can reopen the data, evidence, and reasoning.",
+        "bench": "Use the handoff package for review, repetition, or continuation by another team member.",
+        "caution": "Screenshots are not reproducibility; saved state plus provenance is closer."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case T --out ./tmp/genomeforge_case_t",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_t"
     },
@@ -983,6 +1844,23 @@
         "/api/share-create",
         "/api/share-load"
       ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Save Project",
+        "panel": "History Graph / Results",
+        "fields": [
+          "Project Name",
+          "Workspace/Review fields if relevant"
+        ]
+      },
+      "decision_card": {
+        "decision": "Treat the saved project as acceptable only if another person can reopen the data, evidence, and reasoning.",
+        "bench": "Use the handoff package for review, repetition, or continuation by another team member.",
+        "caution": "Screenshots are not reproducibility; saved state plus provenance is closer."
+      },
+      "glossary_terms": [
+        "CDS"
+      ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AB --out ./tmp/genomeforge_case_ab",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ab"
     },
@@ -1000,6 +1878,26 @@
         "/api/primer-design",
         "/api/grna-design",
         "/api/sequence-analytics"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Rerun a workflow under a small parameter sweep to see whether the biological conclusion is robust or fragile.",
+        "panel": "Results plus the matching visualization panel",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Name",
+          "Topology",
+          "Frame",
+          "workflow-specific controls"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AC --out ./tmp/genomeforge_case_ac",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ac"
@@ -1020,6 +1918,23 @@
         "/api/project-save",
         "/api/share-create",
         "/api/project-history-svg"
+      ],
+      "ui_walkthrough": {
+        "tab": "Advanced",
+        "button": "Save Project",
+        "panel": "History Graph / Results",
+        "fields": [
+          "Project Name",
+          "Workspace/Review fields if relevant"
+        ]
+      },
+      "decision_card": {
+        "decision": "Treat the saved project as acceptable only if another person can reopen the data, evidence, and reasoning.",
+        "bench": "Use the handoff package for review, repetition, or continuation by another team member.",
+        "caution": "Screenshots are not reproducibility; saved state plus provenance is closer."
+      },
+      "glossary_terms": [
+        "CDS"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AD --out ./tmp/genomeforge_case_ad",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_ad"

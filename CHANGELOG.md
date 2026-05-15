@@ -4,6 +4,37 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-05-15
+
+### Added
+
+- Added in-app Learning Mode for guided flagship workflows.
+- Added evidence-to-decision cards that connect workflow outputs to biological inference, confidence limits, and next bench actions.
+- Expanded the tutorial generator with exact UI walkthroughs, just-in-time glossary cards, evidence/inference checkpoints, bench decision cards, common wrong interpretations, and lab-chief teaching prompts for all 45 cases.
+- Added browser regression coverage for Learning Mode and decision-card updates.
+
+### Changed
+
+- Regenerated the tutorial HTML, PDF, dataset metadata, and case playbook for the new teaching model.
+- Updated README, handoff, npm package metadata, Python package metadata, and release notes for the new release.
+- Reworked SVG minimap and pan/zoom interactions to use scoped pointer-event listeners instead of brittle handler-property assignment.
+
+### Fixed
+
+- Removed local browser favicon 404 noise with an embedded SVG favicon.
+- Preserved feature/cut/codon click inspection while keeping map pan/zoom behavior available.
+- Extended documentation validation to catch Python package version drift.
+
+### Validation
+
+- `python3 docs/validate_docs.py`
+- `python3 -m py_compile backend/project_api.py collab/store.py docs/tutorial/generate_tutorial.py docs/validate_docs.py docs/tutorial/datasets/extract_case_bundle.py docs/build_tutorial_pdf.py`
+- `node --check webui/js/ui-core.js && node --check webui/js/workflows-core.js && node --check webui/js/workflows-analysis.js && node --check webui/js/workflows-search.js && node --check webui/js/workflows-projects.js && node --check webui/js/app.js`
+- `python3 -m unittest discover -s tests -p 'test_*.py'`
+- `python3 smoke_test.py`
+- `python3 real_world_functional_test.py`
+- `npm run test:e2e`
+
 ## [0.1.9] - 2026-04-29
 
 ### Added

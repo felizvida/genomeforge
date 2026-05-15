@@ -69,11 +69,15 @@ async function runReviewApprove() {
 async function runProjectSave() {
   try {
     const history = historyState.stack.slice(0, historyState.index + 1);
-    show(await callApi('/api/project-save', payload({
+    const r = await callApi('/api/project-save', payload({
       project_name: document.getElementById('projectName').value,
       history,
       features: featureState,
-    })));
+    }));
+    setDecisionCard('project', r, {
+      evidence: `Project "${document.getElementById('projectName').value}" saved with ${history.length} history state(s).`,
+    });
+    show(r);
   } catch (e) { show(String(e)); }
 }
 
@@ -157,6 +161,10 @@ async function runShareCreate() {
       include_content: true,
     });
     document.getElementById('shareId').value = r.share_id || '';
+    setDecisionCard('project', r, {
+      evidence: `Share bundle ${r.share_id || '(pending)'} created for project handoff.`,
+      next: 'Load the share bundle in a clean session before treating it as a reproducible handoff.',
+    });
     show(r);
   } catch (e) { show(String(e)); }
 }
@@ -175,6 +183,10 @@ async function runProjectHistoryGraph() {
       project_name: document.getElementById('projectName').value,
     });
     document.getElementById('historyGraph').innerHTML = r.svg || '';
+    setDecisionCard('project', r, {
+      evidence: 'Project history graph rendered from saved state.',
+      next: 'Use the graph to confirm the decision trail is visible before sharing the project.',
+    });
     show(r);
   } catch (e) { show(String(e)); }
 }

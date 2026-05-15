@@ -206,6 +206,172 @@ CONCEPT_ILLUSTRATIONS = {
     },
 }
 
+GLOSSARY_TERMS = {
+    'amplicon': {
+        'definition': 'A DNA segment produced by PCR.',
+        'cs_analogy': 'A selected substring copied many times so it can be measured.',
+        'why_it_matters': 'Amplicon size and specificity determine whether a gel, trace, or sequencing run answers the intended question.',
+    },
+    'CDS': {
+        'definition': 'Coding sequence: the DNA interval that is translated into a protein.',
+        'cs_analogy': 'The executable body of a function, excluding surrounding configuration.',
+        'why_it_matters': 'Treating non-CDS DNA as CDS can create nonsense translations and misleading protein conclusions.',
+    },
+    'codon': {
+        'definition': 'A three-base DNA word that specifies one amino acid or a stop signal.',
+        'cs_analogy': 'A fixed-width instruction token read by the translation machine.',
+        'why_it_matters': 'One inserted or deleted base shifts every downstream token and can destroy a protein.',
+    },
+    'consensus': {
+        'definition': 'A best-supported sequence assembled from one or more reads or traces.',
+        'cs_analogy': 'A merged result from multiple noisy observations.',
+        'why_it_matters': 'Consensus calls should preserve uncertainty when evidence is ambiguous rather than inventing false precision.',
+    },
+    'frame': {
+        'definition': 'The offset used to group DNA bases into codons.',
+        'cs_analogy': 'The parser alignment for fixed-width tokens.',
+        'why_it_matters': 'A correct sequence in the wrong frame can translate into a completely different protein.',
+    },
+    'methylation': {
+        'definition': 'A chemical base modification that can block or alter enzyme cutting.',
+        'cs_analogy': 'Hidden metadata attached to a character that changes how another program handles it.',
+        'why_it_matters': 'A restriction site can exist in the text sequence but fail experimentally if methylation blocks the enzyme.',
+    },
+    'ORF': {
+        'definition': 'Open reading frame: a stretch that can be translated without hitting a stop codon.',
+        'cs_analogy': 'A candidate executable region with no early termination token.',
+        'why_it_matters': 'ORFs are clues, not proof; biological context decides whether one is actually used.',
+    },
+    'restriction site': {
+        'definition': 'A short DNA motif recognized and cut by a restriction enzyme.',
+        'cs_analogy': 'A delimiter or cut marker embedded in a long string.',
+        'why_it_matters': 'Restriction sites determine whether cloning, diagnostic digest, or screening plans are physically possible.',
+    },
+    'Sanger trace': {
+        'definition': 'A chromatogram showing fluorescent peak evidence behind a called DNA sequence.',
+        'cs_analogy': 'A debugger trace behind a summarized test result.',
+        'why_it_matters': 'Base calls are interpretations of peaks; weak or mixed peaks should change confidence.',
+    },
+    'silent mutation': {
+        'definition': 'A DNA change that preserves the encoded amino acid.',
+        'cs_analogy': 'A source-code rewrite that compiles to the same instruction.',
+        'why_it_matters': 'Protein-preserving does not always mean biologically neutral because codon usage, RNA structure, or regulatory motifs can still shift.',
+    },
+    'topology': {
+        'definition': 'Whether a DNA molecule is circular or linear.',
+        'cs_analogy': 'A data structure boundary condition: wraparound exists for circular plasmids but not linear fragments.',
+        'why_it_matters': 'Topology changes digest fragments, cloning interpretation, and map layout.',
+    },
+}
+
+CHEAT_SHEETS = [
+    {
+        'title': 'Plasmid Map',
+        'use_when': 'You need to decide where a construct can be cut, assembled, selected, or expressed.',
+        'read_for': ['Topology', 'unique cutters', 'feature direction', 'antibiotic/selection markers'],
+        'common_trap': 'Treating the map as decoration instead of an experimental plan.',
+    },
+    {
+        'title': 'Reading Frame',
+        'use_when': 'You are translating DNA, checking mutations, or designing silent edits.',
+        'read_for': ['Start codon', 'codon triplets', 'stop codons', 'feature boundaries'],
+        'common_trap': 'Starting translation one base too early or late and blaming the sequence.',
+    },
+    {
+        'title': 'Diagnostic Digest',
+        'use_when': 'You need an enzyme that distinguishes two related constructs or alleles.',
+        'read_for': ['Cut count difference', 'fragment-size separation', 'single-site specificity', 'gel readability'],
+        'common_trap': 'Choosing the enzyme with many cuts instead of the enzyme that answers the comparison question.',
+    },
+    {
+        'title': 'Sanger Trace',
+        'use_when': 'You are verifying a plasmid, genotype, or local edit.',
+        'read_for': ['Peak quality', 'mixed bases', 'edge decay', 'alignment mismatch support'],
+        'common_trap': 'Trusting the called letters without inspecting the chromatogram evidence.',
+    },
+    {
+        'title': 'BLAST Result',
+        'use_when': 'You need public-reference context for a selected sequence.',
+        'read_for': ['Query coordinates', 'identity', 'coverage', 'database scope', 'runner-up hits'],
+        'common_trap': 'Treating the top hit as identity proof without checking coverage and database context.',
+    },
+]
+
+UI_GUIDES = [
+    {
+        'match_api': '/api/restriction-compare',
+        'tab': 'Advanced',
+        'fields': ['Sequence / FASTA / GenBank', 'Enzymes', 'Enzyme Set Name', 'Restriction Comparison / Diagnostic Cutters', 'Minimum Delta'],
+        'button': 'Compare Restriction Sites',
+        'panel': 'Diagnostic Restriction View',
+        'sample': 'Use <code>BamHI,EcoRI,HindIII</code> and a related sequence in <code>Restriction Comparison / Diagnostic Cutters</code>.',
+        'troubleshoot': 'If no candidates appear, lower <code>Minimum Delta</code> to 1 or add enzymes that recognize motifs present in only one construct.',
+    },
+    {
+        'match_api': '/api/digest-gel',
+        'tab': 'Advanced',
+        'fields': ['Gel Band Sizes', 'User-Defined DNA Ladder', 'Enzymes', 'Enzyme Set Name'],
+        'button': 'Digest Gel With Ladder',
+        'panel': 'Results',
+        'sample': 'Save the ladder first, then reuse its ladder name as the digest marker set.',
+        'troubleshoot': 'If the gel is hard to interpret, add ladder bands near the expected fragment sizes or choose enzymes that separate fragments farther apart.',
+    },
+    {
+        'match_api': '/api/text-map',
+        'tab': 'Map',
+        'fields': ['Track Start', 'Track End', 'Frame', 'Text Map Width'],
+        'button': 'Render Text Map',
+        'panel': 'Text Map',
+        'sample': 'Start with width <code>80</code> and a short window such as <code>1..180</code> for readable line wrapping.',
+        'troubleshoot': 'If translation looks wrong, check the frame selector before interpreting amino acids.',
+    },
+    {
+        'match_api': '/api/silent-restriction-sites',
+        'tab': 'Advanced',
+        'fields': ['Frame', 'Enzymes', 'Enzyme Set Name', 'Silent Max Candidates'],
+        'button': 'Find Silent Restriction Sites',
+        'panel': 'Silent Restriction Site View',
+        'sample': 'Use frame <code>1</code> for EGFP and a small enzyme set before expanding the search.',
+        'troubleshoot': 'If all candidates are biologically awkward, narrow the enzyme list or inspect codon usage before adopting an edit.',
+    },
+    {
+        'match_api': '/api/blast-launch',
+        'tab': 'Advanced',
+        'fields': ['BLAST Query Sequence', 'External BLAST Launch', 'BLAST Program', 'BLAST Database'],
+        'button': 'Launch Selected Sequence Externally',
+        'panel': 'External BLAST Launchpad',
+        'sample': 'Enter a selected region or leave the query blank to use the current record sequence.',
+        'troubleshoot': 'If provider interpretation feels inconsistent, confirm that the FASTA header contains the intended coordinates and that the database scope matches the organism question.',
+    },
+    {
+        'match_api': '/api/trace-alignment-links',
+        'tab': 'Trace/Interop',
+        'fields': ['Trace ID', 'Reference Sequence For Trace Alignment', 'Trace Window Start', 'Trace Window End'],
+        'button': 'Linked Trace Alignment',
+        'panel': 'Trace-to-Reference Links',
+        'sample': 'Import or load a trace first, then keep the window narrow around the mismatch or verification region.',
+        'troubleshoot': 'If rows do not link usefully, reduce the window and verify the trace reference sequence matches the intended construct orientation.',
+    },
+    {
+        'match_api': '/api/trace-chromatogram-svg',
+        'tab': 'Trace/Interop',
+        'fields': ['Trace ID', 'Trace Window Start', 'Trace Window End'],
+        'button': 'Trace Chromatogram',
+        'panel': 'Sanger Chromatogram',
+        'sample': 'Start with a high-confidence central window rather than the noisy trace edges.',
+        'troubleshoot': 'If peaks look ambiguous, do not force a yes/no call; mark the region as needing repeat evidence.',
+    },
+    {
+        'match_api': '/api/project-save',
+        'tab': 'Advanced',
+        'fields': ['Project Name', 'Workspace/Review fields if relevant'],
+        'button': 'Save Project',
+        'panel': 'History Graph / Results',
+        'sample': 'Use a descriptive project name that encodes molecule, date, and decision state.',
+        'troubleshoot': 'If a collaborator cannot reproduce the result, reload the saved project in a clean browser session and compare the history graph.',
+    },
+]
+
 RECORDS = {
     'EGFP_CDS': {
         'type': 'public-source',
@@ -884,8 +1050,284 @@ def format_list(items: list[str], *, escape_items: bool = True) -> str:
     return ''.join(f'<li>{item}</li>' for item in items)
 
 
+def render_nested_list(items: list[str]) -> str:
+    return '<ul>' + format_list(items) + '</ul>'
+
+
 def render_record_badges(records: list[str]) -> str:
     return ''.join(f'<span class="badge">{escape(record)}</span>' for record in records)
+
+
+def guide_for_case(case_info: dict) -> dict:
+    for api in case_info['apis']:
+        for guide in UI_GUIDES:
+            if guide['match_api'] == api:
+                return guide
+    return {
+        'tab': case_info['tab'],
+        'fields': ['Sequence / FASTA / GenBank', 'Name', 'Topology', 'Frame', 'workflow-specific controls'],
+        'button': case_info['workflow'],
+        'panel': 'Results plus the matching visualization panel',
+        'sample': 'Use the starter values below when provided; otherwise run the default setting first.',
+        'troubleshoot': 'If your result differs, confirm the loaded record, topology, frame, and window before changing biological interpretation.',
+    }
+
+
+def render_exact_ui_steps(case_info: dict) -> str:
+    guide = guide_for_case(case_info)
+    fields = ', '.join(f'<code>{escape(field)}</code>' for field in guide['fields'])
+    steps = [
+        f'Load the included prebuilt bundle <code>{escape(prebuilt_case_bundle_path(case_info["id"]))}</code> into <code>Sequence / FASTA / GenBank</code>. Keep <code>Name</code> descriptive and set <code>Topology</code> according to the bundle manifest.',
+        f'Open the <code>{escape(guide["tab"])}</code> tab. Confirm these UI landmarks before running: {fields}.',
+        f'{guide["sample"]}',
+        f'Click <code>{escape(guide["button"])}</code>. The primary visible result should appear in <code>{escape(guide["panel"])}</code> and the JSON details should appear in <code>Results</code>.',
+        f'Compare your output with the sample result below. If it differs, use this first troubleshooting rule: {guide["troubleshoot"]}',
+        f'Write one sentence beginning “The evidence supports...” and one sentence beginning “The next bench decision is...”. Keep the endpoint record with <code>{escape(", ".join(case_info["apis"]))}</code>.',
+    ]
+    return '<div class="stepbox"><b>Step-by-Step in Genome Forge: Exact UI Walkthrough</b><ol>' + format_list(steps, escape_items=False) + '</ol></div>'
+
+
+def glossary_terms_for_case(case_info: dict) -> list[str]:
+    text = ' '.join([
+        case_info['title'],
+        case_info['workflow'],
+        case_info['biological_question'],
+        case_info['biology'],
+        ' '.join(case_info['apis']),
+        ' '.join(case_info['records']),
+    ]).lower()
+    selected = []
+    for term in GLOSSARY_TERMS:
+        if term.lower() in text:
+            selected.append(term)
+    if any(api in case_info['apis'] for api in ['/api/translate', '/api/orfs', '/api/silent-restriction-sites', '/api/codon-optimize']):
+        selected.extend(['CDS', 'ORF', 'frame', 'codon'])
+    if any(api in case_info['apis'] for api in ['/api/digest', '/api/digest-advanced', '/api/restriction-compare', '/api/silent-restriction-sites']):
+        selected.extend(['restriction site', 'methylation'])
+    if any(api.startswith('/api/trace') or api in ['/api/import-ab1'] for api in case_info['apis']):
+        selected.extend(['Sanger trace', 'consensus'])
+    if any(api in case_info['apis'] for api in ['/api/pcr', '/api/pcr-gel-lanes', '/api/primers']):
+        selected.append('amplicon')
+    deduped = []
+    for term in selected:
+        if term in GLOSSARY_TERMS and term not in deduped:
+            deduped.append(term)
+    return deduped[:5]
+
+
+def render_case_glossary(case_info: dict) -> str:
+    terms = glossary_terms_for_case(case_info)
+    if not terms:
+        terms = ['topology', 'restriction site', 'frame']
+    rows = ''.join(
+        dedent(f'''
+        <div class="glossary-card">
+          <h4>{escape(term)}</h4>
+          <p><b>Meaning:</b> {escape(GLOSSARY_TERMS[term]['definition'])}</p>
+          <p><b>CS analogy:</b> {escape(GLOSSARY_TERMS[term]['cs_analogy'])}</p>
+          <p><b>Why it matters:</b> {escape(GLOSSARY_TERMS[term]['why_it_matters'])}</p>
+        </div>
+        ''').strip()
+        for term in terms
+    )
+    return f'<div class="glossary-strip"><b>Just-in-Time Glossary</b><div class="glossary-grid">{rows}</div></div>'
+
+
+def decision_profile(case_info: dict) -> dict[str, str]:
+    apis = set(case_info['apis'])
+    title = case_info['title'].lower()
+    if '/api/restriction-compare' in apis or 'diagnostic' in title:
+        return {
+            'decision': 'Choose the enzyme only if it creates a readable difference between the related molecules.',
+            'bench': 'Run a small diagnostic digest and compare the observed gel bands with the predicted parent/variant patterns.',
+            'caution': 'Do not prefer a cutter merely because it cuts often; prefer the cutter that answers the discrimination question cleanly.',
+        }
+    if '/api/silent-restriction-sites' in apis:
+        return {
+            'decision': 'Proceed only after confirming the edit preserves translation and does not create an unwanted local feature.',
+            'bench': 'Order or clone the silent-edit design, then verify with both sequencing and the new digest handle.',
+            'caution': 'Silent means amino-acid-preserving, not automatically consequence-free.',
+        }
+    if any(api.startswith('/api/trace') or api == '/api/import-ab1' for api in apis):
+        return {
+            'decision': 'Accept the construct only where trace peaks support the called sequence at decision-critical bases.',
+            'bench': 'Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.',
+            'caution': 'A clean-looking consensus is not stronger than the raw trace evidence behind it.',
+        }
+    if '/api/blast-launch' in apis or '/api/blast-search' in apis:
+        return {
+            'decision': 'Use public-search hits to refine identity hypotheses, not to erase local coordinate context.',
+            'bench': 'Follow up surprising hits by checking contamination, query length, coverage, and database scope.',
+            'caution': 'Top hit, high identity, and biological identity are related but not identical claims.',
+        }
+    if any(api in apis for api in ['/api/primers', '/api/pcr', '/api/pcr-gel-lanes', '/api/primer-diagnostics']):
+        return {
+            'decision': 'Use the primer pair only if specificity, size, Tm, and interpretation all support the assay goal.',
+            'bench': 'Run the predicted product with appropriate positive and negative controls.',
+            'caution': 'A primer that binds somewhere is not necessarily a primer that produces an interpretable experiment.',
+        }
+    if any(api in apis for api in ['/api/project-save', '/api/share-create', '/api/review-submit']):
+        return {
+            'decision': 'Treat the saved project as acceptable only if another person can reopen the data, evidence, and reasoning.',
+            'bench': 'Use the handoff package for review, repetition, or continuation by another team member.',
+            'caution': 'Screenshots are not reproducibility; saved state plus provenance is closer.',
+        }
+    return {
+        'decision': 'Proceed when the output answers the biological question and the assumptions match the input data type.',
+        'bench': 'Translate the software result into the next physical or review action before changing the molecule.',
+        'caution': 'Do not report the tool output as the conclusion; report the defensible biological interpretation.',
+    }
+
+
+def render_evidence_inference(case_info: dict) -> str:
+    profile = decision_profile(case_info)
+    evidence = [
+        case_info['expected'][0],
+        f"Input records: {', '.join(case_info['records'])}.",
+        f"Primary endpoint(s): {', '.join(case_info['apis'])}.",
+    ]
+    inference = [
+        case_info['interpretation'][0],
+        profile['decision'],
+        profile['caution'],
+    ]
+    return dedent(f'''
+      <div class="evidence-box">
+        <b>Evidence vs Inference</b>
+        <div class="evidence-grid">
+          <div><h4>Observed Evidence</h4>{render_nested_list(evidence)}</div>
+          <div><h4>Defensible Inference</h4>{render_nested_list(inference)}</div>
+        </div>
+      </div>
+    ''').strip()
+
+
+def render_decision_card(case_info: dict) -> str:
+    profile = decision_profile(case_info)
+    return dedent(f'''
+      <div class="decision-card">
+        <b>Bench Decision Card</b>
+        <p><span>Decision:</span> {escape(profile['decision'])}</p>
+        <p><span>Bench consequence:</span> {escape(profile['bench'])}</p>
+        <p><span>Confidence limit:</span> {escape(profile['caution'])}</p>
+      </div>
+    ''').strip()
+
+
+def common_mistakes(case_info: dict) -> list[tuple[str, str]]:
+    apis = set(case_info['apis'])
+    if '/api/restriction-compare' in apis:
+        return [
+            ('Wrong interpretation', 'The enzyme with the most cuts is automatically best.'),
+            ('Correction', 'The best diagnostic cutter creates a simple, readable difference between the exact two molecules being compared.'),
+        ]
+    if '/api/silent-restriction-sites' in apis:
+        return [
+            ('Wrong interpretation', 'A silent edit cannot matter biologically.'),
+            ('Correction', 'It preserves the amino acid, but you still check codon usage, RNA context, and unwanted feature creation.'),
+        ]
+    if any(api.startswith('/api/trace') or api == '/api/import-ab1' for api in apis):
+        return [
+            ('Wrong interpretation', 'The exported base call is the raw experimental fact.'),
+            ('Correction', 'The chromatogram is the rawer evidence; base calls and consensus are interpretations of that signal.'),
+        ]
+    if '/api/blast-launch' in apis or '/api/blast-search' in apis:
+        return [
+            ('Wrong interpretation', 'The top hit proves identity.'),
+            ('Correction', 'Interpret top hits together with query length, coverage, database scope, and local sample context.'),
+        ]
+    if any(api in apis for api in ['/api/translate', '/api/orfs', '/api/codon-optimize']):
+        return [
+            ('Wrong interpretation', 'Any long ORF means the biological object is a complete gene.'),
+            ('Correction', 'An ORF is a clue; annotation, frame, source, and experimental context decide meaning.'),
+        ]
+    return [
+        ('Wrong interpretation', 'If the software output looks clean, the biological conclusion is settled.'),
+        ('Correction', 'A clean output still depends on the input record, parameters, evidence quality, and the decision you are trying to support.'),
+    ]
+
+
+def render_common_mistakes(case_info: dict) -> str:
+    rows = ''.join(
+        f'<p><span>{escape(label)}:</span> {escape(text)}</p>'
+        for label, text in common_mistakes(case_info)
+    )
+    return f'<div class="mistake-box"><b>Common Wrong Interpretation</b>{rows}</div>'
+
+
+def render_lab_chief_checklist(case_info: dict) -> str:
+    profile = decision_profile(case_info)
+    prompts = [
+        f"What biological object are we handling: {', '.join(case_info['records'])}?",
+        f"What would go wrong at the bench if this interpretation is wrong?",
+        f"Which output is evidence, and which sentence is inference?",
+        f"What is the next action: {profile['bench']}",
+    ]
+    return '<div class="chief-box"><b>Lab-Chief Teaching Prompts</b><ul>' + format_list(prompts) + '</ul></div>'
+
+
+def render_cluster_checkpoint(cluster: dict) -> str:
+    cases = CLUSTER_CASES[cluster['id']]
+    first_case = cases[0]
+    last_case = cases[-1]
+    precheck = [
+        f"Before starting, state the biological object type for Case {first_case['id']} without looking at the answer key.",
+        "Name one thing the software can measure directly and one thing you must infer biologically.",
+        "Predict which UI panel will produce the main evidence for this cluster.",
+    ]
+    postcheck = [
+        f"After finishing Case {last_case['id']}, write the next bench or review action in one sentence.",
+        "Identify one parameter that could change confidence without changing the raw sequence.",
+        "Explain one common wrong interpretation and how the corrected reasoning avoids it.",
+    ]
+    roleplay = [
+        "Intern: summarize the result in plain English without jargon.",
+        "Lab chief: challenge the evidence quality and ask what would fail at the bench.",
+        "Program manager: record whether the tutorial, UI, or data bundle caused avoidable friction.",
+    ]
+    return dedent(f'''
+      <div class="cluster-checkpoint">
+        <b>Cluster Checkpoint and Role-Play</b>
+        <div class="checkpoint-grid">
+          <div><h4>Pre-check</h4>{render_nested_list(precheck)}</div>
+          <div><h4>Post-check</h4>{render_nested_list(postcheck)}</div>
+          <div><h4>Training Role-Play</h4>{render_nested_list(roleplay)}</div>
+        </div>
+      </div>
+    ''').strip()
+
+
+def render_global_glossary() -> str:
+    rows = ''.join(
+        '<tr>'
+        f'<td><code>{escape(term)}</code></td>'
+        f'<td>{escape(info["definition"])}</td>'
+        f'<td>{escape(info["cs_analogy"])}</td>'
+        f'<td>{escape(info["why_it_matters"])}</td>'
+        '</tr>'
+        for term, info in sorted(GLOSSARY_TERMS.items(), key=lambda item: item[0].lower())
+    )
+    return (
+        '<table>'
+        '<thead><tr><th>Term</th><th>Biology meaning</th><th>CS analogy</th><th>Why it matters in the lab</th></tr></thead>'
+        f'<tbody>{rows}</tbody>'
+        '</table>'
+    )
+
+
+def render_cheat_sheets() -> str:
+    cards = ''.join(
+        dedent(f'''
+        <div class="cheat-card">
+          <h3>{escape(sheet['title'])}</h3>
+          <p><b>Use when:</b> {escape(sheet['use_when'])}</p>
+          <p><b>Read for:</b> {escape(', '.join(sheet['read_for']))}</p>
+          <p><b>Common trap:</b> {escape(sheet['common_trap'])}</p>
+        </div>
+        ''').strip()
+        for sheet in CHEAT_SHEETS
+    )
+    return f'<div class="cheat-grid">{cards}</div>'
 
 
 def record_reference_table() -> str:
@@ -1379,13 +1821,6 @@ def render_case(case_info: dict) -> str:
     records = case_info['records']
     record_details = ' '.join(RECORDS[name]['input_details'] for name in records)
     starter_values = case_info.get('starter_values', [])
-    steps = [
-        f'Use the included prebuilt bundle <code>{escape(prebuilt_case_bundle_path(case_info["id"]))}</code> or regenerate it with <code>{escape(case_bundle_command(case_info["id"]))}</code>.',
-        f"Open the <code>{escape(case_info['tab'])}</code> tab in Genome Forge and load: <code>{escape(', '.join(records))}</code>.",
-        f"Run <code>{escape(case_info['workflow'])}</code> once with default settings, then rerun after {escape(case_info['parameter_knob'])}.",
-        'Capture one screenshot of the main result panel so you can compare your run with the sample interpretation later.',
-        f"Record the relevant endpoint(s): <code>{escape(', '.join(case_info['apis']))}</code> and write one sentence explaining the biological takeaway.",
-    ]
     expected = case_info['expected']
     interpretation = case_info['interpretation']
     concept_html = render_case_concept_illustration(case_info['id'])
@@ -1421,12 +1856,17 @@ def render_case(case_info: dict) -> str:
           </div>
         </div>
         {starter_html}
-        <div class="stepbox"><b>Step-by-Step in Genome Forge</b><ol>{format_list(steps, escape_items=False)}</ol></div>
+        {render_case_glossary(case_info)}
+        {render_exact_ui_steps(case_info)}
         {concept_html}
         {screenshot_html}
         <div class="resultbox"><b>Sample Results</b><p class="muted">Representative output shaped around the bundled real-world record(s) or their documented training derivatives. Values are rounded for readability, but the biological story is tied to the included data.</p><pre>{format_json_block(case_info['sample_result'])}</pre></div>
         <div class="expected"><b>Expected Results</b><ul>{format_list(expected)}</ul></div>
         <div class="interpret"><b>How to Interpret the Results</b><ul>{format_list(interpretation)}</ul></div>
+        {render_evidence_inference(case_info)}
+        {render_decision_card(case_info)}
+        {render_common_mistakes(case_info)}
+        {render_lab_chief_checklist(case_info)}
         <div class="biology"><b>Biological Explanation</b><p>{escape(case_info['biology'])}</p><p><b>Fun fact from this example:</b> {escape(case_info['fun_fact'])}</p></div>
       </article>
     ''').strip()
@@ -1467,6 +1907,7 @@ def render_cluster(cluster: dict) -> str:
             <p class="caption">{escape(cluster['caption'])}</p>
           </div>
         </div>
+        {render_cluster_checkpoint(cluster)}
         {cases_html}
       </section>
     ''').strip()
@@ -2407,7 +2848,8 @@ def render_html() -> str:
     .case-meta b {{ display: block; color: var(--muted); margin-bottom: 4px; font-size: 9.8px; text-transform: uppercase; letter-spacing: 0.06em; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
     .case-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }}
     .narrative h4 {{ margin: 0 0 4px; font-size: 12px; color: var(--navy); }}
-    .study-note, .stepbox, .resultbox, .expected, .interpret, .biology {{
+    .study-note, .stepbox, .resultbox, .expected, .interpret, .biology,
+    .glossary-strip, .evidence-box, .decision-card, .mistake-box, .chief-box, .cluster-checkpoint {{
       margin-top: 10px;
       border-radius: 8px;
       padding: 10px 12px;
@@ -2419,7 +2861,33 @@ def render_html() -> str:
     .expected {{ border: 1px solid #c8dfcf; border-left: 4px solid #4f8a5b; background: #f6fbf7; }}
     .interpret {{ border: 1px solid #e4d7ab; border-left: 4px solid var(--gold); background: #fff9eb; }}
     .biology {{ border: 1px solid #e1cbd6; border-left: 4px solid var(--rose); background: #fdf6f9; }}
-    .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b {{ display: block; margin-bottom: 4px; color: var(--navy); font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
+    .glossary-strip {{ border: 1px solid #cbd9e2; border-left: 4px solid #446d9b; background: #f5f8fc; }}
+    .evidence-box {{ border: 1px solid #bdd7d8; border-left: 4px solid var(--teal); background: #f1faf9; }}
+    .decision-card {{ border: 1px solid #c8dfcf; border-left: 4px solid #4f8a5b; background: #f5fbf6; }}
+    .mistake-box {{ border: 1px solid #e7c1bf; border-left: 4px solid #b7504c; background: #fff7f5; }}
+    .chief-box {{ border: 1px solid #ddd0e2; border-left: 4px solid var(--rose); background: #fbf6fd; }}
+    .cluster-checkpoint {{ border: 1px solid #d7e3eb; border-left: 4px solid var(--navy); background: #f6f9fb; margin-bottom: 10px; }}
+    .study-note b, .stepbox b, .resultbox b, .expected b, .interpret b, .biology b,
+    .glossary-strip > b, .evidence-box > b, .decision-card > b, .mistake-box > b, .chief-box > b, .cluster-checkpoint > b {{
+      display: block;
+      margin-bottom: 4px;
+      color: var(--navy);
+      font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    }}
+    .glossary-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 7px; }}
+    .glossary-card {{ border: 1px solid #d7e3eb; border-radius: 7px; background: #ffffff; padding: 8px; }}
+    .glossary-card h4 {{ margin: 0 0 3px; color: var(--teal); font-size: 11.2px; }}
+    .glossary-card p {{ margin: 2px 0; font-size: 10.2px; line-height: 1.45; }}
+    .evidence-grid, .checkpoint-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }}
+    .checkpoint-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
+    .evidence-grid h4, .checkpoint-grid h4 {{ margin: 2px 0 4px; color: var(--teal); font-size: 11.5px; }}
+    .decision-card p, .mistake-box p {{ margin: 3px 0; }}
+    .decision-card span, .mistake-box span {{ color: var(--navy); font-weight: 800; font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; }}
+    .chief-box ul, .evidence-box ul, .cluster-checkpoint ul {{ margin-bottom: 0; }}
+    .cheat-grid {{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }}
+    .cheat-card {{ border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; background: #ffffff; padding: 10px; page-break-inside: avoid; }}
+    .cheat-card h3 {{ color: var(--navy); font-size: 12px; margin-bottom: 5px; }}
+    .cheat-card p {{ margin: 4px 0; font-size: 10.2px; }}
     h2, h3, h4 {{ break-after: avoid-page; page-break-after: avoid; }}
     .card, .figure {{ break-inside: avoid-page; page-break-inside: avoid; }}
     @media print {{
@@ -2605,7 +3073,8 @@ def render_html() -> str:
         page-break-inside: auto;
         margin-bottom: 4mm;
       }}
-      .study-note, .stepbox, .expected, .interpret, .biology {{
+      .study-note, .stepbox, .expected, .interpret, .biology,
+      .glossary-strip, .evidence-box, .decision-card, .mistake-box, .chief-box, .cluster-checkpoint {{
         break-inside: avoid-page;
         page-break-inside: avoid;
       }}
@@ -2613,10 +3082,18 @@ def render_html() -> str:
         break-inside: auto;
         page-break-inside: auto;
       }}
-      .study-note, .stepbox, .resultbox, .expected, .interpret, .biology {{
+      .study-note, .stepbox, .resultbox, .expected, .interpret, .biology,
+      .glossary-strip, .evidence-box, .decision-card, .mistake-box, .chief-box, .cluster-checkpoint {{
         border-radius: 0;
         margin-top: 4mm;
         padding: 3.2mm 3.8mm;
+      }}
+      .glossary-grid, .evidence-grid, .checkpoint-grid, .cheat-grid {{
+        display: block;
+      }}
+      .glossary-card, .cheat-card {{
+        border-radius: 0;
+        margin-bottom: 3mm;
       }}
       pre {{
         break-inside: auto;
@@ -2722,6 +3199,31 @@ def render_html() -> str:
     </section>
 
     <section class="section">
+      <p class="section-kicker">Reasoning Loop</p>
+      <h2>Evidence-to-Decision Framework</h2>
+      <p class="muted">Every workflow in this book should end with a decision, not merely a screenshot. Genome Forge now teaches the same compact loop in the tutorial and in the web UI: observe evidence, state the inference, name the confidence limit, and choose the next bench or review action.</p>
+      <div class="cards">
+        <div class="card"><h3>Evidence</h3><p>What did the software actually observe or compute: a cut count, a trace peak, a primer product, a sequence alignment, or a saved history state?</p></div>
+        <div class="card"><h3>Inference</h3><p>What biological claim does that evidence support, and what assumption connects the output to the claim?</p></div>
+        <div class="card"><h3>Decision</h3><p>What should happen next at the bench or in review: proceed, repeat, reject, redesign, document, or seek more evidence?</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="section-kicker">CS-to-Biology Bridge</p>
+      <h2>Glossary for Computer Scientists</h2>
+      <p class="muted">Use this table as the translation layer between sequence-as-string intuition and DNA-as-physical-molecule reasoning. The same terms also appear as just-in-time glossary cards inside the cases where they matter most.</p>
+      {render_global_glossary()}
+    </section>
+
+    <section class="section">
+      <p class="section-kicker">Printable Reference</p>
+      <h2>One-Page Cheat Sheets for Core Evidence Types</h2>
+      <p class="muted">These cards are meant for double-sided printing or quick lab-bench review. Each one tells you what to read, when to use it, and the beginner mistake to avoid.</p>
+      {render_cheat_sheets()}
+    </section>
+
+    <section class="section">
       <p class="section-kicker">Reference</p>
       <h2>Primer on Ambiguity Codes</h2>
       <p class="muted">Several later lessons teach ambiguity-aware matching directly. These symbols do not mean the sequence is broken. They mean the evidence still permits a small set of bases at a position, and Genome Forge can search, compare, and design around that uncertainty.</p>
@@ -2789,8 +3291,11 @@ def render_html() -> str:
 
 
 def build_case_inputs() -> list[dict]:
-    return [
-        {
+    rows = []
+    for case_info in CASES:
+        guide = guide_for_case(case_info)
+        profile = decision_profile(case_info)
+        rows.append({
             'case_id': case_info['id'],
             'title': case_info['title'],
             'cluster': case_info['cluster'],
@@ -2798,11 +3303,18 @@ def build_case_inputs() -> list[dict]:
             'tab': case_info['tab'],
             'workflow': case_info['workflow'],
             'apis': case_info['apis'],
+            'ui_walkthrough': {
+                'tab': guide['tab'],
+                'button': guide['button'],
+                'panel': guide['panel'],
+                'fields': guide['fields'],
+            },
+            'decision_card': profile,
+            'glossary_terms': glossary_terms_for_case(case_info),
             'extract_command': case_bundle_command(case_info['id']),
             'prebuilt_bundle_dir': f'docs/tutorial/datasets/case_bundles/case_{case_info["id"].lower()}',
-        }
-        for case_info in CASES
-    ]
+        })
+    return rows
 
 
 def build_dataset_json() -> dict:
@@ -2867,6 +3379,8 @@ def render_playbook() -> str:
     for cluster in CLUSTERS:
         lines.extend([f'## Cluster {cluster["id"]}: {cluster["title"]}', ''])
         for case_info in CLUSTER_CASES[cluster['id']]:
+            profile = decision_profile(case_info)
+            guide = guide_for_case(case_info)
             lines.extend([
                 f'## Case {case_info["id"]}: {case_info["title"]}',
                 '',
@@ -2874,9 +3388,13 @@ def render_playbook() -> str:
                 f'- Focus: {case_info["biological_question"]}',
                 f'- Records: {", ".join(case_info["records"])}',
                 f'- Workflow: {case_info["workflow"]}',
+                f'- UI path: {guide["tab"]} tab -> `{guide["button"]}` -> {guide["panel"]}',
                 f'- APIs: {", ".join(case_info["apis"])}',
                 f'- Extract bundle: `{case_bundle_command(case_info["id"])} `'.rstrip(),
                 f'- Key expected signal: {case_info["expected"][0]}',
+                f'- Evidence/inference checkpoint: {case_info["interpretation"][0]}',
+                f'- Bench decision: {profile["decision"]}',
+                f'- Common caution: {profile["caution"]}',
                 '',
             ])
     return '\n'.join(lines).rstrip() + '\n'

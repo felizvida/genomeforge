@@ -46,6 +46,24 @@ test('track minimap rerender does not overwrite global mouse handlers', async ({
   expect(preserved.up).toBe(true);
 });
 
+test('guides users through Learning Mode and updates the decision card', async ({ page }) => {
+  await page.locator('.topbar button[data-action="toggleLearningMode"]').click();
+  await expect(page.locator('#learningModePanel')).toBeVisible();
+
+  await page.locator('#learningScenario').selectOption('silent-site');
+  await page.locator('#learningModePanel [data-action="startLearningScenario"]').click();
+  await expect(page.locator('#learningStepCard')).toContainText('Silent restriction-site engineering');
+  await expect(page.locator('#decisionCardViz')).toContainText('Learning Mode: Silent restriction-site engineering');
+  await expect(page.locator('.learning-highlight')).toHaveCount(1);
+
+  await page.locator('#learningModePanel [data-action="nextLearningStep"]').click();
+  await expect(page.locator('#learningProgress')).toContainText('2/4');
+  await expect(page.locator('#learningStepCard')).toContainText('Choose the enzyme set');
+
+  await page.locator('#learningModePanel [data-action="previousLearningStep"]').click();
+  await expect(page.locator('#learningProgress')).toContainText('1/4');
+});
+
 test('runs trace import, chromatogram, and BLAST-like search', async ({ page }) => {
   await activateTab(page, 'tab-trace');
   await page.locator('#tab-trace [data-action="runImportAb1"]').click();

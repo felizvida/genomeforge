@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Genome Forge UI</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f172a'/%3E%3Cpath d='M18 21c12-10 16 32 28 22M18 43c12 10 16-32 28-22' fill='none' stroke='%235eead4' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='22' cy='24' r='3' fill='%23fbbf24'/%3E%3Ccircle cx='42' cy='40' r='3' fill='%23f43f5e'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -20,6 +21,7 @@
         <button data-action="runDigest">Digest</button>
         <button data-action="runPrimerDesign">Design Primers</button>
         <button data-action="runCodonOptimize">Optimize</button>
+        <button data-action="toggleLearningMode">Learning Mode</button>
       </div>
     </section>
     <div class="frame">
@@ -29,6 +31,40 @@
         <span class="chip">Interactive DNA design cockpit</span>
       </div>
       <div class="subtitle">Comprehensive molecular cloning workbench with interactive maps, advanced assembly workflows, and modern visual analytics.</div>
+
+      <section id="learningModePanel" class="learning-panel" hidden>
+        <div class="learning-head">
+          <div>
+            <span class="learning-kicker">Guided Training</span>
+            <h2>Learning Mode</h2>
+          </div>
+          <span id="learningProgress" class="learning-progress">Choose a workflow</span>
+        </div>
+        <label>Training Workflow</label>
+        <select id="learningScenario">
+          <option value="plasmid-map">Plasmid map and unique cutters</option>
+          <option value="text-map">Text map as source-code view</option>
+          <option value="diagnostic-digest">Diagnostic digest between constructs</option>
+          <option value="custom-ladder">Custom ladder digest planning</option>
+          <option value="silent-site">Silent restriction-site engineering</option>
+          <option value="trace-review">Chromatogram-first trace review</option>
+          <option value="trace-links">Linked trace-to-reference navigation</option>
+          <option value="blast-launch">Selected-sequence BLAST handoff</option>
+          <option value="project-handoff">Reproducible project handoff</option>
+        </select>
+        <div class="row">
+          <button data-action="startLearningScenario">Start</button>
+          <button data-action="toggleLearningMode">Hide</button>
+        </div>
+        <div id="learningStepCard" class="learning-step">
+          <b>Pick a workflow and press Start.</b>
+          <p>Genome Forge will highlight the next control, explain the biology concept, and ask for the bench decision.</p>
+        </div>
+        <div class="row">
+          <button data-action="previousLearningStep">Previous</button>
+          <button data-action="nextLearningStep">Next</button>
+        </div>
+      </section>
 
       <label>Name</label>
       <input id="name" value="pDemo" />
@@ -666,6 +702,10 @@ TTTCCCGGGAAATTT</textarea>
       </div>
       <label class="panel-title">Results</label>
       <div class="output" id="out">Ready.</div>
+      <label class="panel-title">Evidence-to-Decision Card</label>
+      <div id="decisionCardViz" class="decision-card-viz">
+        Run a workflow or start Learning Mode to translate evidence into inference, confidence limits, and the next bench action.
+      </div>
       <label class="panel-title">Map Preview</label>
       <div id="map" class="interactive-viz">Click "Render Map".</div>
       <div class="viz-controls">

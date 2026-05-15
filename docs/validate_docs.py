@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import re
 import sys
+import json
+import tomllib
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 API_DOC = ROOT / "docs" / "API.md"
 TUTORIAL = ROOT / "docs" / "tutorial" / "user_training_tutorial.html"
 PLAYBOOK = ROOT / "docs" / "tutorial" / "datasets" / "case_playbook.md"
@@ -14,6 +17,9 @@ DATASET_README = ROOT / "docs" / "tutorial" / "datasets" / "README.md"
 CASE_BUNDLES_DIR = ROOT / "docs" / "tutorial" / "datasets" / "case_bundles"
 SCREENSHOT_DIR = ROOT / "docs" / "tutorial" / "assets" / "screenshots"
 README = ROOT / "README.md"
+PACKAGE_JSON = ROOT / "package.json"
+PACKAGE_LOCK = ROOT / "package-lock.json"
+PYPROJECT = ROOT / "pyproject.toml"
 HANDOFF = ROOT / "HANDOFF_ZERO_MEMORY.md"
 WEB_UI = ROOT / "web_ui.py"
 BACKEND_DIR = ROOT / "backend"
@@ -24,6 +30,11 @@ EXPECTED_SECTION_LABELS = [
     "Sample Results",
     "Expected Results",
     "How to Interpret the Results",
+    "Just-in-Time Glossary",
+    "Evidence vs Inference",
+    "Bench Decision Card",
+    "Common Wrong Interpretation",
+    "Lab-Chief Teaching Prompts",
     "Biological Explanation",
 ]
 
@@ -92,6 +103,11 @@ def main() -> int:
         count = tutorial_text.count(label)
         if count != EXPECTED_CASE_COUNT:
             errors.append(f"Tutorial section '{label}' appears {count} times, expected {EXPECTED_CASE_COUNT}")
+    if tutorial_text.count("Cluster Checkpoint and Role-Play") != 8:
+        errors.append("Tutorial does not include one checkpoint/role-play block for each cluster")
+    for needle in ["Glossary for Computer Scientists", "One-Page Cheat Sheets", "Evidence-to-Decision"]:
+        if needle not in tutorial_text:
+            errors.append(f"Tutorial is missing training scaffold section '{needle}'")
 
     playbook_text = PLAYBOOK.read_text(encoding="utf-8")
     playbook_cases = set(re.findall(r"## Case ([A-Z]{1,2}):", playbook_text))
@@ -142,9 +158,35 @@ def main() -> int:
     for needle in ["docs/README.md", "docs/INSTALL.md", "docs/API.md", "docs/MODERNIZATION_PLAN.md", "CONTRIBUTING.md", "Roadmap Snapshot"]:
         if needle not in readme_text:
             errors.append(f"README.md does not reference {needle}")
+    readme_required = [
+        f"tutorial-{EXPECTED_CASE_COUNT}%20real--world%20lessons",
+        f"a {EXPECTED_CASE_COUNT}-lesson self-study tutorial",
+        f"Genome Forge {VERSION}",
+        f"/releases/tag/{VERSION}",
+    ]
+    for needle in readme_required:
+        if needle not in readme_text:
+            errors.append(f"README.md is not synchronized with current tutorial/release marker '{needle}'")
+    if "39%20real--world%20lessons" in readme_text or "v0.1.8" in readme_text:
+        errors.append("README.md contains stale release or lesson-count text")
+
+    package_version = json.loads(PACKAGE_JSON.read_text(encoding="utf-8")).get("version")
+    if package_version != VERSION.removeprefix("v"):
+        errors.append(f"package.json version is {package_version}, expected {VERSION.removeprefix('v')}")
+    pyproject_version = tomllib.loads(PYPROJECT.read_text(encoding="utf-8")).get("project", {}).get("version")
+    if pyproject_version != VERSION.removeprefix("v"):
+        errors.append(f"pyproject.toml version is {pyproject_version}, expected {VERSION.removeprefix('v')}")
+    if PACKAGE_LOCK.exists():
+        package_lock = json.loads(PACKAGE_LOCK.read_text(encoding="utf-8"))
+        lock_version = package_lock.get("version")
+        root_lock_version = package_lock.get("packages", {}).get("", {}).get("version")
+        if lock_version != VERSION.removeprefix("v") or root_lock_version != VERSION.removeprefix("v"):
+            errors.append(
+                f"package-lock.json version is {lock_version}/{root_lock_version}, expected {VERSION.removeprefix('v')}"
+            )
 
     handoff_text = HANDOFF.read_text(encoding="utf-8")
-    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "108", "97", "102", "generate_tutorial.py", "case_bundles"]:
+    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "115", "104", "14", "112", "45", "Learning Mode", "generate_tutorial.py", "case_bundles"]:
         if needle not in handoff_text:
             errors.append(f"HANDOFF_ZERO_MEMORY.md does not include expected marker '{needle}'")
 

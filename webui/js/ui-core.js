@@ -2,7 +2,7 @@
 /* global callApi */
 
 /** @typedef {{ key: string, location: string, qualifiers: Record<string, string> }} FeatureRecord */
-/** @typedef {{ viewBox: string | null, startViewBox: string | null }} PanelViewport */
+/** @typedef {{ viewBox: string | null, startViewBox: string | null, panZoomController?: AbortController | null }} PanelViewport */
 
     const historyState = {
       stack: [],
@@ -18,11 +18,127 @@
       mode: '',
       spanBp: 0,
       context: null,
-      listenersInstalled: false,
+      dragController: null,
     };
     /** @type {Record<string, PanelViewport>} */
     const panelState = {};
     let selectedFeatureIndex = null;
+    const learningState = {
+      active: false,
+      scenarioId: 'plasmid-map',
+      stepIndex: 0,
+      highlighted: null,
+    };
+    const learningScenarios = {
+      'plasmid-map': {
+        title: 'Plasmid map and unique cutters',
+        concept: 'A plasmid map is a physical experiment plan: topology, features, and restriction sites tell you how the molecule can be cut and verified.',
+        expected: 'Map Preview shows a circular/linear map and the inspector can identify features or cuts.',
+        decision: 'Choose cutters only if they are unique, interpretable, and compatible with the cloning question.',
+        steps: [
+          { tab: 'tab-map', target: '#content', text: 'Load a pUC19 or tutorial bundle FASTA here. Confirm this is the record you intend to map.' },
+          { tab: 'tab-map', target: '#enzymes', text: 'Use a small enzyme set first, such as EcoRI,BamHI,HindIII, before expanding the search.' },
+          { tab: 'tab-map', target: 'button[data-action="runMap"]', text: 'Render the map, then click a cut or feature to inspect why it matters.' },
+          { tab: 'tab-map', target: '#map', text: 'Interpret the map as a wet-lab plan, not a decorative diagram.' },
+        ],
+      },
+      'text-map': {
+        title: 'Text map as source-code view',
+        concept: 'Text maps align sequence, coordinates, translation, and feature annotations in a compact source-code-like view.',
+        expected: 'Text Map displays coordinate blocks, DNA rows, translation context, and feature labels.',
+        decision: 'Use the text map when a graphic map is too zoomed out for codon-level reasoning.',
+        steps: [
+          { tab: 'tab-map', target: '#trackStart', text: 'Choose a narrow window so the text view remains readable.' },
+          { tab: 'tab-map', target: '#trackFrame', text: 'Set the frame before interpreting amino acids.' },
+          { tab: 'tab-map', target: '#textMapWidth', text: 'Start with width 80; wider text can be harder to print or compare.' },
+          { tab: 'tab-map', target: 'button[data-action="runTextMap"]', text: 'Render the text map and read bases, codons, and annotations together.' },
+        ],
+      },
+      'diagnostic-digest': {
+        title: 'Diagnostic digest between constructs',
+        concept: 'A diagnostic digest turns an invisible sequence difference into visible gel-band evidence.',
+        expected: 'Diagnostic Restriction View lists enzymes whose cut counts differ between the two sequences.',
+        decision: 'Pick the cutter that answers the discrimination question with a readable band pattern.',
+        steps: [
+          { tab: 'tab-advanced', target: '#restrictionCompareSeq', text: 'Paste the related construct or allele you want to compare against the current record.' },
+          { tab: 'tab-map', target: '#enzymes', text: 'Set the enzyme panel. Good diagnostic cutters are often found by trying a focused panel first.' },
+          { tab: 'tab-advanced', target: '#restrictionMinDelta', text: 'Use minimum delta 1 when searching for one-site differences.' },
+          { tab: 'tab-advanced', target: 'button[data-action="runRestrictionCompare"]', text: 'Run the comparison and inspect which enzyme cuts one sequence more often than the other.' },
+        ],
+      },
+      'custom-ladder': {
+        title: 'Custom ladder digest planning',
+        concept: 'A DNA ladder is the visual ruler for an agarose gel; in-house ladders change what fragment differences are readable.',
+        expected: 'Digest output is interpreted against the custom ladder sizes saved in the UI.',
+        decision: 'Use a custom ladder when the simulated output should match the marker actually used at the bench.',
+        steps: [
+          { tab: 'tab-advanced', target: '#gelLadderName', text: 'Name the in-house ladder so it can be reused in digest planning.' },
+          { tab: 'tab-advanced', target: '#gelLadderSizes', text: 'Enter ladder sizes from large to small, comma-separated.' },
+          { tab: 'tab-advanced', target: 'button[data-action="runGelLadderSave"]', text: 'Save the ladder before using it as a digest marker.' },
+          { tab: 'tab-advanced', target: 'button[data-action="runDigestGel"]', text: 'Run the digest gel and decide whether the expected bands are actually readable.' },
+        ],
+      },
+      'silent-site': {
+        title: 'Silent restriction-site engineering',
+        concept: 'Genetic-code degeneracy lets some DNA edits preserve the protein while adding or removing a useful restriction site.',
+        expected: 'Silent Restriction Site View lists enzyme sites, codon swaps, and base edits that preserve amino acid identity.',
+        decision: 'Accept only candidates that preserve translation and do not create new downstream risks.',
+        steps: [
+          { tab: 'tab-analysis', target: '#frame', text: 'Set the coding frame; silent-site logic is meaningless in the wrong frame.' },
+          { tab: 'tab-map', target: '#enzymes', text: 'Choose the enzyme set you want to introduce or evaluate.' },
+          { tab: 'tab-advanced', target: '#silentMaxCandidates', text: 'Keep the candidate limit modest while learning; inspect quality rather than volume.' },
+          { tab: 'tab-advanced', target: 'button[data-action="runSilentRestrictionSites"]', text: 'Run the search and click a candidate to inspect its sequence context.' },
+        ],
+      },
+      'trace-review': {
+        title: 'Chromatogram-first trace review',
+        concept: 'Sanger base calls are inferred from peak evidence, so the chromatogram must be reviewed before accepting a construct.',
+        expected: 'Sanger Chromatogram shows peak evidence for the selected trace window.',
+        decision: 'Accept sequence calls only where peaks support them; repeat weak or mixed regions.',
+        steps: [
+          { tab: 'tab-trace', target: '#ab1Base64', text: 'Import or paste trace evidence. The called letters are not the whole experiment.' },
+          { tab: 'tab-trace', target: '#traceId', text: 'Confirm the trace ID before running downstream trace actions.' },
+          { tab: 'tab-trace', target: 'button[data-action="runTraceChromatogram"]', text: 'Render the chromatogram and inspect peak quality before interpreting mismatches.' },
+          { tab: 'tab-trace', target: '#traceChromViz', text: 'Look for clean isolated peaks, mixed peaks, and low-confidence edges.' },
+        ],
+      },
+      'trace-links': {
+        title: 'Linked trace-to-reference navigation',
+        concept: 'Linked trace navigation turns a mismatch row into a route back to raw evidence and reference context.',
+        expected: 'Trace-to-Reference Links provides clickable evidence rows or local mismatch context.',
+        decision: 'Use links to challenge automatic calls, especially around decision-critical bases.',
+        steps: [
+          { tab: 'tab-trace', target: '#traceReference', text: 'Paste the intended reference sequence in the correct orientation.' },
+          { tab: 'tab-trace', target: '#traceWindowStart', text: 'Set a narrow window around the mismatch or verification region.' },
+          { tab: 'tab-trace', target: 'button[data-action="runTraceAlignmentLinks"]', text: 'Generate linked alignment rows and inspect the trace evidence behind each call.' },
+          { tab: 'tab-trace', target: '#traceLinkViz', text: 'Use the links as evidence navigation, not as a substitute for interpretation.' },
+        ],
+      },
+      'blast-launch': {
+        title: 'Selected-sequence BLAST handoff',
+        concept: 'BLAST launch is a precise handoff from local sequence context to public-reference search.',
+        expected: 'External BLAST Launchpad shows provider-specific launch links and a copyable FASTA query.',
+        decision: 'Interpret public hits with query coordinates, coverage, and database scope in mind.',
+        steps: [
+          { tab: 'tab-advanced', target: '#blastQuery', text: 'Paste the selected region, or leave blank to use the current record.' },
+          { tab: 'tab-advanced', target: '#blastProvider', text: 'Choose NCBI for broad nucleotide search or WormBase for organism-specific follow-up.' },
+          { tab: 'tab-advanced', target: '#blastDatabase', text: 'Confirm the database; database scope changes what a top hit means.' },
+          { tab: 'tab-advanced', target: 'button[data-action="runBlastLaunch"]', text: 'Launch or copy the query, then record provider, coordinates, and interpretation.' },
+        ],
+      },
+      'project-handoff': {
+        title: 'Reproducible project handoff',
+        concept: 'A scientific result is more trustworthy when the molecule, evidence, parameters, and review trail travel together.',
+        expected: 'Saved project/share/history output can be reopened by another person or browser session.',
+        decision: 'Handoff only when the next scientist can recover data, reasoning, and limitations without your memory.',
+        steps: [
+          { tab: 'tab-advanced', target: '#projectName', text: 'Use a project name that describes the molecule and decision state.' },
+          { tab: 'tab-advanced', target: 'button[data-action="runProjectSave"]', text: 'Save project state before creating share or review artifacts.' },
+          { tab: 'tab-advanced', target: 'button[data-action="runShareCreate"]', text: 'Create a share bundle for a clean handoff.' },
+          { tab: 'tab-advanced', target: '#historyGraph', text: 'Inspect history so the reasoning trail remains attached to the sequence.' },
+        ],
+      },
+    };
 
     function payload(extra = {}) {
       return {
@@ -47,6 +163,170 @@
         .replaceAll("'", '&#39;');
     }
 
+    function clearLearningHighlight() {
+      if (learningState.highlighted) {
+        learningState.highlighted.classList.remove('learning-highlight');
+        learningState.highlighted = null;
+      }
+    }
+
+    function highlightLearningTarget(selector) {
+      clearLearningHighlight();
+      const target = document.querySelector(selector);
+      if (!target) return;
+      target.classList.add('learning-highlight');
+      learningState.highlighted = target;
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function renderDecisionCard(card) {
+      const host = document.getElementById('decisionCardViz');
+      if (!host || !card) return;
+      host.innerHTML = `
+        <h3>${escapeHtml(card.title || 'Evidence-to-Decision')}</h3>
+        <p><b>Evidence:</b> ${escapeHtml(card.evidence || 'Run a workflow to collect evidence.')}</p>
+        <p><b>Inference:</b> ${escapeHtml(card.inference || 'Interpret the evidence in biological context.')}</p>
+        <p><b>Confidence limit:</b> ${escapeHtml(card.limit || 'Check input type, parameters, and evidence quality before acting.')}</p>
+        <p><b>Next bench action:</b> ${escapeHtml(card.next || 'Choose the next experiment or review step explicitly.')}</p>
+      `;
+    }
+
+    function setDecisionCard(kind, result = {}, extra = {}) {
+      const defaults = {
+        generic: {
+          title: 'Evidence-to-Decision',
+          evidence: 'Workflow output is available in Results.',
+          inference: 'The output needs a biological interpretation before it becomes a conclusion.',
+          limit: 'Confidence depends on the input record, parameters, and evidence quality.',
+          next: 'Write a one-sentence decision before changing the molecule or reporting the result.',
+        },
+        map: {
+          title: 'Map Evidence-to-Decision',
+          evidence: 'Map and restriction features are visible in the current molecule context.',
+          inference: 'Cuts and features define what cloning or verification moves are physically plausible.',
+          limit: 'A map is only as trustworthy as its sequence, topology, and annotation source.',
+          next: 'Choose a unique, interpretable cut or verify the relevant feature before cloning.',
+        },
+        text_map: {
+          title: 'Text Map Evidence-to-Decision',
+          evidence: 'Coordinates, DNA text, translation, and features are aligned in one view.',
+          inference: 'Local edits can be interpreted at base, codon, and feature levels together.',
+          limit: 'Translation meaning depends on the selected frame and biological object type.',
+          next: 'Use the text view to justify the exact coordinate or codon you plan to edit or report.',
+        },
+        diagnostic_digest: {
+          title: 'Diagnostic Digest Evidence-to-Decision',
+          evidence: `${result.diagnostic_count ?? 0} discriminatory candidate(s) found between the two sequences.`,
+          inference: 'A useful cutter converts a sequence difference into a readable gel difference.',
+          limit: 'Cut-count difference is not enough; fragment sizes must also be resolvable.',
+          next: 'Pick one enzyme and write the expected parent/variant band pattern before running the digest.',
+        },
+        custom_ladder: {
+          title: 'Custom Ladder Evidence-to-Decision',
+          evidence: 'Digest fragments are being evaluated against the selected lab ladder.',
+          inference: 'Readability depends on marker spacing as much as on correct cutting chemistry.',
+          limit: 'A correct digest can still be experimentally ambiguous if bands are too close.',
+          next: 'Use the ladder that matches the bench gel and revise enzyme choice if bands are not separable.',
+        },
+        silent_site: {
+          title: 'Silent Site Evidence-to-Decision',
+          evidence: `${result.candidate_count ?? 0} protein-preserving restriction-site candidate(s) reported.`,
+          inference: 'Synonymous edits can add a screening handle while preserving amino acid identity.',
+          limit: 'Silent does not guarantee neutral; codon usage, RNA context, and feature overlap can still matter.',
+          next: 'Verify translation and inspect local context before accepting the engineered site.',
+        },
+        trace: {
+          title: 'Trace Evidence-to-Decision',
+          evidence: 'Trace output links called sequence back to chromatogram or alignment evidence.',
+          inference: 'Construct or genotype calls are defensible only where raw peaks support the base call.',
+          limit: 'Weak, mixed, or edge peaks require caution even when the consensus looks clean.',
+          next: 'Accept, repeat, or add opposite-strand evidence based on the weakest decision-critical region.',
+        },
+        blast: {
+          title: 'BLAST Handoff Evidence-to-Decision',
+          evidence: 'A coordinate-aware query is ready for NCBI or WormBase follow-up.',
+          inference: 'Public hits can support identity or contamination hypotheses when interpreted with coverage and scope.',
+          limit: 'The top hit is not proof without query length, coverage, and database context.',
+          next: 'Record provider, query coordinates, top-hit coverage, and any contamination hypothesis.',
+        },
+        project: {
+          title: 'Reproducibility Evidence-to-Decision',
+          evidence: 'Project/share/history output preserves sequence state and workflow context.',
+          inference: 'The work is handoff-ready only if another scientist can reopen and interrogate it.',
+          limit: 'Screenshots alone are not reproducible scientific state.',
+          next: 'Reload the saved artifact in a clean session and document remaining limitations.',
+        },
+      };
+      renderDecisionCard({ ...(defaults[kind] || defaults.generic), ...extra });
+    }
+
+    function activeLearningScenario() {
+      return learningScenarios[learningState.scenarioId] || learningScenarios['plasmid-map'];
+    }
+
+    function renderLearningStep() {
+      const panel = document.getElementById('learningModePanel');
+      const stepHost = document.getElementById('learningStepCard');
+      const progress = document.getElementById('learningProgress');
+      if (!panel || !stepHost || !progress) return;
+      const scenario = activeLearningScenario();
+      const step = scenario.steps[Math.max(0, Math.min(learningState.stepIndex, scenario.steps.length - 1))];
+      learningState.stepIndex = scenario.steps.indexOf(step);
+      if (step.tab && typeof activateTab === 'function') activateTab(step.tab);
+      progress.textContent = `${learningState.stepIndex + 1}/${scenario.steps.length}`;
+      stepHost.innerHTML = `
+        <b>${escapeHtml(scenario.title)}</b>
+        <p>${escapeHtml(step.text)}</p>
+        <p><span>Concept:</span> ${escapeHtml(scenario.concept)}</p>
+        <p><span>Expected result:</span> ${escapeHtml(scenario.expected)}</p>
+        <p><span>Decision prompt:</span> ${escapeHtml(scenario.decision)}</p>
+      `;
+      highlightLearningTarget(step.target);
+      renderDecisionCard({
+        title: `Learning Mode: ${scenario.title}`,
+        evidence: scenario.expected,
+        inference: scenario.concept,
+        limit: 'This guided step teaches interpretation; still verify your loaded sequence, parameters, and sample data.',
+        next: scenario.decision,
+      });
+    }
+
+    function toggleLearningMode() {
+      const panel = document.getElementById('learningModePanel');
+      if (!panel) return;
+      learningState.active = panel.hidden;
+      panel.hidden = !learningState.active;
+      if (learningState.active) {
+        const select = document.getElementById('learningScenario');
+        if (select) learningState.scenarioId = select.value;
+        renderLearningStep();
+      } else {
+        clearLearningHighlight();
+      }
+    }
+
+    function startLearningScenario() {
+      const panel = document.getElementById('learningModePanel');
+      const select = document.getElementById('learningScenario');
+      if (!panel || !select) return;
+      learningState.active = true;
+      learningState.scenarioId = select.value;
+      learningState.stepIndex = 0;
+      panel.hidden = false;
+      renderLearningStep();
+    }
+
+    function nextLearningStep() {
+      const scenario = activeLearningScenario();
+      learningState.stepIndex = Math.min(scenario.steps.length - 1, learningState.stepIndex + 1);
+      renderLearningStep();
+    }
+
+    function previousLearningStep() {
+      learningState.stepIndex = Math.max(0, learningState.stepIndex - 1);
+      renderLearningStep();
+    }
+
     function panelSvg(panelId) {
       return document.querySelector(`#${panelId} svg`);
     }
@@ -68,21 +348,42 @@
       if (!state.viewBox) state.viewBox = svg.getAttribute('viewBox');
       state.startViewBox = state.viewBox;
       svg.setAttribute('viewBox', state.viewBox);
+      if (state.panZoomController) state.panZoomController.abort();
+      state.panZoomController = new AbortController();
+      const { signal } = state.panZoomController;
+      svg.style.touchAction = 'none';
       let dragging = false;
       let sx = 0;
       let sy = 0;
-      svg.onwheel = (e) => {
+      svg.addEventListener('wheel', (e) => {
         e.preventDefault();
         zoomPanel(panelId, e.deltaY < 0 ? 1.1 : 0.9);
-      };
-      svg.onmousedown = (e) => {
+      }, { signal, passive: false });
+      svg.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('[data-feature-index], [data-cut-enzyme], [data-codon-start]')) return;
         dragging = true;
         sx = e.clientX;
         sy = e.clientY;
+        try {
+          svg.setPointerCapture(e.pointerId);
+        } catch {
+          // Pointer capture can fail if the element is detached during a redraw.
+        }
+      }, { signal });
+      const endDrag = (e) => {
+        dragging = false;
+        if (e?.pointerId !== undefined) {
+          try {
+            svg.releasePointerCapture(e.pointerId);
+          } catch {
+            // Safe to ignore when capture was already released.
+          }
+        }
       };
-      svg.onmouseup = () => { dragging = false; };
-      svg.onmouseleave = () => { dragging = false; };
-      svg.onmousemove = (e) => {
+      svg.addEventListener('pointerup', endDrag, { signal });
+      svg.addEventListener('pointercancel', endDrag, { signal });
+      svg.addEventListener('lostpointercapture', endDrag, { signal });
+      svg.addEventListener('pointermove', (e) => {
         if (!dragging) return;
         const vb = (panelState[panelId]?.viewBox || svg.getAttribute('viewBox')).split(/\s+/).map(Number);
         const scaleX = vb[2] / Math.max(svg.clientWidth, 1);
@@ -95,7 +396,7 @@
         svg.setAttribute('viewBox', panelState[panelId].viewBox);
         sx = e.clientX;
         sy = e.clientY;
-      };
+      }, { signal });
     }
 
     function zoomPanel(panelId, factor) {
@@ -286,33 +587,38 @@
       minimapState.mode = '';
       minimapState.dragOffsetBp = 0;
       minimapState.spanBp = 0;
+      if (minimapState.dragController) {
+        minimapState.dragController.abort();
+        minimapState.dragController = null;
+      }
     }
 
-    function installMinimapDragListeners() {
-      if (minimapState.listenersInstalled) return;
-      window.addEventListener('mousemove', (ev) => {
-        if (!minimapState.dragging || !minimapState.context) return;
-        const { toBp } = minimapState.context;
-        const [curS, curE] = trackWindow();
-        if (minimapState.mode === 'drag') {
-          const span = Math.max(2, minimapState.spanBp || (curE - curS + 1));
-          const leftBp = toBp(ev.clientX) - minimapState.dragOffsetBp;
-          setTrackWindow(leftBp, leftBp + span - 1);
-        } else if (minimapState.mode === 'resize_left') {
-          setTrackWindow(toBp(ev.clientX), curE);
-        } else if (minimapState.mode === 'resize_right') {
-          setTrackWindow(curS, toBp(ev.clientX));
-        }
-      });
-      window.addEventListener('mouseup', () => {
-        if (!minimapState.dragging) return;
-        resetMinimapDrag();
-      });
-      window.addEventListener('blur', () => {
-        if (!minimapState.dragging) return;
-        resetMinimapDrag();
-      });
-      minimapState.listenersInstalled = true;
+    function updateMinimapDrag(ev) {
+      if (!minimapState.dragging || !minimapState.context) return;
+      const { toBp } = minimapState.context;
+      const [curS, curE] = trackWindow();
+      if (minimapState.mode === 'drag') {
+        const span = Math.max(2, minimapState.spanBp || (curE - curS + 1));
+        const leftBp = toBp(ev.clientX) - minimapState.dragOffsetBp;
+        setTrackWindow(leftBp, leftBp + span - 1);
+      } else if (minimapState.mode === 'resize_left') {
+        setTrackWindow(toBp(ev.clientX), curE);
+      } else if (minimapState.mode === 'resize_right') {
+        setTrackWindow(curS, toBp(ev.clientX));
+      }
+    }
+
+    function startMinimapDrag(mode, ev) {
+      ev.preventDefault();
+      resetMinimapDrag();
+      minimapState.dragging = true;
+      minimapState.mode = mode;
+      minimapState.dragController = new AbortController();
+      const { signal } = minimapState.dragController;
+      window.addEventListener('pointermove', updateMinimapDrag, { signal });
+      window.addEventListener('pointerup', resetMinimapDrag, { signal });
+      window.addEventListener('pointercancel', resetMinimapDrag, { signal });
+      window.addEventListener('blur', resetMinimapDrag, { signal });
     }
 
     function renderTrackMiniMap() {
@@ -370,37 +676,30 @@
         return 1 + Math.round(frac * (len - 1));
       };
       minimapState.context = { toBp };
-      installMinimapDragListeners();
 
-      brush.onmousedown = (ev) => {
-        ev.preventDefault();
-        minimapState.dragging = true;
-        minimapState.mode = 'drag';
+      brush.addEventListener('pointerdown', (ev) => {
+        startMinimapDrag('drag', ev);
         const brushX = Number(brush.getAttribute('x'));
         const bpAtPointer = toBp(ev.clientX);
         const bpAtBrushLeft = 1 + Math.round(((brushX - x0) / trackW) * (len - 1));
         minimapState.dragOffsetBp = bpAtPointer - bpAtBrushLeft;
         minimapState.spanBp = Math.max(2, e - s + 1);
-      };
+      });
 
-      leftHandle.onmousedown = (ev) => {
-        ev.preventDefault();
+      leftHandle.addEventListener('pointerdown', (ev) => {
         ev.stopPropagation();
-        minimapState.dragging = true;
-        minimapState.mode = 'resize_left';
-      };
+        startMinimapDrag('resize_left', ev);
+      });
 
-      rightHandle.onmousedown = (ev) => {
-        ev.preventDefault();
+      rightHandle.addEventListener('pointerdown', (ev) => {
         ev.stopPropagation();
-        minimapState.dragging = true;
-        minimapState.mode = 'resize_right';
-      };
+        startMinimapDrag('resize_right', ev);
+      });
 
-      svg.onmousedown = (ev) => {
+      svg.addEventListener('pointerdown', (ev) => {
         if (ev.target === brush || ev.target === leftHandle || ev.target === rightHandle) return;
         const bp = toBp(ev.clientX);
         const span = Math.max(2, e - s + 1);
         setTrackWindow(bp - Math.floor(span / 2), bp + Math.ceil(span / 2));
-      };
+      });
     }

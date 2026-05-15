@@ -15,10 +15,18 @@ async function runTranslate(toStop) {
 
 async function runDigest() {
   try {
-    show(await callApi('/api/digest', payload({
+    const r = await callApi('/api/digest', payload({
       enzymes: document.getElementById('enzymes').value,
       enzyme_set: document.getElementById('enzymeSetName').value,
-    })));
+    }));
+    setDecisionCard('diagnostic_digest', { diagnostic_count: (r.fragments || []).length }, {
+      title: 'Digest Evidence-to-Decision',
+      evidence: `Digest returned ${(r.fragments || []).length} fragment(s) for the selected enzyme set.`,
+      inference: 'Fragment sizes are the expected physical readout if the digest chemistry and topology assumptions hold.',
+      limit: 'Fragment counts are only interpretable when topology, enzyme set, and methylation state match the real sample.',
+      next: 'Compare predicted fragments with a ladder plan before using the digest as verification evidence.',
+    });
+    show(r);
   } catch (e) { show(String(e)); }
 }
 
@@ -27,6 +35,7 @@ async function runMap() {
     const r = await callApi('/api/map', payload({ enzymes: document.getElementById('enzymes').value }));
     document.getElementById('map').innerHTML = r.svg;
     enhancePanel('map');
+    setDecisionCard('map');
     show('Map rendered.');
   } catch (e) { show(String(e)); }
 }
@@ -56,6 +65,9 @@ async function runTextMap() {
       frame: Number(document.getElementById('trackFrame').value),
     }));
     document.getElementById('textMapViz').innerHTML = `<pre>${escapeHtml(r.text_map || '')}</pre>`;
+    setDecisionCard('text_map', r, {
+      evidence: `Text map rendered ${r.chunk_count ?? 0} chunk(s) across ${r.start_1based}..${r.end_1based}.`,
+    });
     show({ text_map_range: `${r.start_1based}..${r.end_1based}`, chunks: r.chunk_count, features: r.feature_count });
   } catch (e) { show(String(e)); }
 }
@@ -69,6 +81,13 @@ async function runPrimerDesign() {
     }));
     document.getElementById('forward').value = r.forward.sequence;
     document.getElementById('reverse').value = r.reverse.sequence;
+    setDecisionCard('generic', r, {
+      title: 'Primer Evidence-to-Decision',
+      evidence: `Primer pair proposed with forward ${r.forward.sequence.length} nt and reverse ${r.reverse.sequence.length} nt.`,
+      inference: 'The pair is a candidate assay, not yet a proven experimental readout.',
+      limit: 'Primer usefulness depends on specificity, Tm compatibility, product size, and controls.',
+      next: 'Run primer diagnostics and virtual PCR before ordering or using the pair.',
+    });
     show(r);
   } catch (e) { show(String(e)); }
 }

@@ -190,11 +190,15 @@ async function runGelLadderList() {
 
 async function runDigestGel() {
   try {
-    show(await callApi('/api/digest-gel', payload({
+    const r = await callApi('/api/digest-gel', payload({
       enzymes: document.getElementById('enzymes').value,
       enzyme_set: document.getElementById('enzymeSetName').value,
       marker_set: document.getElementById('gelLadderName').value || document.getElementById('gelMarkerSet').value,
-    })));
+    }));
+    setDecisionCard('custom_ladder', r, {
+      evidence: `Digest gel rendered with marker set ${document.getElementById('gelLadderName').value || document.getElementById('gelMarkerSet').value}.`,
+    });
+    show(r);
   } catch (e) { show(String(e)); }
 }
 
@@ -221,6 +225,7 @@ async function runRestrictionCompare() {
       min_delta: Number(document.getElementById('restrictionMinDelta').value),
     }));
     renderRestrictionCompare(r);
+    setDecisionCard('diagnostic_digest', r);
     show({ diagnostic_count: r.diagnostic_count, enzyme_count: r.enzyme_count, top: (r.diagnostic_candidates || []).slice(0, 5) });
   } catch (e) { show(String(e)); }
 }
@@ -264,6 +269,7 @@ async function runSilentRestrictionSites() {
       max_candidates: Number(document.getElementById('silentMaxCandidates').value),
     }));
     renderSilentSites(r);
+    setDecisionCard('silent_site', r);
     show({ candidate_count: r.candidate_count, frame: r.frame, truncated: r.truncated });
   } catch (e) { show(String(e)); }
 }

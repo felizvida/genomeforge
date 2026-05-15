@@ -69,7 +69,7 @@
     }
     .quick-actions {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 8px;
     }
     .quick-actions button {
@@ -124,6 +124,76 @@
       font-size: 12px;
       margin: 6px 0 14px;
       line-height: 1.5;
+    }
+    .learning-panel {
+      border: 1px solid rgba(125, 211, 252, 0.34);
+      border-left: 4px solid var(--accent);
+      border-radius: 14px;
+      background:
+        radial-gradient(560px 220px at 0% 0%, rgba(52, 211, 153, 0.16), transparent 60%),
+        linear-gradient(160deg, rgba(9, 30, 49, 0.96), rgba(8, 20, 35, 0.92));
+      padding: 12px;
+      margin: 10px 0 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+    .learning-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .learning-head h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+    .learning-kicker {
+      display: block;
+      color: #86efac;
+      font-family: "IBM Plex Mono", Menlo, monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .learning-progress {
+      border: 1px solid #315172;
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: #bfdbfe;
+      background: rgba(2, 8, 23, 0.35);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .learning-step {
+      border: 1px solid #284666;
+      border-radius: 12px;
+      background: rgba(2, 8, 23, 0.34);
+      padding: 10px;
+      margin: 9px 0;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #dbeafe;
+    }
+    .learning-step b {
+      color: #fef3c7;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .learning-step p {
+      margin: 5px 0;
+    }
+    .learning-step span {
+      color: #86efac;
+      font-weight: 800;
+    }
+    .learning-highlight {
+      outline: 3px solid rgba(52, 211, 153, 0.88) !important;
+      outline-offset: 3px;
+      box-shadow: 0 0 0 6px rgba(52, 211, 153, 0.18), 0 0 24px rgba(52, 211, 153, 0.24) !important;
+      position: relative;
+      z-index: 20;
     }
     .tabs {
       display: flex;
@@ -225,6 +295,29 @@
       overflow: auto;
       line-height: 1.45;
       white-space: pre-wrap;
+    }
+    .decision-card-viz {
+      border: 1px solid #2a475f;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      min-height: 128px;
+      background: linear-gradient(165deg, #f8fbff, #ecfdf5);
+      color: #0f172a;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .decision-card-viz h3 {
+      margin: 0 0 6px;
+      color: #064e3b;
+      font-size: 14px;
+    }
+    .decision-card-viz p {
+      margin: 5px 0;
+    }
+    .decision-card-viz b {
+      color: #17324a;
     }
     #map {
       border: 1px solid #2a475f;
