@@ -156,6 +156,7 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 ## Notes
 
 - The API is intentionally local-first and currently served by Python stdlib HTTP infrastructure.
+- The server binds to loopback by default and requires `--allow-remote` before accepting non-loopback hosts.
 - The local server emits security headers and a CSP for browser defense in depth; see [Security Model](SECURITY_MODEL.md).
 - Many endpoints return JSON plus embedded SVG payloads for visualization.
 - Some biological algorithms are heuristic by design and should be interpreted alongside validation evidence.

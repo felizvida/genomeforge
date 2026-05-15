@@ -4,6 +4,32 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-05-15
+
+### Changed
+
+- The local web server now refuses non-loopback bind addresses by default and requires explicit `--allow-remote` opt-in before accepting network-facing hosts.
+- Installation, security, architecture, API, developer, and README docs now describe the loopback-only default and remote-bind opt-in path.
+
+### Added
+
+- Added regression coverage for loopback bind validation, blocked remote binds, and explicit remote-bind opt-in.
+
+### Fixed
+
+- Stabilized browser workflow tests so repeated actions cannot pass against stale output from a prior API response.
+
+### Validation
+
+- `python3 docs/validate_docs.py`
+- `python3 -m py_compile web_ui.py tests/test_web_ui_security.py docs/validate_docs.py`
+- `python3 -m unittest tests.test_web_ui_security -v`
+- `python3 -m unittest discover -s tests -p 'test_*.py'`
+- `./.venv-docs/bin/python -m pytest`
+- `python3 smoke_test.py`
+- `python3 real_world_functional_test.py`
+- `npm run test:e2e`
+
 ## [0.1.12] - 2026-05-15
 
 ### Added

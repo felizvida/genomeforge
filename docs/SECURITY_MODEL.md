@@ -15,7 +15,13 @@ The default command is intentionally loopback-only:
 python3 web_ui.py --host 127.0.0.1 --port 8080
 ```
 
-Avoid binding to `0.0.0.0` unless the machine is behind an appropriate trusted network boundary and you understand that Genome Forge does not yet provide production-grade authentication, session management, rate limiting, or multi-user isolation.
+The server refuses non-loopback bind addresses unless you make that choice explicit:
+
+```bash
+python3 web_ui.py --host 0.0.0.0 --port 8080 --allow-remote
+```
+
+Avoid `--allow-remote` unless the machine is behind an appropriate trusted network boundary and you understand that Genome Forge does not yet provide production-grade authentication, session management, rate limiting, or multi-user isolation.
 
 ## Browser Boundary
 

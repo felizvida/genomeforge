@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 import unittest
 
-from web_ui import Handler, SECURITY_HEADERS
+from web_ui import Handler, SECURITY_HEADERS, validate_bind_host
 
 
 class HeaderCaptureHandler(Handler):
@@ -42,3 +42,18 @@ class WebUiSecurityHeaderTests(unittest.TestCase):
         self.assertIn("object-src 'none'", csp)
         self.assertIn("frame-ancestors 'none'", csp)
         self.assertNotIn("script-src 'self' 'unsafe-inline'", csp)
+
+    def test_loopback_bind_hosts_are_allowed_by_default(self) -> None:
+        self.assertEqual(validate_bind_host("127.0.0.1"), "127.0.0.1")
+        self.assertEqual(validate_bind_host("localhost"), "localhost")
+        self.assertEqual(validate_bind_host("::1"), "::1")
+        self.assertEqual(validate_bind_host(""), "127.0.0.1")
+
+    def test_non_loopback_bind_host_requires_explicit_opt_in(self) -> None:
+        with self.assertRaisesRegex(ValueError, "non-loopback"):
+            validate_bind_host("0.0.0.0")
+        with self.assertRaisesRegex(ValueError, "non-loopback"):
+            validate_bind_host("192.168.1.10")
+
+    def test_non_loopback_bind_host_can_be_explicitly_allowed(self) -> None:
+        self.assertEqual(validate_bind_host("0.0.0.0", allow_remote=True), "0.0.0.0")

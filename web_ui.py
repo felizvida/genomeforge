@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parent
 WEBUI_ROOT = ROOT / "webui"
 INDEX_PATH = WEBUI_ROOT / "index.html"
 COLLAB_ROOT = ROOT / "collab_data"
+LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
 
 
 SECURITY_HEADERS = {
@@ -140,7 +141,22 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json({"error": str(e)}, status=400)
 
 
-def run(host: str = "127.0.0.1", port: int = 8080) -> None:
+def is_loopback_host(host: str) -> bool:
+    return str(host).strip().lower() in LOOPBACK_HOSTS
+
+
+def validate_bind_host(host: str, allow_remote: bool = False) -> str:
+    clean_host = str(host).strip() or "127.0.0.1"
+    if is_loopback_host(clean_host) or allow_remote:
+        return clean_host
+    raise ValueError(
+        "Refusing to bind Genome Forge to a non-loopback host without --allow-remote. "
+        "This local-first server does not provide production-grade authentication."
+    )
+
+
+def run(host: str = "127.0.0.1", port: int = 8080, allow_remote: bool = False) -> None:
+    host = validate_bind_host(host, allow_remote=allow_remote)
     server = ThreadingHTTPServer((host, port), Handler)
     print(f"Genome Forge web UI running at http://{host}:{port}")
     server.serve_forever()
@@ -150,8 +166,13 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Run Genome Forge local web UI")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8080)
+    ap.add_argument(
+        "--allow-remote",
+        action="store_true",
+        help="Allow binding to a non-loopback host. Use only behind a trusted network boundary.",
+    )
     args = ap.parse_args()
-    run(host=args.host, port=args.port)
+    run(host=args.host, port=args.port, allow_remote=args.allow_remote)
 
 
 if __name__ == "__main__":

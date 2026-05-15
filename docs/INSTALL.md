@@ -24,6 +24,14 @@ Then open:
 http://127.0.0.1:8080
 ```
 
+The web UI is loopback-only by default. If you intentionally expose it to a trusted network, you must opt in:
+
+```bash
+python3 web_ui.py --host 0.0.0.0 --port 8080 --allow-remote
+```
+
+Do not use remote binding on an untrusted network; the current server is a local-first workbench, not a hosted multi-user service.
+
 ## Recommended Path: Editable Local Install
 
 Create an environment and install the project in editable mode:

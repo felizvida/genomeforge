@@ -23,6 +23,8 @@ Runtime:
 python3 web_ui.py --port 8080
 ```
 
+Remote binding is blocked unless you pass `--allow-remote`; keep the default loopback mode for normal development.
+
 Editable install:
 
 ```bash

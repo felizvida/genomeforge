@@ -10,8 +10,17 @@ async function activateTab(page, tabId) {
 }
 
 async function clickAction(page, selector, expectedText = null) {
+  const before = await page.locator('#out').innerText().catch(() => '');
   await page.locator(selector).click();
   if (expectedText) {
+    await page.waitForFunction(
+      ({ beforeText, needle }) => {
+        const out = document.querySelector('#out');
+        return out && out.innerText !== beforeText && out.innerText.includes(needle);
+      },
+      { beforeText: before, needle: expectedText },
+      { timeout: 10000 },
+    );
     await expect(page.locator('#out')).toContainText(expectedText);
   }
 }
