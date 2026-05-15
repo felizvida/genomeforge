@@ -23,6 +23,14 @@ python3 web_ui.py --host 0.0.0.0 --port 8080 --allow-remote
 
 Avoid `--allow-remote` unless the machine is behind an appropriate trusted network boundary and you understand that Genome Forge does not yet provide production-grade authentication, session management, rate limiting, or multi-user isolation.
 
+JSON API POST bodies are capped at 64 MiB by default so malformed clients cannot force unbounded request reads:
+
+```bash
+python3 web_ui.py --port 8080 --max-post-mb 128
+```
+
+Raise this only for trusted local workflows that genuinely need larger records or bundles.
+
 ## Browser Boundary
 
 The local HTTP server emits defense-in-depth browser headers on every response:
@@ -49,6 +57,7 @@ Genome Forge accepts user-provided biological data, including FASTA, GenBank-lik
 - generated share HTML escapes stored project metadata and sequence previews
 - server-rendered SVG labels escape user-controlled record and feature text
 - browser-rendered SVG panels pass through an allowlist sanitizer before DOM insertion
+- oversized JSON POST bodies are rejected before body reads
 - project ACL updates require an owner actor once initial ownership is established
 - audit logs are read-only through the public API surface
 

@@ -4,6 +4,30 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-05-15
+
+### Added
+
+- Added a configurable JSON POST body limit to the local web server, defaulting to 64 MiB.
+- Added `--max-post-mb` for users who intentionally need larger local payloads.
+- Added regression coverage for content-length parsing, invalid lengths, oversized payload rejection, and MiB-to-byte limit configuration.
+
+### Changed
+
+- Oversized POST requests now fail before body reads with HTTP `413` and a clear configured-limit error.
+- Security, install, architecture, API, developer, README, and handoff docs now describe the request-size boundary where relevant.
+
+### Validation
+
+- `python3 docs/validate_docs.py`
+- `python3 -m py_compile web_ui.py tests/test_web_ui_security.py docs/validate_docs.py`
+- `python3 -m unittest tests.test_web_ui_security -v`
+- `python3 -m unittest discover -s tests -p 'test_*.py'`
+- `./.venv-docs/bin/python -m pytest`
+- `python3 smoke_test.py`
+- `python3 real_world_functional_test.py`
+- `npm run test:e2e`
+
 ## [0.1.13] - 2026-05-15
 
 ### Changed

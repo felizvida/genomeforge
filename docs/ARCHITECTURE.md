@@ -74,6 +74,7 @@ Security boundary:
 
 - binds to `127.0.0.1` by default
 - refuses non-loopback bind addresses unless started with `--allow-remote`
+- bounds JSON POST body reads with a configurable 64 MiB default limit
 - emits CSP, frame-denial, referrer, content-type, opener, and permissions-policy headers on every response
 - is intended for trusted local workstation use, not untrusted network exposure
 

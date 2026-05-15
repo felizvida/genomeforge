@@ -24,6 +24,7 @@ WEBUI_ROOT = ROOT / "webui"
 INDEX_PATH = WEBUI_ROOT / "index.html"
 COLLAB_ROOT = ROOT / "collab_data"
 LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+DEFAULT_MAX_POST_BYTES = 64 * 1024 * 1024
 
 
 SECURITY_HEADERS = {
@@ -47,7 +48,39 @@ SECURITY_HEADERS = {
 }
 
 
+class PayloadTooLargeError(ValueError):
+    pass
+
+
+def parse_content_length(value: str | None) -> int:
+    if value is None or str(value).strip() == "":
+        return 0
+    try:
+        length = int(str(value).strip())
+    except ValueError as exc:
+        raise ValueError("Content-Length must be an integer") from exc
+    if length < 0:
+        raise ValueError("Content-Length cannot be negative")
+    return length
+
+
+def payload_limit_bytes_from_mb(max_post_mb: int) -> int:
+    if max_post_mb < 1:
+        raise ValueError("max-post-mb must be at least 1")
+    return max_post_mb * 1024 * 1024
+
+
+def validate_post_length(length: int, max_bytes: int = DEFAULT_MAX_POST_BYTES) -> int:
+    if max_bytes < 1:
+        raise ValueError("max_post_bytes must be positive")
+    if length > max_bytes:
+        raise PayloadTooLargeError(f"POST body exceeds configured limit of {max_bytes} bytes")
+    return length
+
+
 class Handler(BaseHTTPRequestHandler):
+    max_post_bytes = DEFAULT_MAX_POST_BYTES
+
     def end_headers(self) -> None:
         for name, value in SECURITY_HEADERS.items():
             self.send_header(name, value)
@@ -109,7 +142,21 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         try:
-            n = int(self.headers.get("Content-Length", "0"))
+            n = validate_post_length(
+                parse_content_length(self.headers.get("Content-Length")),
+                self.max_post_bytes,
+            )
+        except PayloadTooLargeError as e:
+            self._send_json(
+                {"error": str(e), "max_post_bytes": self.max_post_bytes},
+                status=HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
+            )
+            return
+        except ValueError as e:
+            self._send_json({"error": str(e)}, status=400)
+            return
+
+        try:
             payload = json.loads(self.rfile.read(n).decode("utf-8") if n > 0 else "{}")
             record: SequenceRecord | None = None
 
@@ -155,10 +202,16 @@ def validate_bind_host(host: str, allow_remote: bool = False) -> str:
     )
 
 
-def run(host: str = "127.0.0.1", port: int = 8080, allow_remote: bool = False) -> None:
+def run(
+    host: str = "127.0.0.1",
+    port: int = 8080,
+    allow_remote: bool = False,
+    max_post_mb: int = DEFAULT_MAX_POST_BYTES // (1024 * 1024),
+) -> None:
     host = validate_bind_host(host, allow_remote=allow_remote)
+    Handler.max_post_bytes = payload_limit_bytes_from_mb(max_post_mb)
     server = ThreadingHTTPServer((host, port), Handler)
-    print(f"Genome Forge web UI running at http://{host}:{port}")
+    print(f"Genome Forge web UI running at http://{host}:{port} (max POST {max_post_mb} MiB)")
     server.serve_forever()
 
 
@@ -171,8 +224,14 @@ def main() -> None:
         action="store_true",
         help="Allow binding to a non-loopback host. Use only behind a trusted network boundary.",
     )
+    ap.add_argument(
+        "--max-post-mb",
+        type=int,
+        default=DEFAULT_MAX_POST_BYTES // (1024 * 1024),
+        help="Maximum accepted JSON POST body size in MiB.",
+    )
     args = ap.parse_args()
-    run(host=args.host, port=args.port, allow_remote=args.allow_remote)
+    run(host=args.host, port=args.port, allow_remote=args.allow_remote, max_post_mb=args.max_post_mb)
 
 
 if __name__ == "__main__":

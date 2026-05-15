@@ -3,7 +3,16 @@ from __future__ import annotations
 import io
 import unittest
 
-from web_ui import Handler, SECURITY_HEADERS, validate_bind_host
+from web_ui import (
+    DEFAULT_MAX_POST_BYTES,
+    Handler,
+    PayloadTooLargeError,
+    SECURITY_HEADERS,
+    parse_content_length,
+    payload_limit_bytes_from_mb,
+    validate_bind_host,
+    validate_post_length,
+)
 
 
 class HeaderCaptureHandler(Handler):
@@ -12,12 +21,29 @@ class HeaderCaptureHandler(Handler):
         super().send_header(keyword, value)
 
 
+class JsonCaptureHandler(Handler):
+    def _send_json(self, data, status: int = 200) -> None:
+        self.sent_json = data
+        self.sent_status = status
+
+
 def make_handler_for_header_capture() -> HeaderCaptureHandler:
     handler = HeaderCaptureHandler.__new__(HeaderCaptureHandler)
     handler.captured_headers = {}
     handler._headers_buffer = []  # noqa: SLF001
     handler.wfile = io.BytesIO()
     handler.request_version = "HTTP/1.1"
+    return handler
+
+
+def make_handler_for_post_capture(content_length: int | str) -> JsonCaptureHandler:
+    handler = JsonCaptureHandler.__new__(JsonCaptureHandler)
+    handler.sent_json = None
+    handler.sent_status = None
+    handler.headers = {"Content-Length": str(content_length)}
+    handler.rfile = io.BytesIO(b"")
+    handler.wfile = io.BytesIO()
+    handler.path = "/api/info"
     return handler
 
 
@@ -57,3 +83,30 @@ class WebUiSecurityHeaderTests(unittest.TestCase):
 
     def test_non_loopback_bind_host_can_be_explicitly_allowed(self) -> None:
         self.assertEqual(validate_bind_host("0.0.0.0", allow_remote=True), "0.0.0.0")
+
+    def test_content_length_parsing_rejects_invalid_values(self) -> None:
+        self.assertEqual(parse_content_length(None), 0)
+        self.assertEqual(parse_content_length(" 42 "), 42)
+        with self.assertRaisesRegex(ValueError, "integer"):
+            parse_content_length("abc")
+        with self.assertRaisesRegex(ValueError, "negative"):
+            parse_content_length("-1")
+
+    def test_post_length_limit_accepts_boundary_and_rejects_oversize(self) -> None:
+        self.assertEqual(validate_post_length(DEFAULT_MAX_POST_BYTES), DEFAULT_MAX_POST_BYTES)
+        with self.assertRaisesRegex(PayloadTooLargeError, "configured limit"):
+            validate_post_length(DEFAULT_MAX_POST_BYTES + 1)
+
+    def test_post_size_limit_can_be_configured_in_mebibytes(self) -> None:
+        self.assertEqual(payload_limit_bytes_from_mb(1), 1024 * 1024)
+        self.assertEqual(payload_limit_bytes_from_mb(64), DEFAULT_MAX_POST_BYTES)
+        with self.assertRaisesRegex(ValueError, "at least 1"):
+            payload_limit_bytes_from_mb(0)
+
+    def test_oversized_post_returns_payload_too_large(self) -> None:
+        handler = make_handler_for_post_capture(DEFAULT_MAX_POST_BYTES + 1)
+        handler.do_POST()
+
+        self.assertEqual(handler.sent_status, 413)
+        self.assertEqual(handler.sent_json["max_post_bytes"], DEFAULT_MAX_POST_BYTES)
+        self.assertIn("configured limit", handler.sent_json["error"])

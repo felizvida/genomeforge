@@ -25,6 +25,8 @@ python3 web_ui.py --port 8080
 
 Remote binding is blocked unless you pass `--allow-remote`; keep the default loopback mode for normal development.
 
+The default API request cap is 64 MiB; use `--max-post-mb` only when testing unusually large trusted local records.
+
 Editable install:
 
 ```bash

@@ -20,7 +20,7 @@ It combines:
 
 Latest release:
 
-- [Genome Forge v0.1.13](https://github.com/felizvida/genomeforge/releases/tag/v0.1.13)
+- [Genome Forge v0.1.14](https://github.com/felizvida/genomeforge/releases/tag/v0.1.14)
 
 ## Why Genome Forge
 
@@ -92,7 +92,7 @@ Open:
 http://127.0.0.1:8080
 ```
 
-The local server refuses non-loopback bind addresses unless you explicitly pass `--allow-remote`; see [Security Model](docs/SECURITY_MODEL.md).
+The local server refuses non-loopback bind addresses unless you explicitly pass `--allow-remote`, and JSON API POST bodies are capped at 64 MiB by default. See [Security Model](docs/SECURITY_MODEL.md).
 
 Recommended editable install:
 
@@ -114,7 +114,7 @@ genomeforge input.fasta info
 
 Current shipped baseline:
 
-- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `44/44` passed
+- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `48/48` passed
 - `python3 smoke_test.py` -> `115/115` passed
 - `python3 real_world_functional_test.py` -> `104/104` passed
 - `npm run test:e2e` -> `15/15` passed

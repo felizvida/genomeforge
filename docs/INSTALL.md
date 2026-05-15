@@ -32,6 +32,12 @@ python3 web_ui.py --host 0.0.0.0 --port 8080 --allow-remote
 
 Do not use remote binding on an untrusted network; the current server is a local-first workbench, not a hosted multi-user service.
 
+The JSON API accepts POST bodies up to 64 MiB by default. For unusually large trusted local records, raise the cap explicitly:
+
+```bash
+python3 web_ui.py --port 8080 --max-post-mb 128
+```
+
 ## Recommended Path: Editable Local Install
 
 Create an environment and install the project in editable mode:
