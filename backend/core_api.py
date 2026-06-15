@@ -13,6 +13,7 @@ from canonical_schema import (
 )
 from collab.store import create_workspace
 from compat.dna_format import export_dna_container, import_dna_container
+from compat.sbol_format import looks_like_sbol, parse_sbol, to_sbol
 from genomeforge_toolkit import (
     Feature,
     SequenceRecord,
@@ -103,6 +104,8 @@ def parse_record(payload: Dict[str, Any]) -> SequenceRecord:
         record = parse_genbank(content)
     elif content.lstrip().startswith("ID"):
         record = parse_embl(content)
+    elif looks_like_sbol(content):
+        record = parse_sbol(content)
     else:
         record = SequenceRecord(name=name, sequence=sanitize_sequence(content), topology=topology)
 
@@ -210,6 +213,8 @@ def handle_core_endpoint(
             return {"target_format": "genbank", "content": to_genbank(rec)}
         if target == "embl":
             return {"target_format": "embl", "content": to_embl(rec)}
+        if target == "sbol":
+            return {"target_format": "sbol", "content": to_sbol(rec)}
         if target == "json":
             return {
                 "target_format": "json",
@@ -225,7 +230,7 @@ def handle_core_endpoint(
             return {"target_format": "payload", "payload": canonical_to_payload(canon)}
         if target in {"canonical", "canonical_json"}:
             return {"target_format": "canonical", "canonical_record": canon}
-        raise ValueError("Unsupported target_format. Use fasta|genbank|embl|json|dna|payload|canonical")
+        raise ValueError("Unsupported target_format. Use fasta|genbank|embl|sbol|json|dna|payload|canonical")
 
     if path == "/api/import-dna":
         raw = _decode_b64_field(str(payload.get("dna_base64", "")).strip(), "dna_base64")

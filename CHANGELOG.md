@@ -4,6 +4,30 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.17] - 2026-06-15
+
+### Added
+
+- Added import/export compatibility audits across GenBank, SBOL, FASTA, and portable Genome Forge DNA round trips.
+- Added a built-in five-case golden compatibility project covering an annotated plasmid, restriction cloning design, expected edit, sequencing-confirmed construct, and multi-record project bundle.
+- Added a lightweight SBOL RDF/XML subset importer/exporter for sequence, topology, feature coordinates, qualifiers, and CDS translation-preservation checks.
+- Added browser UI controls and a compatibility report table with imported-cleanly, warnings, metadata-loss, export-safe, and needs-review states.
+- Added focused compatibility tests plus smoke, real-world, and browser coverage.
+
+### Changed
+
+- `/api/convert-record` now supports `sbol` as an export target.
+- Expanded the self-study book to 47 cases with Case AU, "Compatibility Round-Trip Trust Audit."
+- Updated validation baselines to 63 unit tests, 122 smoke checks, 113 real-world workflow steps, and 17 browser E2E tests.
+
+### Validation
+
+- `make quality PYTHON=./.venv-docs/bin/python3`
+- `./.venv-docs/bin/python3 smoke_test.py`
+- `./.venv-docs/bin/python3 real_world_functional_test.py`
+- `npm run test:e2e`
+- `git diff --check`
+
 ## [0.1.16] - 2026-06-15
 
 ### Added

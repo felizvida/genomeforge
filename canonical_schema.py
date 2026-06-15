@@ -16,6 +16,8 @@ def infer_source_format(content: str) -> str:
     c = str(content or "").lstrip()
     if not c:
         return "unknown"
+    if c.startswith("<") and ("sbol" in c[:1000].lower() or "componentdefinition" in c[:2000].lower()):
+        return "sbol"
     if c.startswith(">"):
         return "fasta"
     if c.startswith("LOCUS"):
@@ -149,4 +151,3 @@ def canonical_to_payload(canonical: Dict[str, Any]) -> Dict[str, Any]:
         "features": [{"key": f.key, "location": f.location, "qualifiers": dict(f.qualifiers)} for f in rec.features],
         "canonical_record": canonical,
     }
-

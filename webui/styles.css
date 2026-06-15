@@ -556,6 +556,32 @@
       color: #b7cde4;
       margin-top: 10px;
     }
+    .compat-summary {
+      display: grid;
+      gap: 4px;
+      border: 1px solid #2b4a66;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #0b1828;
+    }
+    .compat-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "IBM Plex Mono", Menlo, monospace;
+      font-size: 12px;
+    }
+    .compat-table th,
+    .compat-table td {
+      border-bottom: 1px solid #263f58;
+      padding: 6px 7px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compat-table th {
+      color: #c8ddf2;
+      background: #0f2034;
+    }
     .ok { color: var(--ok); }
     .warn { color: var(--warn); }
     @media (max-width: 1020px) {

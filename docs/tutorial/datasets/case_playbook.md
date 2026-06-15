@@ -562,6 +562,20 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Bench decision: Accept the construct only when expected edits have enough high-quality read support and coverage gaps do not touch decision-critical positions.
 - Common caution: A high-support local variant report is useful construct evidence, but it is not a substitute for production-grade NGS secondary analysis.
 
+## Case AU: Compatibility Round-Trip Trust Audit
+
+- Cluster: Data Fidelity and Interoperability
+- Focus: If you migrate a construct out of SnapGene or Geneious, how do you know which metadata survived instead of silently trusting the exported file?
+- Records: EGFP_CDS, pUC19_MCS
+- Workflow: Audit whether rich construct metadata survives export and re-import across GenBank, SBOL, portable DNA, and FASTA.
+- UI path: Trace/Interop tab -> `Audit Current Record` -> Compatibility Report
+- APIs: /api/compatibility-audit, /api/compatibility-golden-project, /api/convert-record
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AU --out ./tmp/genomeforge_case_au `
+- Key expected signal: A compatibility table with at least one export-safe path for every rich record.
+- Evidence/inference checkpoint: Sequence-only success is not metadata success.
+- Bench decision: Proceed when the output answers the biological question and the assumptions match the input data type.
+- Common caution: Do not report the tool output as the conclusion; report the defensible biological interpretation.
+
 ## Case AK: Reference Element Auto-Flagging and siRNA Design/Mapping
 
 - Cluster: Data Fidelity and Interoperability

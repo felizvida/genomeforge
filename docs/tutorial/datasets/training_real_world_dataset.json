@@ -1726,6 +1726,43 @@
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_at"
     },
     {
+      "case_id": "AU",
+      "title": "Compatibility Round-Trip Trust Audit",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS",
+        "pUC19_MCS"
+      ],
+      "tab": "Trace/Interop",
+      "workflow": "Audit whether rich construct metadata survives export and re-import across GenBank, SBOL, portable DNA, and FASTA.",
+      "apis": [
+        "/api/compatibility-audit",
+        "/api/compatibility-golden-project",
+        "/api/convert-record"
+      ],
+      "ui_walkthrough": {
+        "tab": "Trace/Interop",
+        "button": "Audit Current Record",
+        "panel": "Compatibility Report",
+        "fields": [
+          "Sequence / FASTA / GenBank",
+          "Topology",
+          "Compatibility Audit Formats"
+        ]
+      },
+      "decision_card": {
+        "decision": "Proceed when the output answers the biological question and the assumptions match the input data type.",
+        "bench": "Translate the software result into the next physical or review action before changing the molecule.",
+        "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
+      },
+      "glossary_terms": [
+        "CDS",
+        "topology"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AU --out ./tmp/genomeforge_case_au",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_au"
+    },
+    {
       "case_id": "AK",
       "title": "Reference Element Auto-Flagging and siRNA Design/Mapping",
       "cluster": "G",

@@ -325,12 +325,14 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         f = r.post("/api/convert-record", {"canonical_record": c, "target_format": "fasta"})
         g = r.post("/api/convert-record", {"canonical_record": c, "target_format": "genbank"})
         e = r.post("/api/convert-record", {"canonical_record": c, "target_format": "embl"})
+        s = r.post("/api/convert-record", {"canonical_record": c, "target_format": "sbol"})
         j = r.post("/api/convert-record", {"canonical_record": c, "target_format": "json"})
         d = r.post("/api/convert-record", {"canonical_record": c, "target_format": "dna"})
         p = r.post("/api/convert-record", {"canonical_record": c, "target_format": "payload"})
         assert f["target_format"] == "fasta"
         assert g["target_format"] == "genbank"
         assert e["target_format"] == "embl"
+        assert s["target_format"] == "sbol" and "ComponentDefinition" in s["content"]
         assert j["target_format"] == "json"
         assert d["target_format"] == "genomeforge_dna" and int(d["bytes"]) > 0
         assert p["target_format"] == "payload"
@@ -338,11 +340,12 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
             "fasta_len": len(f["content"]),
             "genbank_len": len(g["content"]),
             "embl_len": len(e["content"]),
+            "sbol_len": len(s["content"]),
             "json_len": len(j["content"]),
             "dna_bytes": int(d["bytes"]),
         }
 
-    r.check("convert_record_roundtrip", "Roundtrip canonical -> FASTA/GenBank/EMBL/JSON/DNA container/payload", _convert_record)
+    r.check("convert_record_roundtrip", "Roundtrip canonical -> FASTA/GenBank/EMBL/SBOL/JSON/DNA container/payload", _convert_record)
     r.check(
         "dna_export_import",
         "Export and import Genome Forge DNA container",
@@ -350,6 +353,27 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
             "/api/import-dna",
             {"dna_base64": r.post("/api/export-dna", egfp_payload)["dna_base64"]},
         ),
+    )
+    r.check(
+        "sbol_export_import",
+        "Export EGFP record to SBOL and re-import for info/feature count",
+        lambda: r.post("/api/info", {"content": r.post("/api/convert-record", {**egfp_payload, "target_format": "sbol"})["content"]}),
+    )
+
+    def _compatibility_audit() -> dict[str, Any]:
+        out = r.post(
+            "/api/compatibility-audit",
+            {**egfp_payload, "target_formats": ["genbank", "sbol", "genomeforge_dna", "fasta"]},
+        )
+        assert out["summary"]["records_with_export_safe_path"] == 1
+        assert out["summary"]["lost_metadata_count"] >= 1
+        return out["summary"]
+
+    r.check("compatibility_audit", "Audit EGFP import/export round-trip preservation across formats", _compatibility_audit)
+    r.check(
+        "compatibility_golden_project",
+        "Audit built-in SnapGene/Geneious-style golden project bundle",
+        lambda: r.post("/api/compatibility-golden-project", {"target_formats": ["genbank", "sbol", "genomeforge_dna", "fasta"]})["summary"],
     )
     r.check(
         "trace_import_align_consensus",

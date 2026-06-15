@@ -24,7 +24,7 @@ HANDOFF = ROOT / "HANDOFF_ZERO_MEMORY.md"
 WEB_UI = ROOT / "web_ui.py"
 BACKEND_DIR = ROOT / "backend"
 
-EXPECTED_CASE_COUNT = 46
+EXPECTED_CASE_COUNT = 47
 EXPECTED_SECTION_LABELS = [
     "Step-by-Step in Genome Forge",
     "Sample Results",
@@ -112,6 +112,7 @@ def main() -> int:
         "annotation-transfer walkthrough": "Click <code>Transfer Annotations</code>",
         "sanger-consensus walkthrough": "Click <code>Multi-read Consensus</code>",
         "ngs-lite workflow walkthrough": "Click <code>Workflow Report</code>",
+        "compatibility-audit walkthrough": "Click <code>Audit Current Record</code>",
     }
     for label, needle in tutorial_required_steps.items():
         if needle not in tutorial_text:
@@ -194,7 +195,7 @@ def main() -> int:
             )
 
     handoff_text = HANDOFF.read_text(encoding="utf-8")
-    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "57", "119", "110", "16", "118", "46", "Learning Mode", "generate_tutorial.py", "case_bundles"]:
+    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "63", "122", "113", "17", "120", "47", "Learning Mode", "generate_tutorial.py", "case_bundles"]:
         if needle not in handoff_text:
             errors.append(f"HANDOFF_ZERO_MEMORY.md does not include expected marker '{needle}'")
 

@@ -12,6 +12,7 @@ from typing import Any, Dict
 from backend.analysis_api import handle_analysis_endpoint
 from backend.assembly_api import handle_assembly_endpoint
 from backend.biology_api import handle_biology_endpoint
+from backend.compatibility_api import handle_compatibility_endpoint
 from backend.core_api import handle_core_endpoint, parse_record
 from backend.design_api import handle_design_endpoint
 from backend.ngs_api import handle_ngs_endpoint
@@ -178,6 +179,8 @@ class Handler(BaseHTTPRequestHandler):
             elif (domain_response := handle_analysis_endpoint(self.path, payload, get_record)) is not None:
                 self._send_json(domain_response)
             elif (domain_response := handle_ngs_endpoint(self.path, payload, get_record)) is not None:
+                self._send_json(domain_response)
+            elif (domain_response := handle_compatibility_endpoint(self.path, payload, get_record)) is not None:
                 self._send_json(domain_response)
             elif (domain_response := handle_biology_endpoint(self.path, payload, get_record)) is not None:
                 self._send_json(domain_response)

@@ -115,6 +115,18 @@ test('runs trace import, chromatogram, and BLAST-like search', async ({ page }) 
   await expect(page.locator('#out')).toContainText('"hits"');
 });
 
+test('runs compatibility audit report from the browser UI', async ({ page }) => {
+  await activateTab(page, 'tab-trace');
+  await page.locator('#compatFormats').fill('genbank,sbol,genomeforge_dna,fasta');
+  await page.locator('#tab-trace [data-action="runCompatibilityAudit"]').click();
+  await expect(page.locator('#interopReportViz')).toContainText('Export-safe');
+  await expect(page.locator('#interopReportViz')).toContainText('Needs review');
+
+  await page.locator('#tab-trace [data-action="runGoldenCompatibilityAudit"]').click();
+  await expect(page.locator('#interopReportViz')).toContainText('pGF_EGFP_expression');
+  await expect(page.locator('#out')).toContainText('golden_project');
+});
+
 test('runs ApE-inspired text map, external BLAST, ladders, diagnostic cutters, and silent sites', async ({ page }) => {
   await page.locator('#enzymeSetName').fill('');
   await activateTab(page, 'tab-map');

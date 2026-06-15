@@ -206,6 +206,88 @@ async function runExportDna() {
   } catch (e) { show(String(e)); }
 }
 
+function compatibilityFormats() {
+  return document.getElementById('compatFormats').value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function renderCompatibilityReport(report) {
+  const host = document.getElementById('interopReportViz');
+  if (!host) return;
+  const status = report.status || 'needs_review';
+  const summary = report.summary || {};
+  const rows = [];
+  (report.records || []).forEach((record) => {
+    (record.round_trips || []).forEach((rt) => {
+      rows.push(`
+        <tr>
+          <td>${escapeHtml(record.name)}</td>
+          <td>${escapeHtml(rt.format)}</td>
+          <td>${escapeHtml(rt.status)}</td>
+          <td>${rt.imported_cleanly ? 'yes' : 'no'}</td>
+          <td>${rt.export_safe ? 'yes' : 'no'}</td>
+          <td>${escapeHtml((rt.warnings || []).join(' | '))}</td>
+          <td>${Number(rt.missing_feature_count || 0) + Number(rt.missing_qualifier_count || 0) + Number(rt.translation_mismatch_count || 0)}</td>
+        </tr>
+      `);
+    });
+  });
+  host.innerHTML = `
+    <div class="compat-summary ${status === 'export_safe' ? 'ok' : 'warn'}">
+      <b>${escapeHtml(status === 'export_safe' ? 'Export-safe' : 'Needs review')}</b>
+      <span>${Number(summary.records_with_export_safe_path || 0)} / ${Number(summary.record_count || 0)} record(s) have at least one export-safe path.</span>
+      <span>${Number(summary.warning_count || 0)} warning(s), ${Number(summary.lost_metadata_count || 0)} metadata-loss finding(s).</span>
+    </div>
+    <table class="compat-table">
+      <thead>
+        <tr><th>Record</th><th>Format</th><th>Status</th><th>Imported cleanly</th><th>Export-safe</th><th>Warnings</th><th>Loss count</th></tr>
+      </thead>
+      <tbody>${rows.join('') || '<tr><td colspan="7">No audit rows.</td></tr>'}</tbody>
+    </table>
+  `;
+}
+
+async function runCompatibilityAudit() {
+  try {
+    const r = await callApi('/api/compatibility-audit', payload({
+      target_formats: compatibilityFormats(),
+    }));
+    renderCompatibilityReport(r);
+    setDecisionCard('interop', r, {
+      evidence: `Compatibility audit status: ${r.status}; ${r.summary?.records_with_export_safe_path || 0}/${r.summary?.record_count || 0} record(s) have an export-safe path.`,
+      next: 'Use an export-safe format for handoff; treat FASTA-only paths as sequence-only exports when annotations matter.',
+    });
+    show({
+      status: r.status,
+      imported_cleanly: r.imported_cleanly,
+      export_safe: r.export_safe,
+      summary: r.summary,
+      formats: r.formats,
+    });
+  } catch (e) { show(String(e)); }
+}
+
+async function runGoldenCompatibilityAudit() {
+  try {
+    const r = await callApi('/api/compatibility-golden-project', {
+      target_formats: compatibilityFormats(),
+    });
+    renderCompatibilityReport(r);
+    setDecisionCard('interop', r, {
+      evidence: `Golden project audit covered ${r.golden_project?.case_count || 0} real-world compatibility cases.`,
+      next: 'Check which formats are recommended before migrating old SnapGene or Geneious project data.',
+    });
+    show({
+      status: r.status,
+      golden_project: r.golden_project,
+      summary: r.summary,
+      formats: r.formats,
+    });
+  } catch (e) { show(String(e)); }
+}
+
 async function runImportAb1() {
   try {
     const ab1b64 = document.getElementById('ab1Base64').value.trim();

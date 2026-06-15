@@ -276,17 +276,49 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
         f = r.post("/api/convert-record", {"canonical_record": c, "target_format": "fasta"})[1]
         g = r.post("/api/convert-record", {"canonical_record": c, "target_format": "genbank"})[1]
         e = r.post("/api/convert-record", {"canonical_record": c, "target_format": "embl"})[1]
+        s = r.post("/api/convert-record", {"canonical_record": c, "target_format": "sbol"})[1]
         j = r.post("/api/convert-record", {"canonical_record": c, "target_format": "json"})[1]
         d = r.post("/api/convert-record", {"canonical_record": c, "target_format": "dna"})[1]
         p = r.post("/api/convert-record", {"canonical_record": c, "target_format": "payload"})[1]
         assert f["target_format"] == "fasta" and f["content"].startswith(">")
         assert g["target_format"] == "genbank" and g["content"].lstrip().startswith("LOCUS")
         assert e["target_format"] == "embl" and e["content"].lstrip().startswith("ID")
+        assert s["target_format"] == "sbol" and "ComponentDefinition" in s["content"]
         assert j["target_format"] == "json" and '"canonical_record"' in j["content"]
         assert d["target_format"] == "genomeforge_dna" and int(d["bytes"]) > 0 and isinstance(d["dna_base64"], str)
         assert p["target_format"] == "payload" and isinstance(p["payload"], dict)
 
     r.check("api_convert_record_roundtrip", _convert_record_roundtrip)
+
+    def _sbol_convert_import() -> None:
+        sbol = r.post("/api/convert-record", {**base_payload, "target_format": "sbol"})[1]["content"]
+        info = r.post("/api/info", {"content": sbol})[1]
+        assert info["length"] == len(seq)
+        assert info["features"] == len(base_payload["features"])
+        assert info["topology"] == "circular"
+
+    r.check("api_sbol_convert_import", _sbol_convert_import)
+
+    def _compatibility_audit() -> None:
+        out = r.post(
+            "/api/compatibility-audit",
+            {**base_payload, "target_formats": ["genbank", "sbol", "genomeforge_dna", "fasta"]},
+        )[1]
+        assert out["record_count"] == 1
+        assert out["summary"]["records_with_export_safe_path"] == 1
+        statuses = [rt["status"] for rt in out["records"][0]["round_trips"]]
+        assert "export_safe" in statuses
+        assert "needs_review" in statuses
+
+    r.check("api_compatibility_audit", _compatibility_audit)
+
+    def _compatibility_golden_project() -> None:
+        out = r.post("/api/compatibility-golden-project", {"target_formats": ["genbank", "sbol"]})[1]
+        assert out["golden_project"]["case_count"] == 5
+        assert out["record_count"] == 5
+        assert out["summary"]["round_trip_count"] == 10
+
+    r.check("api_compatibility_golden_project", _compatibility_golden_project)
 
     def _dna_export_import() -> None:
         ex = r.post("/api/export-dna", base_payload)[1]

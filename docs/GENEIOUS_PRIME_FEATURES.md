@@ -26,6 +26,11 @@ Source:
 - `/api/fastq-qc` and `/api/fastq-trim`: local FASTQ quality summaries and adapter/quality trimming for small amplicon or construct-verification read sets.
 - `/api/ngs-map-reads`: lightweight local read-to-reference mapping with coverage, consensus, zero-coverage regions, read-level mapping rows, and simple variant evidence.
 - `/api/ngs-workflow-report`: automated QC -> trimming -> mapping -> variant report that summarizes SnapGene-style construct verification, Geneious-style sequence analysis, NGS-lite pipeline evidence, and trust/release evidence in one decision surface.
+- `/api/compatibility-audit`: import/export round-trip report for FASTA, GenBank, SBOL, and portable Genome Forge DNA. It labels imported-cleanly, warning, metadata-loss, export-safe, and needs-review states, then checks sequence, topology, feature coordinates, qualifiers, and CDS translations.
+- `/api/compatibility-golden-project`: built-in SnapGene/Geneious-style project audit covering an annotated plasmid, restriction cloning design, expected edit, sequencing-confirmed construct, and multi-record project bundle.
+- `/api/convert-record` now exports SBOL in addition to FASTA, GenBank, EMBL, JSON, payload, canonical JSON, and portable DNA container outputs.
+
+Genome Forge still does not write proprietary native SnapGene `.dna` files. Native `.dna` import remains optional and parser-dependent; portable Genome Forge DNA is the export-safe local container.
 
 ## Test Strategy
 
@@ -34,5 +39,7 @@ The new regression tests use common molecular-biology data patterns rather than 
 - pUC19 multiple-cloning-site sequence plus EGFP CDS to validate annotation transfer of reporter features into a candidate plasmid context.
 - EGFP-derived Sanger read panels to validate expected variant confirmation, mixed evidence reporting, and failure on unexpected variants.
 - EGFP amplicon FASTQ reads with one expected reporter variant and one adapter-contaminated tail to validate QC, trimming, coverage, variant calling, and replacement-phase decision reporting.
+- Rich construct records with promoter, CDS, terminator, primer annotations, qualifiers, and circular topology to validate GenBank, SBOL, and portable DNA round-trip preservation.
+- A five-record golden compatibility project to validate realistic migration from SnapGene/Geneious-style project data and to ensure FASTA metadata loss is visible rather than silent.
 
 These tests are intentionally deterministic and local-first, so they can run in CI without public database access while still representing realistic bench decisions.

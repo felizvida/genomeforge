@@ -139,7 +139,8 @@ Legend:
 | Workspace and role mapping | Available | Experimental | Focused | Present for lightweight project coordination. |
 | Batch digest operations | Available | Validated heuristic | Focused | Bulk digest workflow is available. |
 | Import FASTA, GenBank, and EMBL with annotations | Available | Validated heuristic | Suite | Core annotated import flows are well covered. |
-| Export FASTA and GenBank | Available | Production-ready | Suite | Standard export flows are stable. |
+| Export FASTA, GenBank, SBOL, and portable DNA | Available | Production-ready | Suite | Standard exports are stable; FASTA is sequence-only and is flagged by compatibility audit when annotations matter. |
+| Import/export compatibility audit | Available | Validated heuristic | Suite | Reports imported-cleanly, warning, metadata-loss, export-safe, and needs-review states across FASTA, GenBank, SBOL, and portable DNA round trips. |
 | Proprietary `.dna` import | Available | Experimental | Basic | Depends on optional Biopython-backed parsing; fidelity varies by source file. |
 
 ## Platform and Scope

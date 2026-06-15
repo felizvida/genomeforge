@@ -287,6 +287,12 @@ GAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGC</textarea>
           <button data-action="runImportDna">Import DNA Container</button>
           <button data-action="runExportDna">Export DNA Container</button>
         </div>
+        <label>Compatibility Audit Formats</label>
+        <input id="compatFormats" value="genbank,sbol,genomeforge_dna,fasta" />
+        <div class="row">
+          <button class="hot" data-action="runCompatibilityAudit">Audit Current Record</button>
+          <button data-action="runGoldenCompatibilityAudit">Audit Golden Project</button>
+        </div>
       </div>
 
       <div id="tab-advanced" class="tabpane">
@@ -379,6 +385,7 @@ GAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGC</textarea>
             <option value="fasta">fasta</option>
             <option value="genbank">genbank</option>
             <option value="embl">embl</option>
+            <option value="sbol">sbol</option>
             <option value="json">json</option>
             <option value="dna">dna (base64)</option>
             <option value="payload">payload</option>
@@ -824,6 +831,8 @@ TTTCCCGGGAAATTT</textarea>
       </div>
       <label class="panel-title">NGS Lite Evidence Report</label>
       <div id="ngsReportViz">Run "Workflow Report" from the NGS Lite tab.</div>
+      <label class="panel-title">Compatibility Report</label>
+      <div id="interopReportViz">Run "Audit Current Record" from the Trace/Interop tab.</div>
       <label class="panel-title">External BLAST Launchpad</label>
       <div id="externalBlastViz">Use "Launch Selected Sequence Externally" to open NCBI or WormBase with a copyable FASTA query.</div>
       <label class="panel-title">Sanger Chromatogram</label>
