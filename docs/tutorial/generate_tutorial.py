@@ -344,6 +344,24 @@ UI_GUIDES = [
         'troubleshoot': 'If provider interpretation feels inconsistent, confirm that the FASTA header contains the intended coordinates and that the database scope matches the organism question.',
     },
     {
+        'match_api': '/api/annotation-transfer',
+        'tab': 'Advanced',
+        'fields': ['Similarity Annotation Transfer References', 'Annotation Transfer Identity', 'Annotation Transfer Coverage', 'Sequence / FASTA / GenBank'],
+        'button': 'Transfer Annotations',
+        'panel': 'Results',
+        'sample': 'Paste an annotated EGFP reference record and use strict identity/coverage thresholds before adding transferred features.',
+        'troubleshoot': 'If no features transfer, confirm the reference has feature locations and the target construct actually contains the referenced part.',
+    },
+    {
+        'match_api': '/api/sanger-consensus',
+        'tab': 'Trace/Interop',
+        'fields': ['Reference Sequence For Trace Alignment', 'Sanger Consensus Reads', 'Trace Expected Bases', 'Minimum Called Percent'],
+        'button': 'Multi-read Consensus',
+        'panel': 'Results',
+        'sample': 'Use multiple reads covering the expected edit and set expected bases only for positions with planned sequence changes.',
+        'troubleshoot': 'If the verdict fails, inspect no-coverage genotype calls, unexpected variants, and mixed-position disagreements before changing the construct call.',
+    },
+    {
         'match_api': '/api/trace-alignment-links',
         'tab': 'Trace/Interop',
         'fields': ['Trace ID', 'Reference Sequence For Trace Alignment', 'Trace Window Start', 'Trace Window End'],
@@ -729,15 +747,20 @@ CASES = [
          ['A clear report for each assembly junction, including scar length and frame impact.', 'A statement about whether circular continuity preserves the intended construct logic.', 'A validation plan for confirming the junctions experimentally.'],
          ['A construct can have the right parts but the wrong joins.', 'Small scars matter most when they land in coding or regulatory boundaries.', 'If the junction explanation is shaky, the construct explanation is shaky.'],
          'changing the overlap length or insert orientation'),
-    case('Z', 'Multi-Trace Consensus for Final Construct Call', 'D', ['EGFP_CDS'], 'Trace', 'Combine multiple trace-derived views into one final verdict about a reporter construct.', ['/api/import-ab1', '/api/trace-align', '/api/trace-consensus'],
+    case('Z', 'Multi-Trace Consensus for Final Construct Call', 'D', ['EGFP_CDS'], 'Trace', 'Combine multiple Sanger reads into a consensus, variant table, and final construct verdict.', ['/api/import-ab1', '/api/sanger-consensus', '/api/trace-chromatogram-svg'],
          'When several sequencing reads exist for the same construct, how do you combine them into one decision rather than trusting the loudest trace?',
          'This case uses a real reporter CDS because plasmid verification is one of the most common reasons a lab reaches for sequence traces. The record is familiar, which keeps the attention on evidence integration rather than reference confusion.',
-         'Consensus building is an evidence aggregation problem. A single noisy trace can be misleading; several partially overlapping traces can support a stable call. The skill is deciding when disagreement reflects noise, chemistry, or a real sequence change.',
+         'Consensus building is an evidence aggregation problem. A single noisy trace can be misleading; several reads can support a stable call, expose mixed positions, and separate expected engineered variants from unexpected errors. The skill is deciding when disagreement reflects noise, chemistry, or a real sequence change.',
          'Consensus is not democracy; three low-quality reads do not magically beat one high-quality read. Quality still matters.',
-         {'trace_count': 3, 'consensus_mismatches_vs_reference': 0, 'final_verdict': 'construct confirmed'},
-         ['A multi-trace summary with overlap or mismatch hotspots identified explicitly.', 'A consensus sequence or final mismatch count relative to the expected construct.', 'A final verification verdict with confidence language.'],
-         ['Agreement across independent traces raises confidence, especially when the same region is supported more than once.', 'Disagreement near weak peaks should be treated differently from disagreement in high-quality regions.', 'Your final call should always say whether the evidence is enough to proceed.'],
-         'changing the trace subset or quality threshold'),
+         {'trace_count': 3, 'expected_variant_positions': [67], 'unexpected_variant_count': 0, 'mixed_position_count': 1, 'final_verdict': 'construct confirmed with expected reporter variant'},
+         ['A multi-read consensus report with called-base coverage, variants, and disagreements.', 'A genotype-style check showing whether expected edited positions match the design.', 'A final verification verdict that distinguishes expected variants from unexpected sequence problems.'],
+         ['Agreement across independent reads raises confidence, especially when decision-critical positions are supported more than once.', 'Mixed positions are not automatically failures; they are flags that need trace-quality context.', 'Your final call should say whether unexpected variants remain after accounting for the expected design edit.'],
+         'changing the read subset, expected variant list, or quality threshold',
+         starter_values=[
+             'Reference sequence: <code>EGFP_CDS</code>',
+             'Read panel: two reads with the expected position-67 training variant plus one parent-like read',
+             'Expected bases JSON: <code>{"67":"C"}</code> if the engineered base is C in the training variant',
+         ]),
     case('H', 'MSA, Identity Heatmap, and Phylogeny', 'E', ['EGFP_CDS', 'EGFP_Y67H_training_variant', 'EGFP_S204Y_training_variant', 'mCherry_CDS'], 'Advanced', 'Compare a small reporter family panel to see what is conserved, what is engineered, and what is genuinely distant.', ['/api/msa', '/api/heatmap', '/api/phylo'],
          'How do related engineered proteins cluster, and what does that clustering tell you about reuse versus redesign?',
          'This panel mixes two very close EGFP-derived variants with a more distant real reporter, mCherry. That is a good training set because it contains both “small edit” and “different family” comparisons in the same workflow.',
@@ -783,15 +806,20 @@ CASES = [
          ['A shortlist of gRNA candidates near the intended edit window.', 'A donor-template design with clearly defined edit and homology arms.', 'An explicit note about off-target risk or why a candidate should be downgraded.'],
          ['A guide closer to the edit is not automatically the best if the off-target profile is ugly.', 'HDR design should be explained in genomic terms: where is the intended edit, and what sequence context supports repair?', 'Treat design scores as prioritization tools, not promises.'],
          'changing the PAM or HDR arm length'),
-    case('R', 'Promoter/RBS Context for Expression Tuning', 'F', ['lacZ_alpha_fragment', 'EGFP_CDS'], 'Advanced', 'Use annotation and translation context to discuss why expression output depends on more than the CDS alone.', ['/api/auto-annotate', '/api/sequence-tracks'],
-         'Why can two constructs with the same coding sequence express differently in cells or bacteria?',
-         'This case intentionally uses a familiar reporter CDS plus a vector-associated expression context discussion. The tutorial point is conceptual: CDS correctness is necessary, but expression strength is influenced by promoter and translation-initiation context as well.',
-         'Engineers often start with the code analogy that the CDS is the “program.” In biology, the promoter and ribosome-binding context are closer to the runtime environment and scheduler. The same code can behave very differently when the surrounding control logic changes.',
-         'A perfect CDS in the wrong context is like efficient code behind a broken API gateway: nothing useful reaches the user.',
-         {'dominant_takeaway': 'regulatory context can dominate phenotype', 'reporter_cds_intact': True, 'status': 'interpret expression with regulatory context in mind'},
-         ['A diagram or explanation that separates coding sequence from regulatory context.', 'A specific note on how promoter or translation-initiation context could alter outcome.', 'A warning against equating “correct CDS” with “correct phenotype.”'],
-         ['When phenotype and sequence disagree, regulation is one of the first places to look.', 'This is a conceptual case: the value is in learning what extra information you would seek next.', 'Always separate “what is encoded” from “how strongly and when it is used.”'],
-         'changing the annotated feature context'),
+    case('R', 'Reference-Guided Annotation Transfer', 'B', ['pUC19_MCS', 'EGFP_CDS'], 'Advanced', 'Transfer known EGFP reference annotations onto a candidate vector-plus-reporter construct by similarity.', ['/api/annotation-transfer', '/api/sequence-tracks'],
+         'When a new construct contains a familiar part, can you recover the useful feature labels without manually re-annotating every coordinate?',
+         'This case combines a pUC19-style cloning context with a real EGFP reporter CDS. The candidate molecule is not just one clean gene; it is a vector context plus an inserted reporter part, which is exactly the situation where reference-guided annotation saves time and reduces coordinate mistakes.',
+         'Annotation transfer turns prior knowledge into current context. A reference feature is not blindly copied; it is mapped through sequence similarity and only trusted when identity and feature coverage are high enough. The biological value is that downstream map, track, primer, and validation views inherit the correct functional labels.',
+         'Good annotation transfer feels quiet when it works: a familiar part appears in a new construct, and the feature labels land where a scientist expects them.',
+         {'source_reference': 'EGFP_CDS_reference', 'target_construct': 'pUC19_MCS + EGFP_CDS', 'transferred_features': ['EGFP reporter CDS', 'gfp N-terminus'], 'identity_pct': 100.0, 'feature_coverage_pct': 100.0},
+         ['A transfer report listing source record, identity, feature coverage, and target coordinates.', 'A candidate construct whose feature list now includes the transferred EGFP labels.', 'A follow-up map or sequence track showing that transferred coordinates align with the reporter insert.'],
+         ['Similarity-supported transfer is stronger than manual copy-paste because it preserves evidence about identity and coverage.', 'Low coverage should block or downgrade a transferred feature even when part of the sequence looks familiar.', 'Transferred annotations are hypotheses until the target construct and source reference are both trustworthy.'],
+         'changing the identity threshold, feature-coverage threshold, or reference record list',
+         starter_values=[
+             'Target content: <code>pUC19_MCS + EGFP_CDS</code>',
+             'Reference record: <code>EGFP_CDS</code> with CDS and gene features',
+             'Suggested thresholds: <code>98%</code> identity and <code>95%</code> feature coverage',
+         ]),
     case('V', 'Codon Usage Bias and Host Portability', 'F', ['EGFP_CDS', 'mCherry_CDS'], 'Advanced', 'Discuss how two common reporter CDS records might look to different host translation systems.', ['/api/codon-optimize'],
          'If you move a gene between hosts, what sequence properties might become limiting even when the protein target stays the same?',
          'Reporter genes are excellent portability examples because labs routinely move them among bacteria, mammalian cells, and synthetic constructs. The DNA sequence is portable, but the translation machinery and expression context are not identical across hosts.',
@@ -1104,7 +1132,7 @@ def glossary_terms_for_case(case_info: dict) -> list[str]:
         selected.extend(['CDS', 'ORF', 'frame', 'codon'])
     if any(api in case_info['apis'] for api in ['/api/digest', '/api/digest-advanced', '/api/restriction-compare', '/api/silent-restriction-sites']):
         selected.extend(['restriction site', 'methylation'])
-    if any(api.startswith('/api/trace') or api in ['/api/import-ab1'] for api in case_info['apis']):
+    if any(api.startswith('/api/trace') or api in ['/api/import-ab1', '/api/sanger-consensus'] for api in case_info['apis']):
         selected.extend(['Sanger trace', 'consensus'])
     if any(api in case_info['apis'] for api in ['/api/pcr', '/api/pcr-gel-lanes', '/api/primers']):
         selected.append('amplicon')
@@ -1148,7 +1176,7 @@ def decision_profile(case_info: dict) -> dict[str, str]:
             'bench': 'Order or clone the silent-edit design, then verify with both sequencing and the new digest handle.',
             'caution': 'Silent means amino-acid-preserving, not automatically consequence-free.',
         }
-    if any(api.startswith('/api/trace') or api == '/api/import-ab1' for api in apis):
+    if any(api.startswith('/api/trace') or api in {'/api/import-ab1', '/api/sanger-consensus'} for api in apis):
         return {
             'decision': 'Accept the construct only where trace peaks support the called sequence at decision-critical bases.',
             'bench': 'Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.',
@@ -1226,7 +1254,7 @@ def common_mistakes(case_info: dict) -> list[tuple[str, str]]:
             ('Wrong interpretation', 'A silent edit cannot matter biologically.'),
             ('Correction', 'It preserves the amino acid, but you still check codon usage, RNA context, and unwanted feature creation.'),
         ]
-    if any(api.startswith('/api/trace') or api == '/api/import-ab1' for api in apis):
+    if any(api.startswith('/api/trace') or api in {'/api/import-ab1', '/api/sanger-consensus'} for api in apis):
         return [
             ('Wrong interpretation', 'The exported base call is the raw experimental fact.'),
             ('Correction', 'The chromatogram is the rawer evidence; base calls and consensus are interpretations of that signal.'),
@@ -1259,8 +1287,8 @@ def render_lab_chief_checklist(case_info: dict) -> str:
     profile = decision_profile(case_info)
     prompts = [
         f"What biological object are we handling: {', '.join(case_info['records'])}?",
-        f"What would go wrong at the bench if this interpretation is wrong?",
-        f"Which output is evidence, and which sentence is inference?",
+        "What would go wrong at the bench if this interpretation is wrong?",
+        "Which output is evidence, and which sentence is inference?",
         f"What is the next action: {profile['bench']}",
     ]
     return '<div class="chief-box"><b>Lab-Chief Teaching Prompts</b><ul>' + format_list(prompts) + '</ul></div>'
@@ -1422,6 +1450,16 @@ def compute_featured_results() -> list[dict[str, str]]:
             'title': 'Genome Forge now teaches uncertainty as a first-class sequence state',
             'value': f'EGFP ambiguity training record carries {sum(1 for ch in ambiguous if ch not in "ACGT")} explicit unresolved positions',
             'story': 'That matters because real assay design and identity search often start before every position is perfectly resolved. Good workflows preserve uncertainty instead of flattening it away.',
+        },
+        {
+            'title': 'Annotation transfer turns familiar parts into reusable evidence',
+            'value': 'EGFP reference features can now transfer into a candidate plasmid by similarity',
+            'story': 'This mirrors a beloved Geneious-style workflow: a known part appears in a new construct, and useful feature labels follow only when identity and coverage support the transfer.',
+        },
+        {
+            'title': 'Multi-read Sanger consensus now separates expected edits from surprises',
+            'value': 'Consensus reports variants, disagreements, genotype checks, and a final verdict',
+            'story': 'The tutorial now asks students to confirm an expected reporter variant while still flagging unexpected sequence changes. That is closer to real construct verification than trusting one base-called read.',
         },
         {
             'title': 'Selected-sequence launch bridges local work to public search',

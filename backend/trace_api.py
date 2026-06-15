@@ -4,12 +4,13 @@ import base64
 import json
 import math
 import uuid
+from collections import Counter
 from html import escape as html_escape
 from typing import Any, Dict, List
 
 from bio.trace_tools import align_trace_to_reference, edit_trace_base, trace_consensus, trace_summary
 from compat.ab1_format import parse_ab1_bytes, synthetic_trace_from_sequence
-from genomeforge_toolkit import DNA_ALPHABET
+from genomeforge_toolkit import DNA_ALPHABET, IUPAC_BASE_SETS
 
 
 TRACE_CACHE: Dict[str, Dict[str, Any]] = {}
@@ -241,6 +242,197 @@ def trace_verify_genotype(
     }
 
 
+IUPAC_FROM_BASE_SET = {frozenset(v): k for k, v in IUPAC_BASE_SETS.items()}
+
+
+def _consensus_base_from_counts(counts: Counter[str]) -> tuple[str, int, float]:
+    if not counts:
+        return "N", 0, 0.0
+    ranked = counts.most_common()
+    top_count = ranked[0][1]
+    top_bases = sorted(base for base, count in ranked if count == top_count)
+    total = sum(counts.values())
+    if len(top_bases) == 1:
+        return top_bases[0], top_count, round(100.0 * top_count / max(1, total), 2)
+    return IUPAC_FROM_BASE_SET.get(frozenset(top_bases), "N"), top_count, round(100.0 * top_count / max(1, total), 2)
+
+
+def _resolve_trace_collection(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
+    traces: List[Dict[str, Any]] = []
+    trace_ids = payload.get("trace_ids", [])
+    if isinstance(trace_ids, str):
+        trace_ids = [item.strip() for item in trace_ids.split(",") if item.strip()]
+    if isinstance(trace_ids, list):
+        for trace_id in trace_ids:
+            traces.append(_resolve_trace({"trace_id": str(trace_id)}))
+
+    trace_records = payload.get("trace_records", payload.get("traces", []))
+    if isinstance(trace_records, str):
+        trace_records = json.loads(trace_records)
+    if isinstance(trace_records, list):
+        for trace_record in trace_records:
+            if isinstance(trace_record, dict):
+                traces.append(dict(trace_record))
+
+    read_sequences = payload.get("read_sequences", payload.get("reads", []))
+    if isinstance(read_sequences, str):
+        read_sequences = [item.strip() for item in read_sequences.splitlines() if item.strip()]
+    if isinstance(read_sequences, list):
+        for sequence in read_sequences:
+            traces.append(synthetic_trace_from_sequence(str(sequence)))
+
+    cached = [_cache_trace(trace) for trace in traces]
+    if not cached:
+        raise ValueError("trace_ids, trace_records, or read_sequences are required")
+    return cached
+
+
+def sanger_multi_read_consensus(
+    traces: List[Dict[str, Any]],
+    reference_sequence: str,
+    min_quality: int = 20,
+    identity_threshold_pct: float = 85.0,
+    min_called_pct: float = 80.0,
+    genotype_positions: List[int] | None = None,
+    expected_bases: Dict[str, str] | None = None,
+    max_unexpected_variants: int = 0,
+) -> Dict[str, Any]:
+    reference = _clean_dna_string(reference_sequence)
+    if not reference:
+        raise ValueError("reference_sequence is required")
+    if not traces:
+        raise ValueError("at least one trace is required")
+
+    votes: List[Counter[str]] = [Counter() for _ in reference]
+    read_summaries: List[Dict[str, Any]] = []
+    for trace in traces:
+        consensus = trace_consensus(trace, min_quality=min_quality)
+        consensus_seq = str(consensus.get("consensus", ""))
+        alignment = align_trace_to_reference(trace, reference)
+        trace_pos = 0
+        ref_pos = 0
+        covered_positions: List[int] = []
+        for trace_base, ref_base in zip(str(alignment.get("aligned_trace", "")), str(alignment.get("aligned_reference", ""))):
+            if trace_base != "-":
+                trace_pos += 1
+            if ref_base != "-":
+                ref_pos += 1
+            if trace_base == "-" or ref_base == "-":
+                continue
+            call = consensus_seq[trace_pos - 1] if trace_pos - 1 < len(consensus_seq) else "N"
+            if call in {"A", "C", "G", "T"}:
+                votes[ref_pos - 1][call] += 1
+                covered_positions.append(ref_pos)
+        read_summaries.append(
+            {
+                "trace_id": str(trace.get("trace_id", "")),
+                "trace_length": int(alignment.get("trace_length", 0)),
+                "identity_pct": float(alignment.get("identity_pct", 0.0)),
+                "mismatch_count": int(alignment.get("mismatch_count", 0)),
+                "low_quality_bases": int(consensus.get("low_quality_bases", 0)),
+                "covered_reference_bases": len(set(covered_positions)),
+                "reference_span": [min(covered_positions), max(covered_positions)] if covered_positions else [],
+            }
+        )
+
+    consensus_chars: List[str] = []
+    position_rows: List[Dict[str, Any]] = []
+    variants: List[Dict[str, Any]] = []
+    disagreements: List[Dict[str, Any]] = []
+    for idx, counts in enumerate(votes, start=1):
+        base, support, support_pct = _consensus_base_from_counts(counts)
+        consensus_chars.append(base)
+        depth = sum(counts.values())
+        if depth:
+            row = {
+                "position_1based": idx,
+                "reference_base": reference[idx - 1],
+                "consensus_base": base,
+                "depth": depth,
+                "support": support,
+                "support_pct": support_pct,
+                "counts": dict(sorted(counts.items())),
+            }
+            position_rows.append(row)
+            if len(counts) > 1:
+                disagreements.append(row)
+            base_set = IUPAC_BASE_SETS.get(base, frozenset())
+            if base != "N" and base_set != frozenset({reference[idx - 1]}):
+                variants.append(row)
+
+    expected_bases = expected_bases or {}
+    genotype_calls: List[Dict[str, Any]] = []
+    for raw_pos in genotype_positions or []:
+        pos = int(raw_pos)
+        if pos < 1 or pos > len(reference):
+            continue
+        counts = votes[pos - 1]
+        depth = sum(counts.values())
+        base, support, support_pct = _consensus_base_from_counts(counts)
+        expected = _clean_dna_string(str(expected_bases.get(str(pos), "")))[:1]
+        base_set = IUPAC_BASE_SETS.get(base, frozenset())
+        matches_expected = (expected in base_set) if expected and depth > 0 else (False if expected else None)
+        genotype_calls.append(
+            {
+                "position_1based": pos,
+                "reference_base": reference[pos - 1],
+                "consensus_base": base,
+                "expected_base": expected or None,
+                "matches_expected": matches_expected,
+                "status": "called" if depth > 0 else "no_coverage",
+                "depth": depth,
+                "support": support,
+                "support_pct": support_pct,
+                "counts": dict(sorted(counts.items())),
+            }
+        )
+
+    expected_positions = {int(pos) for pos in expected_bases if str(pos).isdigit()}
+    unexpected_variants = [variant for variant in variants if int(variant["position_1based"]) not in expected_positions]
+    expected_failures = [call for call in genotype_calls if call.get("matches_expected") is False]
+    low_identity_reads = [row for row in read_summaries if float(row["identity_pct"]) < float(identity_threshold_pct)]
+    called_bases = sum(1 for counts in votes if counts)
+    called_pct = round(100.0 * called_bases / max(1, len(reference)), 2)
+    verdict_pass = (
+        called_pct >= float(min_called_pct)
+        and not low_identity_reads
+        and len(unexpected_variants) <= int(max_unexpected_variants)
+        and not expected_failures
+    )
+    return {
+        "mode": "sanger_multi_read_consensus",
+        "reference_length": len(reference),
+        "read_count": len(traces),
+        "min_quality": int(min_quality),
+        "identity_threshold_pct": float(identity_threshold_pct),
+        "min_called_pct": float(min_called_pct),
+        "called_bases": called_bases,
+        "called_pct": called_pct,
+        "consensus_length": len(reference),
+        "consensus": "".join(consensus_chars),
+        "variant_count": len(variants),
+        "unexpected_variant_count": len(unexpected_variants),
+        "disagreement_count": len(disagreements),
+        "genotype_call_count": len(genotype_calls),
+        "variants": variants[:500],
+        "unexpected_variants": unexpected_variants[:500],
+        "disagreements": disagreements[:500],
+        "genotype_calls": genotype_calls,
+        "read_summaries": read_summaries,
+        "verdict": "PASS" if verdict_pass else "FAIL",
+        "failure_reasons": [
+            reason
+            for reason, failed in [
+                ("called_pct_below_threshold", called_pct < float(min_called_pct)),
+                ("low_identity_reads", bool(low_identity_reads)),
+                ("unexpected_variants", len(unexpected_variants) > int(max_unexpected_variants)),
+                ("expected_genotype_mismatch", bool(expected_failures)),
+            ]
+            if failed
+        ],
+    }
+
+
 def trace_alignment_navigation(
     trace_record: Dict[str, Any],
     reference_sequence: str,
@@ -389,6 +581,27 @@ def handle_trace_endpoint(path: str, payload: Dict[str, Any]) -> Dict[str, Any] 
             expected_bases={str(k): str(v) for k, v in dict(expected_bases).items()} if isinstance(expected_bases, dict) else {},
             identity_threshold_pct=float(payload.get("identity_threshold_pct", 98.0)),
             max_mismatches=int(payload.get("max_mismatches", 5)),
+        )
+
+    if path == "/api/sanger-consensus":
+        reference = str(payload.get("reference_sequence", payload.get("reference", "")))
+        if not reference.strip():
+            raise ValueError("reference_sequence is required")
+        genotype_positions = payload.get("genotype_positions", [])
+        if isinstance(genotype_positions, str):
+            genotype_positions = [int(x.strip()) for x in genotype_positions.split(",") if x.strip()]
+        expected_bases = payload.get("expected_bases", {})
+        if isinstance(expected_bases, str):
+            expected_bases = json.loads(expected_bases)
+        return sanger_multi_read_consensus(
+            _resolve_trace_collection(payload),
+            reference_sequence=reference,
+            min_quality=int(payload.get("min_quality", 20)),
+            identity_threshold_pct=float(payload.get("identity_threshold_pct", 85.0)),
+            min_called_pct=float(payload.get("min_called_pct", 80.0)),
+            genotype_positions=[int(x) for x in genotype_positions if isinstance(x, (int, float, str))],
+            expected_bases={str(k): str(v) for k, v in dict(expected_bases).items()} if isinstance(expected_bases, dict) else {},
+            max_unexpected_variants=int(payload.get("max_unexpected_variants", 0)),
         )
 
     return None

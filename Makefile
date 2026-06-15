@@ -1,6 +1,7 @@
 PYTHON ?= python3
+COVERAGE_TARGETS := --cov=backend --cov=bio --cov=collab --cov=compat --cov=canonical_schema --cov=genomeforge_toolkit --cov=web_ui
 
-.PHONY: install install-dev install-docs run smoke functional unit pytest docs-check tutorial-pdf tutorial-screenshots e2e
+.PHONY: install install-dev install-docs run smoke functional unit pytest coverage lint docs-check tutorial-pdf tutorial-screenshots e2e quality
 
 install:
 	$(PYTHON) -m pip install -e .
@@ -26,6 +27,12 @@ unit:
 pytest:
 	$(PYTHON) -m pytest
 
+coverage:
+	$(PYTHON) -m pytest $(COVERAGE_TARGETS) --cov-report=term-missing:skip-covered --cov-report=xml
+
+lint:
+	$(PYTHON) -m ruff check .
+
 docs-check:
 	$(PYTHON) docs/validate_docs.py
 
@@ -37,3 +44,5 @@ tutorial-screenshots:
 
 e2e:
 	npm run test:e2e
+
+quality: lint coverage docs-check

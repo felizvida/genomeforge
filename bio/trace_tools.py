@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 
 def _clean_dna(s: str) -> str:
@@ -143,4 +143,3 @@ def trace_consensus(trace_record: Dict[str, Any], min_quality: int = 20) -> Dict
         "low_quality_bases": low,
         "consensus": c,
     }
-

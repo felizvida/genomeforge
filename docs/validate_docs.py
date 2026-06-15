@@ -108,6 +108,13 @@ def main() -> int:
     for needle in ["Glossary for Computer Scientists", "One-Page Cheat Sheets", "Evidence-to-Decision"]:
         if needle not in tutorial_text:
             errors.append(f"Tutorial is missing training scaffold section '{needle}'")
+    tutorial_required_steps = {
+        "annotation-transfer walkthrough": "Click <code>Transfer Annotations</code>",
+        "sanger-consensus walkthrough": "Click <code>Multi-read Consensus</code>",
+    }
+    for label, needle in tutorial_required_steps.items():
+        if needle not in tutorial_text:
+            errors.append(f"Tutorial is missing {label}: {needle}")
 
     playbook_text = PLAYBOOK.read_text(encoding="utf-8")
     playbook_cases = set(re.findall(r"## Case ([A-Z]{1,2}):", playbook_text))
@@ -186,7 +193,7 @@ def main() -> int:
             )
 
     handoff_text = HANDOFF.read_text(encoding="utf-8")
-    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "115", "104", "15", "112", "45", "Learning Mode", "generate_tutorial.py", "case_bundles"]:
+    for needle in ["docs/API.md", "docs/MODERNIZATION_PLAN.md", "115", "106", "15", "114", "45", "Learning Mode", "generate_tutorial.py", "case_bundles"]:
         if needle not in handoff_text:
             errors.append(f"HANDOFF_ZERO_MEMORY.md does not include expected marker '{needle}'")
 

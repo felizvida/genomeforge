@@ -439,7 +439,8 @@ class BackendDomainTests(unittest.TestCase):
             "topology": "circular",
             "history": ["ATGGTGAGCAAG", "ATGGTGAGCAAGGGCGAGGAG"],
         }
-        get_record = lambda: SequenceRecord(name="BackendDomain", sequence="ATGGTGAGCAAGGGCGAGGAG", topology="circular")
+        def get_record() -> SequenceRecord:
+            return SequenceRecord(name="BackendDomain", sequence="ATGGTGAGCAAGGGCGAGGAG", topology="circular")
         try:
             saved = handle_project_endpoint("/api/project-save", payload, get_record)
             assert saved is not None
@@ -469,11 +470,12 @@ class BackendDomainTests(unittest.TestCase):
             "content": ">Shareable\nATGGTGAGCAAGGGCGAGGAGCTGTTCACCGG",
             "topology": "linear",
         }
-        get_record = lambda: SequenceRecord(
-            name="Shareable",
-            sequence="ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGG",
-            topology="linear",
-        )
+        def get_record() -> SequenceRecord:
+            return SequenceRecord(
+                name="Shareable",
+                sequence="ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGG",
+                topology="linear",
+            )
         share_path: Path | None = None
         try:
             saved = handle_project_endpoint("/api/project-save", payload, get_record)
@@ -512,11 +514,12 @@ class BackendDomainTests(unittest.TestCase):
             "content": ">Shareable\nATGGTGAGCAAGGGCGAGGAGCTGTTCACCGG",
             "topology": 'linear"><script>alert(2)</script>',
         }
-        get_record = lambda: SequenceRecord(
-            name="Shareable",
-            sequence="ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGG",
-            topology='linear"><script>alert(2)</script>',
-        )
+        def get_record() -> SequenceRecord:
+            return SequenceRecord(
+                name="Shareable",
+                sequence="ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGG",
+                topology='linear"><script>alert(2)</script>',
+            )
         share_path: Path | None = None
         try:
             saved = handle_project_endpoint("/api/project-save", payload, get_record)

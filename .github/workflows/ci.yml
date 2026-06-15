@@ -49,6 +49,10 @@ jobs:
             node --check "$f"
           done
 
+      - name: Python lint
+        run: |
+          python -m ruff check .
+
       - name: Install browser test dependencies
         if: matrix.python-version == '3.11'
         run: |
@@ -63,9 +67,9 @@ jobs:
         run: |
           python docs/validate_docs.py
 
-      - name: Unit tests
+      - name: Unit tests with coverage
         run: |
-          python -m pytest
+          python -m pytest --cov=backend --cov=bio --cov=collab --cov=compat --cov=canonical_schema --cov=genomeforge_toolkit --cov=web_ui --cov-report=term-missing:skip-covered --cov-report=xml
 
       - name: Smoke test suite
         if: matrix.python-version == '3.11'

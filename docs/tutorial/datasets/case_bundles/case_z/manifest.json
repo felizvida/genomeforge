@@ -4,11 +4,11 @@
     "title": "Multi-Trace Consensus for Final Construct Call",
     "cluster": "D",
     "tab": "Trace",
-    "workflow": "Combine multiple trace-derived views into one final verdict about a reporter construct.",
+    "workflow": "Combine multiple Sanger reads into a consensus, variant table, and final construct verdict.",
     "apis": [
       "/api/import-ab1",
-      "/api/trace-align",
-      "/api/trace-consensus"
+      "/api/sanger-consensus",
+      "/api/trace-chromatogram-svg"
     ]
   },
   "records": [

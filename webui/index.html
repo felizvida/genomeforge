@@ -222,6 +222,14 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
           <button data-action="runTraceChromatogram">Trace Chromatogram</button>
           <button data-action="runTraceVerify">Trace Verify/Genotype</button>
         </div>
+        <label>Sanger Consensus Reads (one sequence per line)</label>
+        <textarea id="sangerReadSequences">ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTGGTCGAGCTG
+GAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGC</textarea>
+        <div class="row3">
+          <input id="sangerMinCalledPct" type="number" value="80" />
+          <input id="sangerMaxUnexpectedVariants" type="number" value="0" />
+          <button data-action="runSangerConsensus">Multi-read Consensus</button>
+        </div>
         <div class="row3">
           <input id="traceEditPos" type="number" value="1" />
           <input id="traceEditBase" value="A" />
@@ -378,6 +386,21 @@ GAATTCCGGATCCATGGCCATTGTAA</textarea>
         <div class="row">
           <button data-action="runReferenceDbLoad">Load Reference DB</button>
           <button data-action="runReferenceScan">Reference Scan + Flag Features</button>
+        </div>
+        <label>Similarity Annotation Transfer References (JSON)</label>
+        <textarea id="annotationTransferReferences">[
+  {
+    "name":"EGFP reference",
+    "sequence":"ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTG",
+    "features":[
+      {"key":"CDS","location":"1..57","qualifiers":{"label":"EGFP N-terminus","codon_start":"1"}}
+    ]
+  }
+]</textarea>
+        <div class="row3">
+          <input id="annotationTransferIdentity" type="number" value="85" />
+          <input id="annotationTransferCoverage" type="number" value="70" />
+          <button data-action="runAnnotationTransfer">Transfer Annotations</button>
         </div>
         <label>siRNA Design and Mapping</label>
         <div class="row3">

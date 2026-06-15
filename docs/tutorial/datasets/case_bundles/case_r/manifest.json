@@ -1,22 +1,22 @@
 {
   "case": {
     "case_id": "R",
-    "title": "Promoter/RBS Context for Expression Tuning",
-    "cluster": "F",
+    "title": "Reference-Guided Annotation Transfer",
+    "cluster": "B",
     "tab": "Advanced",
-    "workflow": "Use annotation and translation context to discuss why expression output depends on more than the CDS alone.",
+    "workflow": "Transfer known EGFP reference annotations onto a candidate vector-plus-reporter construct by similarity.",
     "apis": [
-      "/api/auto-annotate",
+      "/api/annotation-transfer",
       "/api/sequence-tracks"
     ]
   },
   "records": [
     {
-      "name": "lacZ_alpha_fragment",
+      "name": "pUC19_MCS",
       "type": "public-source",
-      "topology": "linear",
-      "origin": "lacZ alpha fragment from the classic blue-white screening system associated with cloning vectors such as pUC19.",
-      "why_it_matters": "This fragment is a perfect teaching example of phenotype-linked DNA: inserting the wrong thing into the wrong place changes colony color.",
+      "topology": "circular",
+      "origin": "The pUC19 multiple-cloning site from one of the most widely used teaching and cloning vectors in molecular biology.",
+      "why_it_matters": "A dense multiple-cloning site is a perfect example of engineered sequence architecture: every base exists to make cloning more flexible.",
       "source_label": "NCBI Nucleotide: pUC19 complete sequence",
       "source_url": "https://www.ncbi.nlm.nih.gov/nuccore/M77789.2"
     },

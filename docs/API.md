@@ -18,6 +18,7 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 - `POST /api/trace-chromatogram-svg`
 - `POST /api/trace-verify`
 - `POST /api/trace-alignment-links`
+- `POST /api/sanger-consensus`
 
 ## Core Sequence And Translation
 
@@ -95,6 +96,7 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 - `POST /api/reference-db-list`
 - `POST /api/reference-db-load`
 - `POST /api/reference-scan`
+- `POST /api/annotation-transfer`
 - `POST /api/features-list`
 - `POST /api/features-add`
 - `POST /api/features-update`

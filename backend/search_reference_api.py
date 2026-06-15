@@ -15,6 +15,7 @@ from genomeforge_toolkit import (
     find_all_occurrences,
     iupac_hamming_distance,
     iupac_symbol_matches,
+    parse_feature_interval,
 )
 
 
@@ -286,6 +287,226 @@ def _features_to_dict(features: List[Feature]) -> List[Dict[str, Any]]:
     return [{"key": f.key, "location": f.location, "qualifiers": dict(f.qualifiers)} for f in features]
 
 
+def _payload_features_to_dict(features: Any) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    if not isinstance(features, list):
+        return rows
+    for feature in features:
+        if isinstance(feature, Feature):
+            rows.append({"key": feature.key, "location": feature.location, "qualifiers": dict(feature.qualifiers)})
+        elif isinstance(feature, dict):
+            qualifiers = feature.get("qualifiers", {})
+            rows.append(
+                {
+                    "key": str(feature.get("key", "misc_feature") or "misc_feature"),
+                    "location": str(feature.get("location", "")),
+                    "qualifiers": dict(qualifiers) if isinstance(qualifiers, dict) else {"label": str(qualifiers)},
+                }
+            )
+    return rows
+
+
+def _feature_label(feature: Dict[str, Any]) -> str:
+    qualifiers = feature.get("qualifiers", {})
+    if isinstance(qualifiers, dict):
+        for key in ("label", "gene", "product", "note"):
+            if str(qualifiers.get(key, "")).strip():
+                return str(qualifiers[key]).strip()
+    return str(feature.get("key", "feature"))
+
+
+def _alignment_ref_to_target_map(alignment: Dict[str, Any]) -> Dict[int, int]:
+    target_pos = int(alignment.get("start_a_1based", 1)) - 1
+    ref_pos = int(alignment.get("start_b_1based", 1)) - 1
+    mapping: Dict[int, int] = {}
+    for target_base, ref_base in zip(str(alignment.get("aligned_a", "")), str(alignment.get("aligned_b", ""))):
+        if target_base != "-":
+            target_pos += 1
+        if ref_base != "-":
+            ref_pos += 1
+        if target_base != "-" and ref_base != "-":
+            mapping[ref_pos] = target_pos
+    return mapping
+
+
+def _feature_bounds_for_orientation(feature: Dict[str, Any], reference_length: int, orientation: str) -> tuple[int, int] | None:
+    bounds = parse_feature_interval(str(feature.get("location", "")))
+    if not bounds:
+        return None
+    start, end = bounds
+    start = max(1, min(reference_length, start))
+    end = max(1, min(reference_length, end))
+    if start > end:
+        start, end = end, start
+    if orientation == "-":
+        return reference_length - end + 1, reference_length - start + 1
+    return start, end
+
+
+def _transferred_location(start: int, end: int, orientation: str, source_location: str) -> tuple[str, str]:
+    source_is_complement = "complement" in source_location.lower()
+    target_is_complement = (orientation == "-") ^ source_is_complement
+    location = f"{start}..{end}"
+    return (f"complement({location})" if target_is_complement else location), ("-" if target_is_complement else "+")
+
+
+def _reference_records_from_db(db_name: str) -> List[Dict[str, Any]]:
+    if not db_name:
+        return []
+    doc = load_reference_db(db_name)
+    records: List[Dict[str, Any]] = []
+    for element in doc.get("elements", []):
+        sequence = _clean_dna_string(str(element.get("sequence", "")))
+        if not sequence:
+            continue
+        label = str(element.get("label", "reference element"))
+        key = str(element.get("type", "misc_feature") or "misc_feature")
+        records.append(
+            {
+                "name": label,
+                "sequence": sequence,
+                "features": [
+                    {
+                        "key": key,
+                        "location": f"1..{len(sequence)}",
+                        "qualifiers": {"label": label, "source": f"reference_db:{db_name}"},
+                    }
+                ],
+            }
+        )
+    return records
+
+
+def annotation_transfer_by_similarity(
+    target_record: SequenceRecord,
+    reference_records: List[Dict[str, Any]],
+    min_identity_pct: float = 85.0,
+    min_feature_coverage_pct: float = 70.0,
+    add_features: bool = False,
+    max_features: int = 200,
+) -> Dict[str, Any]:
+    target = _clean_dna_string(target_record.sequence)
+    if not target:
+        raise ValueError("target record sequence is required")
+    if not reference_records:
+        raise ValueError("reference_records or db_name is required")
+
+    transferred: List[Dict[str, Any]] = []
+    reference_summaries: List[Dict[str, Any]] = []
+    original_feature_count = len(target_record.features)
+    existing = {
+        (feature.key, feature.location, str(feature.qualifiers.get("label", "")))
+        for feature in target_record.features
+    }
+    for index, raw_ref in enumerate(reference_records, start=1):
+        if not isinstance(raw_ref, dict):
+            continue
+        ref_name = str(raw_ref.get("name", raw_ref.get("label", f"reference_{index}")) or f"reference_{index}")
+        ref_seq = _clean_dna_string(str(raw_ref.get("sequence", "")))
+        features = _payload_features_to_dict(raw_ref.get("features", []))
+        if not ref_seq or not features:
+            reference_summaries.append(
+                {
+                    "reference_name": ref_name,
+                    "status": "skipped",
+                    "reason": "missing sequence or features",
+                }
+            )
+            continue
+
+        candidates = []
+        for orientation, oriented_seq in (("+", ref_seq), ("-", _revcomp(ref_seq))):
+            alignment = smith_waterman_dna(target, oriented_seq)
+            candidates.append((int(alignment.get("score", 0)), orientation, alignment))
+        _score, orientation, alignment = max(candidates, key=lambda item: item[0])
+        identity_pct = float(alignment.get("identity_pct", 0.0))
+        reference_coverage_pct = round(100.0 * int(alignment.get("aligned_b_bases", 0)) / max(1, len(ref_seq)), 2)
+        target_coverage_pct = round(100.0 * int(alignment.get("aligned_a_bases", 0)) / max(1, len(target)), 2)
+        mapping = _alignment_ref_to_target_map(alignment)
+        accepted = 0
+        rejected = 0
+        for feature in features:
+            if len(transferred) >= max(1, int(max_features)):
+                break
+            oriented_bounds = _feature_bounds_for_orientation(feature, len(ref_seq), orientation)
+            if not oriented_bounds:
+                rejected += 1
+                continue
+            f_start, f_end = oriented_bounds
+            feature_len = max(1, f_end - f_start + 1)
+            mapped_positions = [mapping[pos] for pos in range(f_start, f_end + 1) if pos in mapping]
+            feature_coverage_pct = round(100.0 * len(mapped_positions) / feature_len, 2)
+            if not mapped_positions or identity_pct < float(min_identity_pct) or feature_coverage_pct < float(min_feature_coverage_pct):
+                rejected += 1
+                continue
+
+            target_start = min(mapped_positions)
+            target_end = max(mapped_positions)
+            location, strand = _transferred_location(target_start, target_end, orientation, str(feature.get("location", "")))
+            key = str(feature.get("key", "misc_feature") or "misc_feature")
+            label = _feature_label(feature)
+            qualifiers = feature.get("qualifiers", {})
+            out_qualifiers = dict(qualifiers) if isinstance(qualifiers, dict) else {"label": label}
+            out_qualifiers.update(
+                {
+                    "label": label,
+                    "source": "similarity_annotation_transfer",
+                    "transferred_from": ref_name,
+                    "identity_pct": f"{identity_pct:.2f}",
+                    "feature_coverage_pct": f"{feature_coverage_pct:.2f}",
+                }
+            )
+            row = {
+                "source_record": ref_name,
+                "key": key,
+                "label": label,
+                "reference_location": str(feature.get("location", "")),
+                "target_location": location,
+                "start_1based": target_start,
+                "end_1based": target_end,
+                "strand": strand,
+                "orientation": orientation,
+                "identity_pct": round(identity_pct, 2),
+                "reference_coverage_pct": reference_coverage_pct,
+                "feature_coverage_pct": feature_coverage_pct,
+            }
+            transferred.append(row)
+            accepted += 1
+            marker = (key, location, label)
+            if add_features and marker not in existing:
+                target_record.features.append(Feature(key=key, location=location, qualifiers=out_qualifiers))
+                existing.add(marker)
+        reference_summaries.append(
+            {
+                "reference_name": ref_name,
+                "reference_length": len(ref_seq),
+                "feature_count": len(features),
+                "orientation": orientation,
+                "identity_pct": round(identity_pct, 2),
+                "reference_coverage_pct": reference_coverage_pct,
+                "target_coverage_pct": target_coverage_pct,
+                "accepted_features": accepted,
+                "rejected_features": rejected,
+            }
+        )
+
+    return {
+        "mode": "similarity_annotation_transfer",
+        "target_name": target_record.name,
+        "target_length": len(target),
+        "reference_count": len(reference_records),
+        "min_identity_pct": float(min_identity_pct),
+        "min_feature_coverage_pct": float(min_feature_coverage_pct),
+        "transferred_count": len(transferred),
+        "transferred_features": transferred,
+        "features_added": len(target_record.features) - original_feature_count,
+        "feature_count": len(target_record.features),
+        "features": _features_to_dict(target_record.features),
+        "references": reference_summaries,
+        "truncated": len(transferred) >= max(1, int(max_features)),
+    }
+
+
 def reference_db_path(name: str) -> Path:
     safe = "".join(ch for ch in name if ch.isalnum() or ch in ("-", "_")).strip("_-")
     if not safe:
@@ -541,6 +762,27 @@ def handle_search_reference_endpoint(path: str, payload: Dict[str, Any], get_rec
             get_record(),
             db_name=str(payload.get("db_name", "")).strip(),
             add_features=bool(payload.get("add_features", False)),
+        )
+
+    if path == "/api/annotation-transfer":
+        reference_records = payload.get("reference_records", payload.get("references", []))
+        if isinstance(reference_records, str):
+            reference_records = json.loads(reference_records)
+        refs = [dict(item) for item in reference_records if isinstance(item, dict)] if isinstance(reference_records, list) else []
+        db_name = str(payload.get("db_name", "")).strip()
+        if db_name:
+            try:
+                refs.extend(_reference_records_from_db(db_name))
+            except ValueError:
+                if not refs:
+                    raise
+        return annotation_transfer_by_similarity(
+            get_record(),
+            refs,
+            min_identity_pct=float(payload.get("min_identity_pct", 85.0)),
+            min_feature_coverage_pct=float(payload.get("min_feature_coverage_pct", 70.0)),
+            add_features=bool(payload.get("add_features", False)),
+            max_features=int(payload.get("max_features", 200)),
         )
 
     if path == "/api/sirna-design":

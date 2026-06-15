@@ -4,11 +4,13 @@ This directory is the structured documentation index for Genome Forge.
 
 ## Start Here
 
+- [Zero-Memory Handoff](../HANDOFF_ZERO_MEMORY.md): cold-start runbook for resuming this project from a new thread.
 - [Install Guide](INSTALL.md): local setup for runtime, development, optional biology adapters, and PDF generation.
 - [User Guide](USER_GUIDE.md): common workflows in the web UI and CLI.
 - [Developer Guide](DEVELOPER_GUIDE.md): repo layout, commands, test strategy, and release workflow.
 - [Architecture](ARCHITECTURE.md): current system structure, data flow, and modernization notes.
 - [API Reference](API.md): endpoint inventory grouped by workflow domain.
+- [Geneious Prime Feature Priorities](GENEIOUS_PRIME_FEATURES.md): desirable Geneious-style workflows mapped to Genome Forge implementation.
 - [Security Model](SECURITY_MODEL.md): local-first trust boundary, browser hardening headers, and non-goals.
 - [Contributing Guide](../CONTRIBUTING.md): contribution flow, feedback channels, and validation expectations.
 - [Modernization Plan](MODERNIZATION_PLAN.md): phased roadmap for packaging, architecture, UI, CI, and delivery improvements.

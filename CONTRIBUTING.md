@@ -90,6 +90,8 @@ Python/unit changes:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
+python3 -m pytest --cov=backend --cov=bio --cov=collab --cov=compat --cov=canonical_schema --cov=genomeforge_toolkit --cov=web_ui --cov-report=term-missing:skip-covered --cov-report=xml
+python3 -m ruff check .
 ```
 
 Broad backend workflow changes:

@@ -20,7 +20,7 @@ It combines:
 
 Latest release:
 
-- [Genome Forge v0.1.14](https://github.com/felizvida/genomeforge/releases/tag/v0.1.14)
+- [Genome Forge v0.1.15](https://github.com/felizvida/genomeforge/releases/tag/v0.1.15)
 
 ## Why Genome Forge
 
@@ -114,15 +114,16 @@ genomeforge input.fasta info
 
 Current shipped baseline:
 
-- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `48/48` passed
+- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `53/53` passed
 - `python3 smoke_test.py` -> `115/115` passed
-- `python3 real_world_functional_test.py` -> `104/104` passed
+- `python3 real_world_functional_test.py` -> `106/106` passed
 - `npm run test:e2e` -> `15/15` passed
 
 ## Documentation
 
 Start with:
 
+- [Zero-Memory Handoff](HANDOFF_ZERO_MEMORY.md)
 - [Docs Index](docs/README.md)
 - [Install Guide](docs/INSTALL.md)
 - [User Guide](docs/USER_GUIDE.md)

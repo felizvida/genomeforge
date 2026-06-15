@@ -67,6 +67,7 @@ python3 -m pip install -e ".[dev,bio]"
 This adds:
 
 - `pytest`
+- `pytest-cov`
 - `ruff`
 - `biopython`
 
@@ -101,6 +102,8 @@ If you installed development dependencies, you can also run:
 
 ```bash
 python3 -m pytest
+python3 -m pytest --cov=backend --cov=bio --cov=collab --cov=compat --cov=canonical_schema --cov=genomeforge_toolkit --cov=web_ui --cov-report=term-missing:skip-covered --cov-report=xml
+python3 -m ruff check .
 ```
 
 If you want browser end-to-end validation:

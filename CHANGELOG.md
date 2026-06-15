@@ -4,6 +4,35 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-06-15
+
+### Added
+
+- Added similarity-based annotation transfer for annotated reference records and saved reference libraries.
+- Added multi-read Sanger consensus with variant tables, disagreement reporting, expected genotype checks, and PASS/FAIL construct verdicts.
+- Added browser controls, API documentation, and Geneious Prime feature-priority notes for the new workflows.
+- Added real-world EGFP/pUC19 regression coverage and real-world functional checks for annotation transfer and Sanger consensus.
+
+### Changed
+
+- Updated the self-study book, generated tutorial assets, and case bundles with reference-guided annotation transfer and multi-trace consensus lessons.
+- Expanded validation tooling and release hygiene with coverage/lint quality targets and synchronized current baseline counts.
+
+### Fixed
+
+- Expected Sanger genotype calls without read coverage now fail instead of treating `N` as confirmation.
+- Annotation transfer now rejects unmapped features cleanly, even when the caller sets feature coverage threshold to zero.
+- The generated book now points the new lessons to the actual `Transfer Annotations` and `Multi-read Consensus` UI buttons.
+
+### Validation
+
+- `make quality PYTHON=./.venv-docs/bin/python3`
+- `./.venv-docs/bin/python3 -m unittest discover -s tests -p 'test_*.py'`
+- `./.venv-docs/bin/python3 smoke_test.py`
+- `./.venv-docs/bin/python3 real_world_functional_test.py`
+- `npm run test:e2e`
+- `git diff --check`
+
 ## [0.1.14] - 2026-05-15
 
 ### Added

@@ -160,6 +160,20 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Bench decision: Proceed when the output answers the biological question and the assumptions match the input data type.
 - Common caution: Do not report the tool output as the conclusion; report the defensible biological interpretation.
 
+## Case R: Reference-Guided Annotation Transfer
+
+- Cluster: Sequence Meaning and Functional Annotation
+- Focus: When a new construct contains a familiar part, can you recover the useful feature labels without manually re-annotating every coordinate?
+- Records: pUC19_MCS, EGFP_CDS
+- Workflow: Transfer known EGFP reference annotations onto a candidate vector-plus-reporter construct by similarity.
+- UI path: Advanced tab -> `Transfer Annotations` -> Results
+- APIs: /api/annotation-transfer, /api/sequence-tracks
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case R --out ./tmp/genomeforge_case_r `
+- Key expected signal: A transfer report listing source record, identity, feature coverage, and target coordinates.
+- Evidence/inference checkpoint: Similarity-supported transfer is stronger than manual copy-paste because it preserves evidence about identity and coverage.
+- Bench decision: Proceed when the output answers the biological question and the assumptions match the input data type.
+- Common caution: Do not report the tool output as the conclusion; report the defensible biological interpretation.
+
 ## Cluster C: Assay and Primer System Design
 
 ## Case E: Primer Design and Thermodynamic Screening
@@ -267,12 +281,12 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Cluster: Assembly and Construct Validation
 - Focus: When several sequencing reads exist for the same construct, how do you combine them into one decision rather than trusting the loudest trace?
 - Records: EGFP_CDS
-- Workflow: Combine multiple trace-derived views into one final verdict about a reporter construct.
-- UI path: Trace tab -> `Combine multiple trace-derived views into one final verdict about a reporter construct.` -> Results plus the matching visualization panel
-- APIs: /api/import-ab1, /api/trace-align, /api/trace-consensus
+- Workflow: Combine multiple Sanger reads into a consensus, variant table, and final construct verdict.
+- UI path: Trace/Interop tab -> `Multi-read Consensus` -> Results
+- APIs: /api/import-ab1, /api/sanger-consensus, /api/trace-chromatogram-svg
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case Z --out ./tmp/genomeforge_case_z `
-- Key expected signal: A multi-trace summary with overlap or mismatch hotspots identified explicitly.
-- Evidence/inference checkpoint: Agreement across independent traces raises confidence, especially when the same region is supported more than once.
+- Key expected signal: A multi-read consensus report with called-base coverage, variants, and disagreements.
+- Evidence/inference checkpoint: Agreement across independent reads raises confidence, especially when decision-critical positions are supported more than once.
 - Bench decision: Accept the construct only where trace peaks support the called sequence at decision-critical bases.
 - Common caution: A clean-looking consensus is not stronger than the raw trace evidence behind it.
 
@@ -347,20 +361,6 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case K --out ./tmp/genomeforge_case_k `
 - Key expected signal: A shortlist of gRNA candidates near the intended edit window.
 - Evidence/inference checkpoint: A guide closer to the edit is not automatically the best if the off-target profile is ugly.
-- Bench decision: Proceed when the output answers the biological question and the assumptions match the input data type.
-- Common caution: Do not report the tool output as the conclusion; report the defensible biological interpretation.
-
-## Case R: Promoter/RBS Context for Expression Tuning
-
-- Cluster: Editing and Design for Intervention
-- Focus: Why can two constructs with the same coding sequence express differently in cells or bacteria?
-- Records: lacZ_alpha_fragment, EGFP_CDS
-- Workflow: Use annotation and translation context to discuss why expression output depends on more than the CDS alone.
-- UI path: Advanced tab -> `Use annotation and translation context to discuss why expression output depends on more than the CDS alone.` -> Results plus the matching visualization panel
-- APIs: /api/auto-annotate, /api/sequence-tracks
-- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case R --out ./tmp/genomeforge_case_r `
-- Key expected signal: A diagram or explanation that separates coding sequence from regulatory context.
-- Evidence/inference checkpoint: When phenotype and sequence disagree, regulation is one of the first places to look.
 - Bench decision: Proceed when the output answers the biological question and the assumptions match the input data type.
 - Common caution: Do not report the tool output as the conclusion; report the defensible biological interpretation.
 

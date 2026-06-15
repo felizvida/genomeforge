@@ -90,6 +90,33 @@ async function runReferenceScan() {
   } catch (e) { show(String(e)); }
 }
 
+async function runAnnotationTransfer() {
+  try {
+    const references = JSON.parse(document.getElementById('annotationTransferReferences').value);
+    const r = await callApi('/api/annotation-transfer', payload({
+      reference_records: references,
+      db_name: document.getElementById('referenceDbName').value,
+      min_identity_pct: Number(document.getElementById('annotationTransferIdentity').value),
+      min_feature_coverage_pct: Number(document.getElementById('annotationTransferCoverage').value),
+      add_features: true,
+    }));
+    if (Array.isArray(r.features)) {
+      featureState = r.features;
+    }
+    setDecisionCard('generic', r, {
+      evidence: `Transferred ${r.transferred_count || 0} annotation(s) from ${(r.references || []).length} reference source(s).`,
+      next: 'Inspect transferred coordinates on the map/track, then keep only features with believable identity and coverage.',
+    });
+    show({
+      mode: r.mode,
+      transferred_count: r.transferred_count,
+      features_added: r.features_added,
+      references: r.references,
+      transferred_features: r.transferred_features,
+    });
+  } catch (e) { show(String(e)); }
+}
+
 async function runSirnaDesign() {
   try {
     const r = await callApi('/api/sirna-design', payload({
@@ -321,6 +348,47 @@ async function runTraceVerify() {
       next: 'Use the verdict only after checking whether decision-critical positions had acceptable trace quality.',
     });
     show(r);
+  } catch (e) { show(String(e)); }
+}
+
+async function runSangerConsensus() {
+  try {
+    const reference_sequence = document.getElementById('traceReference').value;
+    const read_sequences = splitSeqLines('sangerReadSequences');
+    const traceId = document.getElementById('traceId').value.trim();
+    const trace_ids = traceId ? [traceId] : [];
+    const genotype_positions = document.getElementById('traceGenotypePositions').value
+      .split(',')
+      .map((x) => Number(x.trim()))
+      .filter((x) => Number.isFinite(x) && x > 0);
+    let expected_bases = {};
+    const raw = document.getElementById('traceExpectedBases').value.trim();
+    if (raw) expected_bases = JSON.parse(raw);
+    const r = await callApi('/api/sanger-consensus', {
+      reference_sequence,
+      trace_ids,
+      read_sequences,
+      genotype_positions,
+      expected_bases,
+      min_quality: 20,
+      identity_threshold_pct: 85,
+      min_called_pct: Number(document.getElementById('sangerMinCalledPct').value),
+      max_unexpected_variants: Number(document.getElementById('sangerMaxUnexpectedVariants').value),
+    });
+    setDecisionCard('trace', r, {
+      evidence: `Sanger consensus verdict ${r.verdict}; ${r.called_pct}% of reference bases called across ${r.read_count} read(s).`,
+      next: 'Review unexpected variants and mixed-position disagreements before accepting the construct.',
+    });
+    show({
+      verdict: r.verdict,
+      called_pct: r.called_pct,
+      variant_count: r.variant_count,
+      unexpected_variant_count: r.unexpected_variant_count,
+      disagreement_count: r.disagreement_count,
+      genotype_calls: r.genotype_calls,
+      variants: r.variants,
+      read_summaries: r.read_summaries,
+    });
   } catch (e) { show(String(e)); }
 }
 

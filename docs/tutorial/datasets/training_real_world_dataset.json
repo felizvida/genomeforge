@@ -1,6 +1,6 @@
 {
   "dataset_name": "genomeforge_training_real_world_v2",
-  "created_at": "2026-05-15",
+  "created_at": "2026-06-15",
   "overview": "Real-world teaching bundle for the Genome Forge tutorial, including public-source records and clearly labeled training derivatives.",
   "usage_tips": [
     "Use extract_case_bundle.py to materialize the exact records for one case.",
@@ -934,22 +934,21 @@
         "EGFP_CDS"
       ],
       "tab": "Trace",
-      "workflow": "Combine multiple trace-derived views into one final verdict about a reporter construct.",
+      "workflow": "Combine multiple Sanger reads into a consensus, variant table, and final construct verdict.",
       "apis": [
         "/api/import-ab1",
-        "/api/trace-align",
-        "/api/trace-consensus"
+        "/api/sanger-consensus",
+        "/api/trace-chromatogram-svg"
       ],
       "ui_walkthrough": {
-        "tab": "Trace",
-        "button": "Combine multiple trace-derived views into one final verdict about a reporter construct.",
-        "panel": "Results plus the matching visualization panel",
+        "tab": "Trace/Interop",
+        "button": "Multi-read Consensus",
+        "panel": "Results",
         "fields": [
-          "Sequence / FASTA / GenBank",
-          "Name",
-          "Topology",
-          "Frame",
-          "workflow-specific controls"
+          "Reference Sequence For Trace Alignment",
+          "Sanger Consensus Reads",
+          "Trace Expected Bases",
+          "Minimum Called Percent"
         ]
       },
       "decision_card": {
@@ -1151,28 +1150,27 @@
     },
     {
       "case_id": "R",
-      "title": "Promoter/RBS Context for Expression Tuning",
-      "cluster": "F",
+      "title": "Reference-Guided Annotation Transfer",
+      "cluster": "B",
       "records": [
-        "lacZ_alpha_fragment",
+        "pUC19_MCS",
         "EGFP_CDS"
       ],
       "tab": "Advanced",
-      "workflow": "Use annotation and translation context to discuss why expression output depends on more than the CDS alone.",
+      "workflow": "Transfer known EGFP reference annotations onto a candidate vector-plus-reporter construct by similarity.",
       "apis": [
-        "/api/auto-annotate",
+        "/api/annotation-transfer",
         "/api/sequence-tracks"
       ],
       "ui_walkthrough": {
         "tab": "Advanced",
-        "button": "Use annotation and translation context to discuss why expression output depends on more than the CDS alone.",
-        "panel": "Results plus the matching visualization panel",
+        "button": "Transfer Annotations",
+        "panel": "Results",
         "fields": [
-          "Sequence / FASTA / GenBank",
-          "Name",
-          "Topology",
-          "Frame",
-          "workflow-specific controls"
+          "Similarity Annotation Transfer References",
+          "Annotation Transfer Identity",
+          "Annotation Transfer Coverage",
+          "Sequence / FASTA / GenBank"
         ]
       },
       "decision_card": {

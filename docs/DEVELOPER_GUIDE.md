@@ -67,6 +67,8 @@ If dev dependencies are installed:
 
 ```bash
 python3 -m pytest
+python3 -m pytest --cov=backend --cov=bio --cov=collab --cov=compat --cov=canonical_schema --cov=genomeforge_toolkit --cov=web_ui --cov-report=term-missing:skip-covered --cov-report=xml
+python3 -m ruff check .
 ```
 
 Broader regression:
@@ -93,6 +95,9 @@ This repo now includes a `Makefile`:
 - `make functional`
 - `make unit`
 - `make pytest`
+- `make coverage`
+- `make lint`
+- `make quality`
 - `make e2e`
 - `make docs-check`
 - `make tutorial-pdf`
@@ -103,14 +108,17 @@ This repo now includes a `Makefile`:
 The intended test stack is layered:
 
 1. `unittest` and `pytest` for focused algorithm and contract checks
-2. `smoke_test.py` for broad endpoint coverage
-3. `real_world_functional_test.py` for workflow validation on real biological examples
-4. Playwright for browser-level user workflow checks
-5. `docs/validate_docs.py` for documentation consistency
+2. `pytest-cov` for branch-aware coverage across core modules and backend API slices
+3. `ruff` for fast Python lint checks
+4. `smoke_test.py` for broad endpoint coverage
+5. `real_world_functional_test.py` for workflow validation on real biological examples
+6. Playwright for browser-level user workflow checks
+7. `docs/validate_docs.py` for documentation consistency
 
 Current shipped baseline:
 
 - focused unit coverage in `tests/`
+- lint and coverage gates for the Python core/backend surface
 - broad API regression through `smoke_test.py`
 - end-to-end biology workflow regression through `real_world_functional_test.py`
 - browser workflow regression through `e2e/webui.spec.js` and shared helpers under `e2e/support/`

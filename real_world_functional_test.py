@@ -394,6 +394,34 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         )(r.post("/api/import-ab1", {"sequence": EGFP_CDS})),
     )
     r.check(
+        "sanger_multi_read_consensus",
+        "Confirm an expected EGFP reporter variant from multiple Sanger reads",
+        lambda: (
+            lambda pos, alt, variant: (
+                lambda out: (
+                    assert_condition(out["verdict"] == "PASS", "expected Sanger consensus PASS"),
+                    assert_condition(int(out["variant_count"]) == 1, "expected one reported variant"),
+                    assert_condition(int(out["unexpected_variant_count"]) == 0, "expected no unexpected variants"),
+                    out,
+                )[-1]
+            )(
+                r.post(
+                    "/api/sanger-consensus",
+                    {
+                        "reference_sequence": EGFP_CDS[:240],
+                        "read_sequences": [variant, variant, EGFP_CDS[:240]],
+                        "genotype_positions": [pos],
+                        "expected_bases": {str(pos): alt},
+                        "min_quality": 20,
+                        "identity_threshold_pct": 98.0,
+                        "min_called_pct": 100.0,
+                        "max_unexpected_variants": 0,
+                    },
+                )
+            )
+        )(67, "C" if EGFP_CDS[66] != "C" else "A", EGFP_CDS[:66] + ("C" if EGFP_CDS[66] != "C" else "A") + EGFP_CDS[67:240]),
+    )
+    r.check(
         "blast_like_search",
         "Run BLAST-like local similarity search across real sequence panel",
         lambda: (
@@ -567,6 +595,45 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
                 out,
             )[-1]
         )(r.post("/api/reference-scan", {**egfp_payload, "db_name": r.created["reference_db"], "add_features": True})),
+    )
+    r.check(
+        "annotation_transfer_similarity",
+        "Transfer EGFP reference annotations into a candidate plasmid construct by similarity",
+        lambda: (
+            lambda out: (
+                assert_condition(int(out.get("transferred_count", 0)) >= 2, "expected transferred EGFP annotations"),
+                assert_condition(int(out.get("features_added", 0)) >= 2, "expected added transferred features"),
+                assert_condition(out["transferred_features"][0]["start_1based"] > len(PUC19_MCS), "expected insert coordinates"),
+                out,
+            )[-1]
+        )(
+            r.post(
+                "/api/annotation-transfer",
+                {
+                    "name": "pUC19_EGFP_candidate",
+                    "topology": "circular",
+                    "content": PUC19_MCS + EGFP_CDS,
+                    "features": [{"key": "misc_feature", "location": f"1..{len(PUC19_MCS)}", "qualifiers": {"label": "pUC19 MCS"}}],
+                    "reference_records": [
+                        {
+                            "name": "EGFP_CDS_reference",
+                            "sequence": EGFP_CDS,
+                            "features": [
+                                {
+                                    "key": "CDS",
+                                    "location": f"1..{len(EGFP_CDS)}",
+                                    "qualifiers": {"label": "EGFP reporter CDS", "codon_start": "1"},
+                                },
+                                {"key": "gene", "location": "1..60", "qualifiers": {"label": "gfp N-terminus"}},
+                            ],
+                        }
+                    ],
+                    "min_identity_pct": 98.0,
+                    "min_feature_coverage_pct": 95.0,
+                    "add_features": True,
+                },
+            )
+        ),
     )
     r.check(
         "sirna_design",
