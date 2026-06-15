@@ -14,6 +14,7 @@ from backend.assembly_api import handle_assembly_endpoint
 from backend.biology_api import handle_biology_endpoint
 from backend.core_api import handle_core_endpoint, parse_record
 from backend.design_api import handle_design_endpoint
+from backend.ngs_api import handle_ngs_endpoint
 from backend.project_api import handle_project_endpoint, render_share_view_html
 from backend.search_reference_api import handle_search_reference_endpoint
 from backend.trace_api import handle_trace_endpoint
@@ -175,6 +176,8 @@ class Handler(BaseHTTPRequestHandler):
             elif (domain_response := handle_design_endpoint(self.path, payload, get_record)) is not None:
                 self._send_json(domain_response)
             elif (domain_response := handle_analysis_endpoint(self.path, payload, get_record)) is not None:
+                self._send_json(domain_response)
+            elif (domain_response := handle_ngs_endpoint(self.path, payload, get_record)) is not None:
                 self._send_json(domain_response)
             elif (domain_response := handle_biology_endpoint(self.path, payload, get_record)) is not None:
                 self._send_json(domain_response)

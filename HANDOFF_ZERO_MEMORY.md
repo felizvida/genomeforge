@@ -25,8 +25,8 @@ If the new thread has enough time, run the full validation stack before making r
 - Local path: `/Users/liux17/Documents/Playground`
 - Main branch in use: `master`
 - License: Apache-2.0
-- Latest documented release at this handoff: `v0.1.15`
-- Latest release URL: `https://github.com/felizvida/genomeforge/releases/tag/v0.1.15`
+- Latest documented release at this handoff: `v0.1.16`
+- Latest release URL: `https://github.com/felizvida/genomeforge/releases/tag/v0.1.16`
 - Runtime model: local-first workstation web app plus CLI, not a hosted multi-tenant SaaS service.
 
 Genome Forge is a local-first DNA design, cloning, validation, visualization, and bioinformatics training workbench. It combines plasmid/sequence visualization, cloning simulation, primer/PCR/trace workflows, CRISPR helpers, reference search, project sharing/review, and a large tutorial built around real biological examples.
@@ -98,11 +98,11 @@ Training docs:
 Current shipped baseline:
 
 - `python3 docs/validate_docs.py`: passes
-- `python3 -m unittest discover -s tests -p 'test_*.py'`: `53` tests pass
-- `./.venv-docs/bin/python -m pytest`: `53` tests pass when the docs virtualenv exists
-- `python3 smoke_test.py`: `115/115` checks pass
-- `python3 real_world_functional_test.py`: `106/106` workflow steps pass
-- `npm run test:e2e`: `15/15` browser tests pass
+- `python3 -m unittest discover -s tests -p 'test_*.py'`: `57` tests pass
+- `./.venv-docs/bin/python -m pytest`: `57` tests pass when the docs virtualenv exists
+- `python3 smoke_test.py`: `119/119` checks pass
+- `python3 real_world_functional_test.py`: `110/110` workflow steps pass
+- `npm run test:e2e`: `16/16` browser tests pass
 
 Use the fast baseline before small edits:
 
@@ -254,7 +254,7 @@ Current notable workflow domains:
 
 Current inventory marker expected by docs validation:
 
-- `114` documented `/api/*` endpoints plus `GET /share/<share_id>`
+- `118` documented `/api/*` endpoints plus `GET /share/<share_id>`
 
 ## 11. Tutorial And Dataset State
 
@@ -262,7 +262,7 @@ The tutorial is intentionally more than a button walkthrough. It teaches bioinfo
 
 Current tutorial state:
 
-- `45` lessons/cases.
+- `46` lessons/cases.
 - Publication-style HTML and PDF outputs.
 - Real-world-inspired training records and derived training variants.
 - Biological meaning sections, expected results, interpretation, and common wrong interpretations.
@@ -290,7 +290,7 @@ Be careful with page layout. The tutorial has been tuned for US Letter print ori
 
 ## 12. Release Process
 
-Use semantic version tags like `v0.1.15`.
+Use semantic version tags like `v0.1.16`.
 
 Typical release sequence:
 
@@ -367,6 +367,7 @@ When a release is pushed, do not call it complete until the new CI run passes.
 
 Recent releases, newest first:
 
+- `v0.1.16`: NGS-lite FASTQ QC/trimming, read mapping, variant evidence, workflow report UI, 46-case tutorial/book, and expanded validation.
 - `v0.1.15`: Geneious-inspired annotation transfer and multi-read Sanger consensus, tutorial/book updates, and audit fixes.
 - `v0.1.14`: request-size safety, `--max-post-mb`, `413` oversized POST handling, 48-test baseline.
 - `v0.1.13`: bind safety, `--allow-remote`, deterministic E2E output waits.
@@ -399,7 +400,7 @@ Security:
 Docs:
 
 - Tutorial PDF/HTML are generated artifacts; update source and rebuild rather than editing generated output by hand when possible.
-- Keep the case count at `45` unless intentionally changing tutorial scope.
+- Keep the case count at `46` unless intentionally changing tutorial scope.
 - Keep paper size US Letter for print material.
 
 ## 16. Recommended Next Work
@@ -454,4 +455,4 @@ If those pass, the project is at a known-good baseline.
 
 ## 19. One-Screen Summary
 
-Genome Forge is a local-first DNA/bioinformatics workbench at release `v0.1.15`. It has broad feature coverage, real-data tutorial material, Geneious-inspired annotation transfer and Sanger consensus workflows, project sharing/review workflows, and a modern browser UI. The latest engineering emphasis has been practical bench-facing workflow depth plus hardening: SVG sanitization, security headers, loopback bind safety, bounded POST reads, and audit-backed edge-case fixes. The main remaining work is structural modernization: frontend state isolation, stricter CSP without inline-style dependency, typed API validation, and deeper test-backed decomposition.
+Genome Forge is a local-first DNA/bioinformatics workbench at release `v0.1.16`. It has broad feature coverage, real-data tutorial material, Geneious-inspired annotation transfer and Sanger consensus workflows, NGS-lite FASTQ/read-mapping/variant evidence, project sharing/review workflows, and a modern browser UI. The latest engineering emphasis has been practical bench-facing workflow depth plus hardening: SVG sanitization, security headers, loopback bind safety, bounded POST reads, audit-backed edge-case fixes, and test-backed replacement-phase reporting. The main remaining work is structural modernization: frontend state isolation, stricter CSP without inline-style dependency, typed API validation, and deeper test-backed decomposition.

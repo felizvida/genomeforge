@@ -548,6 +548,20 @@ This playbook mirrors the tutorial exactly. Use it as the fast checklist after y
 - Bench decision: Use public-search hits to refine identity hypotheses, not to erase local coordinate context.
 - Common caution: Top hit, high identity, and biological identity are related but not identical claims.
 
+## Case AT: NGS-Lite Amplicon Evidence Report
+
+- Cluster: Data Fidelity and Interoperability
+- Focus: Can a small amplicon read set confirm the expected reporter edit while also making quality, adapter trimming, and coverage gaps visible?
+- Records: EGFP_CDS
+- Workflow: Run a compact FASTQ QC, trimming, read-mapping, and variant-evidence workflow for an EGFP amplicon.
+- UI path: NGS Lite tab -> `Workflow Report` -> NGS Lite Evidence Report
+- APIs: /api/fastq-qc, /api/fastq-trim, /api/ngs-map-reads, /api/ngs-workflow-report
+- Extract bundle: `python3 docs/tutorial/datasets/extract_case_bundle.py --case AT --out ./tmp/genomeforge_case_at `
+- Key expected signal: A FASTQ QC report that detects adapter contamination and summarizes read quality.
+- Evidence/inference checkpoint: Coverage at the expected edit is more important than a pretty overall read count.
+- Bench decision: Accept the construct only when expected edits have enough high-quality read support and coverage gaps do not touch decision-critical positions.
+- Common caution: A high-support local variant report is useful construct evidence, but it is not a substitute for production-grade NGS secondary analysis.
+
 ## Case AK: Reference Element Auto-Flagging and siRNA Design/Mapping
 
 - Cluster: Data Fidelity and Interoperability

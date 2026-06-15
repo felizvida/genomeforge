@@ -90,6 +90,16 @@ Legend:
 | External BLAST launch links | Available | Validated heuristic | Suite | Selected sequence can be packaged as FASTA and launched to NCBI BLAST or WormBase/WormBase ParaSite. |
 | DNA and protein motif/entity search | Available | Validated heuristic | Focused | Unified search covers motifs, features, primers, and related objects. |
 
+## NGS-Lite Evidence Workflows
+
+| Feature | Availability | Maturity | Validation | Notes |
+| --- | --- | --- | --- | --- |
+| FASTQ QC | Available | Validated heuristic | Suite | Reports read counts, length distribution, GC, Q20/Q30, per-base quality, and adapter hits for small read sets. |
+| Adapter and quality trimming | Available | Validated heuristic | Suite | Deterministic local trimming with retained/dropped read audit rows. |
+| Lightweight read-to-reference mapping | Available | Experimental | Suite | Small amplicon/construct reads can be mapped with mismatch tolerance, coverage, consensus, and zero-coverage reporting. |
+| Simple variant evidence | Available | Experimental | Suite | Pileup-style base counts identify high-support variants; this is not a replacement for clinical or population variant calling. |
+| Automated NGS-lite workflow report | Available | Experimental | Suite | Combines QC, trimming, mapping, variant checks, and replacement-phase status into one decision report. |
+
 ## CRISPR and RNAi Design
 
 | Feature | Availability | Maturity | Validation | Notes |

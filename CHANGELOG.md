@@ -4,6 +4,31 @@ All notable changes to Genome Forge are documented in this file.
 
 ## [Unreleased]
 
+## [0.1.16] - 2026-06-15
+
+### Added
+
+- Added NGS-lite FASTQ QC and adapter/quality trimming endpoints for local amplicon and construct-verification read sets.
+- Added lightweight read-to-reference mapping with coverage, consensus, zero-coverage regions, read-level mapping rows, and simple high-support variant evidence.
+- Added an automated NGS-lite workflow report that combines QC, trimming, mapping, expected-variant checks, unexpected-variant checks, and replacement-phase status.
+- Added browser UI controls and an evidence table for the NGS Lite workflow.
+- Added focused unit tests, HTTP smoke checks, real-world EGFP amplicon workflow checks, and browser E2E coverage for the NGS Lite workflow.
+
+### Changed
+
+- Expanded the self-study book to 46 cases with Case AT, "NGS-Lite Amplicon Evidence Report."
+- Updated the API inventory, feature coverage matrix, Geneious feature-priority note, README, handoff, tutorial dataset, playbook, case bundles, and generated PDF.
+- Updated validation baselines to 57 unit tests, 119 smoke checks, 110 real-world workflow steps, and 16 browser E2E tests.
+
+### Validation
+
+- `make quality PYTHON=./.venv-docs/bin/python3`
+- `./.venv-docs/bin/python3 -m unittest discover -s tests -p 'test_*.py'`
+- `./.venv-docs/bin/python3 smoke_test.py`
+- `./.venv-docs/bin/python3 real_world_functional_test.py`
+- `npm run test:e2e`
+- `git diff --check`
+
 ## [0.1.15] - 2026-06-15
 
 ### Added

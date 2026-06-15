@@ -85,6 +85,13 @@ This file is also used as a machine-checked inventory surface by `docs/validate_
 - `POST /api/blast-launch`
 - `POST /api/search-entities`
 
+## NGS-Lite QC, Mapping, And Workflow Reports
+
+- `POST /api/fastq-qc`
+- `POST /api/fastq-trim`
+- `POST /api/ngs-map-reads`
+- `POST /api/ngs-workflow-report`
+
 ## Annotation, Features, References, And RNAi
 
 - `POST /api/annotate-auto`

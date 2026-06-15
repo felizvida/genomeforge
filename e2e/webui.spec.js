@@ -161,6 +161,17 @@ test('runs analysis and cloning workflows', async ({ page }) => {
   await expect(page.locator('#inspector')).toContainText('Top ligation product');
 });
 
+test('runs NGS-lite workflow report from the browser UI', async ({ page }) => {
+  await activateTab(page, 'tab-ngs');
+
+  await clickAction(page, '#tab-ngs [data-action="runFastqQc"]', '"read_count": 3');
+  await expect(page.locator('#out')).toContainText('"adapter_hit_count": 1');
+
+  await clickAction(page, '#tab-ngs [data-action="runNgsWorkflowReport"]', '"verdict": "PASS"');
+  await expect(page.locator('#ngsReportViz')).toContainText('NGS-lite local pipeline');
+  await expect(page.locator('#ngsReportViz')).toContainText('Coverage');
+});
+
 test('saves and reloads a project from the browser UI', async ({ page }) => {
   const projectName = `e2e_project_${Date.now()}`;
   const savedContent = '>e2e_project\nGAATTCCGGATCCATGGCCATTGTAATGGGCC';

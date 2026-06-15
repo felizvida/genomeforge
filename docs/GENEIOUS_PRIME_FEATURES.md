@@ -23,6 +23,9 @@ Source:
 
 - `/api/annotation-transfer`: similarity-based annotation transfer from annotated reference records or saved reference libraries onto the current record. It reports identity, reference coverage, feature coverage, source record, target coordinates, and optional feature insertion.
 - `/api/sanger-consensus`: multi-read Sanger consensus and variant validation. It accepts cached trace IDs, trace records, or plain read sequences; reports consensus calls, unexpected variants, mixed-position disagreements, expected genotype checks, read-level summaries, and a PASS/FAIL verdict.
+- `/api/fastq-qc` and `/api/fastq-trim`: local FASTQ quality summaries and adapter/quality trimming for small amplicon or construct-verification read sets.
+- `/api/ngs-map-reads`: lightweight local read-to-reference mapping with coverage, consensus, zero-coverage regions, read-level mapping rows, and simple variant evidence.
+- `/api/ngs-workflow-report`: automated QC -> trimming -> mapping -> variant report that summarizes SnapGene-style construct verification, Geneious-style sequence analysis, NGS-lite pipeline evidence, and trust/release evidence in one decision surface.
 
 ## Test Strategy
 
@@ -30,5 +33,6 @@ The new regression tests use common molecular-biology data patterns rather than 
 
 - pUC19 multiple-cloning-site sequence plus EGFP CDS to validate annotation transfer of reporter features into a candidate plasmid context.
 - EGFP-derived Sanger read panels to validate expected variant confirmation, mixed evidence reporting, and failure on unexpected variants.
+- EGFP amplicon FASTQ reads with one expected reporter variant and one adapter-contaminated tail to validate QC, trimming, coverage, variant calling, and replacement-phase decision reporting.
 
 These tests are intentionally deterministic and local-first, so they can run in CI without public database access while still representing realistic bench decisions.

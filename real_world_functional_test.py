@@ -178,6 +178,26 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
         "content": f">pUC19_MCS\n{PUC19_MCS}",
         "features": [{"key": "misc_feature", "location": "1..63", "qualifiers": {"label": "MCS"}}],
     }
+    ngs_adapter = "AGATCGGAAGAGC"
+    ngs_ref = EGFP_CDS[:180]
+    ngs_pos = 67
+    ngs_alt = "C" if ngs_ref[ngs_pos - 1] != "C" else "A"
+    ngs_variant = ngs_ref[: ngs_pos - 1] + ngs_alt + ngs_ref[ngs_pos:]
+
+    def _fastq(name: str, read_seq: str, tail_quality: str = "") -> str:
+        quality = "I" * len(read_seq)
+        if tail_quality:
+            quality = quality[: -len(tail_quality)] + tail_quality
+        return f"@{name}\n{read_seq}\n+\n{quality}\n"
+
+    ngs_fastq = "".join(
+        [
+            _fastq("egfp_amplicon_read_1", ngs_variant[0:90]),
+            _fastq("egfp_amplicon_read_2", ngs_variant[45:135]),
+            _fastq("egfp_amplicon_read_3", ngs_variant[60:150] + ngs_adapter, "!" * len(ngs_adapter)),
+            _fastq("egfp_amplicon_read_4", ngs_variant[90:180]),
+        ]
+    )
 
     r.check("info_egfp", "Compute basic stats for EGFP CDS", lambda: r.post("/api/info", egfp_payload))
     r.check("info_mcherry", "Compute basic stats for mCherry CDS", lambda: r.post("/api/info", mcherry_payload))
@@ -420,6 +440,80 @@ def run_real_world_suite(base_url: str, verbose: bool) -> tuple[dict[str, Any], 
                 )
             )
         )(67, "C" if EGFP_CDS[66] != "C" else "A", EGFP_CDS[:66] + ("C" if EGFP_CDS[66] != "C" else "A") + EGFP_CDS[67:240]),
+    )
+    r.check(
+        "fastq_qc_adapter",
+        "Run FASTQ QC on EGFP amplicon reads with an adapter-contaminated tail",
+        lambda: (
+            lambda out: (
+                assert_condition(out["read_count"] == 4, "expected four FASTQ reads"),
+                assert_condition(out["adapter_hit_count"] == 1, "expected one adapter-bearing read"),
+                out,
+            )[-1]
+        )(r.post("/api/fastq-qc", {"fastq": ngs_fastq, "adapter_sequence": ngs_adapter})),
+    )
+    r.check(
+        "fastq_trim_adapter",
+        "Trim adapter and low-quality tail from EGFP amplicon reads",
+        lambda: (
+            lambda out: (
+                assert_condition(out["kept_read_count"] == 4, "expected all reads retained after trimming"),
+                assert_condition(out["qc_after"]["adapter_hit_count"] == 0, "adapter should be removed after trimming"),
+                out,
+            )[-1]
+        )(r.post("/api/fastq-trim", {"fastq": ngs_fastq, "adapter_sequence": ngs_adapter, "trim_quality": 20, "min_length": 60})),
+    )
+    r.check(
+        "ngs_map_reads_variant",
+        "Map EGFP amplicon reads and call the expected reporter variant",
+        lambda: (
+            lambda trimmed: (
+                lambda out: (
+                    assert_condition(out["mapped_read_count"] == 4, "expected all reads to map"),
+                    assert_condition(out["variant_count"] == 1, "expected one NGS-lite variant"),
+                    out,
+                )[-1]
+            )(
+                r.post(
+                    "/api/ngs-map-reads",
+                    {
+                        "reference_sequence": ngs_ref,
+                        "fastq": trimmed["trimmed_fastq"],
+                        "min_depth": 2,
+                        "min_alt_count": 2,
+                        "min_alt_fraction": 0.6,
+                    },
+                )
+            )
+        )(r.post("/api/fastq-trim", {"fastq": ngs_fastq, "adapter_sequence": ngs_adapter, "trim_quality": 20, "min_length": 60})),
+    )
+    r.check(
+        "ngs_workflow_report",
+        "Generate a replacement-phase report from EGFP amplicon read evidence",
+        lambda: (
+            lambda out: (
+                assert_condition(out["verdict"] == "PASS", "expected NGS-lite workflow PASS"),
+                assert_condition(out["expected_variant_checks"][0]["status"] == "pass", "expected variant should pass"),
+                assert_condition(len(out["replacement_phase_coverage"]) == 4, "expected four phase coverage rows"),
+                out,
+            )[-1]
+        )(
+            r.post(
+                "/api/ngs-workflow-report",
+                {
+                    "reference_sequence": ngs_ref,
+                    "fastq": ngs_fastq,
+                    "adapter_sequence": ngs_adapter,
+                    "trim_quality": 20,
+                    "min_length": 60,
+                    "expected_variants": {str(ngs_pos): ngs_alt},
+                    "min_reference_coverage_pct": 90,
+                    "min_depth": 2,
+                    "min_alt_count": 2,
+                    "min_alt_fraction": 0.6,
+                },
+            )
+        ),
     )
     r.check(
         "blast_like_search",

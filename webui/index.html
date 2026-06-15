@@ -93,6 +93,7 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
       <div class="tabs" id="tabs">
         <button class="tab active" data-tab="tab-map">Map</button>
         <button class="tab" data-tab="tab-analysis">Analysis</button>
+        <button class="tab" data-tab="tab-ngs">NGS Lite</button>
         <button class="tab" data-tab="tab-primers">Primers/PCR</button>
         <button class="tab" data-tab="tab-search">ORF/Motif</button>
         <button class="tab" data-tab="tab-edit">Edit</button>
@@ -134,6 +135,46 @@ GAATTCCGGATCCATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGAAGCTTTCTAGA</textarea>
         <div class="row">
           <select id="host"><option value="ecoli">ecoli</option><option value="yeast">yeast</option></select>
           <button class="hot" data-action="runCodonOptimize">Codon Optimize</button>
+        </div>
+      </div>
+
+      <div id="tab-ngs" class="tabpane">
+        <label>FASTQ Reads</label>
+        <textarea id="ngsFastq">@egfp_read_1
+ATGGTGAGCAAGGGCGAGGAGCTGTTCACC
++
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+@egfp_read_2
+GGCGAGGAGCTGTTCACCGGGGTGGTGCCC
++
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+@egfp_read_3
+TTCACCGGGGTGGTGCCCATCCTGGTCGAGAGATCGGAAGAGC
++
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII!!!!!!!!!!!!!</textarea>
+        <label>Reference For Read Mapping</label>
+        <textarea id="ngsReference">ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTGGTCGAGCTG</textarea>
+        <div class="row3">
+          <input id="ngsTrimQuality" type="number" value="20" />
+          <input id="ngsMinLength" type="number" value="24" />
+          <input id="ngsMismatchRate" type="number" step="0.01" value="0.08" />
+        </div>
+        <div class="row3">
+          <input id="ngsMinDepth" type="number" value="2" />
+          <input id="ngsMinAltCount" type="number" value="2" />
+          <input id="ngsMinAltFraction" type="number" step="0.05" value="0.6" />
+        </div>
+        <label>Expected Variants (JSON position: base)</label>
+        <input id="ngsExpectedVariants" value='{}' />
+        <label>Adapter Sequence</label>
+        <input id="ngsAdapter" value="AGATCGGAAGAGC" />
+        <div class="row">
+          <button data-action="runFastqQc">FASTQ QC</button>
+          <button data-action="runFastqTrim">Trim Reads</button>
+        </div>
+        <div class="row">
+          <button data-action="runNgsMapReads">Map Reads</button>
+          <button class="hot" data-action="runNgsWorkflowReport">Workflow Report</button>
         </div>
       </div>
 
@@ -781,6 +822,8 @@ TTTCCCGGGAAATTT</textarea>
         <button data-action="resetPanelView" data-args='["compareLensViz"]'>Compare Reset</button>
         <button data-action="runComparisonLensViz">Re-render Compare</button>
       </div>
+      <label class="panel-title">NGS Lite Evidence Report</label>
+      <div id="ngsReportViz">Run "Workflow Report" from the NGS Lite tab.</div>
       <label class="panel-title">External BLAST Launchpad</label>
       <div id="externalBlastViz">Use "Launch Selected Sequence Externally" to open NCBI or WormBase with a copyable FASTA query.</div>
       <label class="panel-title">Sanger Chromatogram</label>

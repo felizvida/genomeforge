@@ -391,6 +391,7 @@
         "caution": "Do not prefer a cutter merely because it cuts often; prefer the cutter that answers the discrimination question cleanly."
       },
       "glossary_terms": [
+        "variant",
         "restriction site",
         "methylation"
       ],
@@ -612,7 +613,8 @@
       },
       "glossary_terms": [
         "CDS",
-        "codon"
+        "codon",
+        "variant"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case P --out ./tmp/genomeforge_case_p",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_p"
@@ -767,6 +769,7 @@
       "glossary_terms": [
         "CDS",
         "consensus",
+        "variant",
         "amplicon"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AL --out ./tmp/genomeforge_case_al",
@@ -959,6 +962,7 @@
       "glossary_terms": [
         "CDS",
         "consensus",
+        "variant",
         "Sanger trace"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case Z --out ./tmp/genomeforge_case_z",
@@ -999,7 +1003,8 @@
         "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
       },
       "glossary_terms": [
-        "CDS"
+        "CDS",
+        "variant"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case H --out ./tmp/genomeforge_case_h",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_h"
@@ -1179,7 +1184,8 @@
         "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
       },
       "glossary_terms": [
-        "CDS"
+        "CDS",
+        "coverage"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case R --out ./tmp/genomeforge_case_r",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_r"
@@ -1375,6 +1381,7 @@
       "glossary_terms": [
         "CDS",
         "consensus",
+        "coverage",
         "Sanger trace"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case Y --out ./tmp/genomeforge_case_y",
@@ -1447,7 +1454,8 @@
         "caution": "Do not report the tool output as the conclusion; report the defensible biological interpretation."
       },
       "glossary_terms": [
-        "CDS"
+        "CDS",
+        "variant"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AF --out ./tmp/genomeforge_case_af",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_af"
@@ -1635,7 +1643,8 @@
         "caution": "Top hit, high identity, and biological identity are related but not identical claims."
       },
       "glossary_terms": [
-        "CDS"
+        "CDS",
+        "coverage"
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AJ --out ./tmp/genomeforge_case_aj",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_aj"
@@ -1673,6 +1682,48 @@
       ],
       "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AS --out ./tmp/genomeforge_case_as",
       "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_as"
+    },
+    {
+      "case_id": "AT",
+      "title": "NGS-Lite Amplicon Evidence Report",
+      "cluster": "G",
+      "records": [
+        "EGFP_CDS"
+      ],
+      "tab": "NGS Lite",
+      "workflow": "Run a compact FASTQ QC, trimming, read-mapping, and variant-evidence workflow for an EGFP amplicon.",
+      "apis": [
+        "/api/fastq-qc",
+        "/api/fastq-trim",
+        "/api/ngs-map-reads",
+        "/api/ngs-workflow-report"
+      ],
+      "ui_walkthrough": {
+        "tab": "NGS Lite",
+        "button": "Workflow Report",
+        "panel": "NGS Lite Evidence Report",
+        "fields": [
+          "FASTQ Reads",
+          "Reference For Read Mapping",
+          "Expected Variants",
+          "Adapter Sequence",
+          "Depth and variant thresholds"
+        ]
+      },
+      "decision_card": {
+        "decision": "Accept the construct only when expected edits have enough high-quality read support and coverage gaps do not touch decision-critical positions.",
+        "bench": "Repeat or deepen the amplicon run if trimming removes too much evidence, coverage is sparse, or unexpected variants survive thresholding.",
+        "caution": "A high-support local variant report is useful construct evidence, but it is not a substitute for production-grade NGS secondary analysis."
+      },
+      "glossary_terms": [
+        "amplicon",
+        "CDS",
+        "FASTQ",
+        "coverage",
+        "variant"
+      ],
+      "extract_command": "python3 docs/tutorial/datasets/extract_case_bundle.py --case AT --out ./tmp/genomeforge_case_at",
+      "prebuilt_bundle_dir": "docs/tutorial/datasets/case_bundles/case_at"
     },
     {
       "case_id": "AK",

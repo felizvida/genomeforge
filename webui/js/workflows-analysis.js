@@ -75,6 +75,112 @@ async function runPhyloTree() {
   } catch (e) { show(String(e)); }
 }
 
+function ngsPayload(extra = {}) {
+  let expected_variants = {};
+  const rawExpected = document.getElementById('ngsExpectedVariants').value.trim();
+  if (rawExpected) {
+    expected_variants = JSON.parse(rawExpected);
+  }
+  return {
+    fastq: document.getElementById('ngsFastq').value,
+    reference_sequence: document.getElementById('ngsReference').value,
+    adapter_sequence: document.getElementById('ngsAdapter').value,
+    trim_quality: Number(document.getElementById('ngsTrimQuality').value),
+    min_length: Number(document.getElementById('ngsMinLength').value),
+    max_mismatch_rate: Number(document.getElementById('ngsMismatchRate').value),
+    min_depth: Number(document.getElementById('ngsMinDepth').value),
+    min_alt_count: Number(document.getElementById('ngsMinAltCount').value),
+    min_alt_fraction: Number(document.getElementById('ngsMinAltFraction').value),
+    expected_variants,
+    ...extra,
+  };
+}
+
+function renderNgsReport(result) {
+  const mapping = result.mapping || result;
+  const variants = (mapping.variants || []).slice(0, 20).map((variant) => (
+    `<tr><td>${variant.position_1based}</td><td>${escapeHtml(variant.reference_base)}</td>` +
+    `<td>${escapeHtml(variant.alternate_base)}</td><td>${variant.depth}</td>` +
+    `<td>${variant.alt_count}</td><td>${variant.alt_fraction}</td></tr>`
+  )).join('');
+  const phases = (result.replacement_phase_coverage || []).map((row) => (
+    `<tr><td>${escapeHtml(row.phase)}</td><td>${escapeHtml(row.status)}</td><td>${escapeHtml(row.evidence)}</td></tr>`
+  )).join('');
+  document.getElementById('ngsReportViz').innerHTML = `
+    <table class="star-grid">
+      <thead><tr><th>Reads</th><th>Mapped</th><th>Coverage</th><th>Mean Depth</th><th>Variants</th></tr></thead>
+      <tbody><tr>
+        <td>${mapping.read_count ?? '-'}</td>
+        <td>${mapping.mapped_read_count ?? '-'} (${mapping.mapped_pct ?? '-'}%)</td>
+        <td>${mapping.covered_pct ?? '-'}%</td>
+        <td>${mapping.mean_depth ?? '-'}</td>
+        <td>${mapping.variant_count ?? 0}</td>
+      </tr></tbody>
+    </table>
+    <table class="star-grid">
+      <thead><tr><th>Pos</th><th>Ref</th><th>Alt</th><th>Depth</th><th>Alt Count</th><th>Alt Fraction</th></tr></thead>
+      <tbody>${variants || '<tr><td colspan="6">No reportable variants at current thresholds.</td></tr>'}</tbody>
+    </table>
+    <table class="star-grid">
+      <thead><tr><th>Phase</th><th>Status</th><th>Evidence</th></tr></thead>
+      <tbody>${phases || '<tr><td colspan="3">Run the full workflow report for phase evidence.</td></tr>'}</tbody>
+    </table>
+  `;
+}
+
+async function runFastqQc() {
+  try {
+    const r = await callApi('/api/fastq-qc', ngsPayload());
+    show(r);
+  } catch (e) { show(String(e)); }
+}
+
+async function runFastqTrim() {
+  try {
+    const r = await callApi('/api/fastq-trim', ngsPayload());
+    document.getElementById('ngsFastq').value = r.trimmed_fastq || document.getElementById('ngsFastq').value;
+    show({ ...r, trimmed_fastq: '<updated FASTQ textarea>' });
+  } catch (e) { show(String(e)); }
+}
+
+async function runNgsMapReads() {
+  try {
+    const r = await callApi('/api/ngs-map-reads', ngsPayload());
+    renderNgsReport(r);
+    show({
+      mapped_read_count: r.mapped_read_count,
+      covered_pct: r.covered_pct,
+      mean_depth: r.mean_depth,
+      variant_count: r.variant_count,
+      variants: r.variants,
+    });
+  } catch (e) { show(String(e)); }
+}
+
+async function runNgsWorkflowReport() {
+  try {
+    const r = await callApi('/api/ngs-workflow-report', ngsPayload());
+    renderNgsReport(r);
+    setDecisionCard('generic', r, {
+      evidence: `NGS-lite workflow verdict ${r.verdict}; ${r.mapping?.covered_pct ?? 0}% coverage and ${r.mapping?.variant_count ?? 0} variant(s).`,
+      next: 'Confirm any expected loci, inspect zero-coverage regions, and rerun with stricter thresholds before release use.',
+      limit: 'This is a local small-sample evidence workflow, not a replacement for production secondary analysis pipelines.',
+    });
+    show({
+      verdict: r.verdict,
+      qc_after: r.trim?.qc_after,
+      mapping: {
+        mapped_read_count: r.mapping?.mapped_read_count,
+        covered_pct: r.mapping?.covered_pct,
+        mean_depth: r.mapping?.mean_depth,
+        variant_count: r.mapping?.variant_count,
+      },
+      expected_variant_checks: r.expected_variant_checks,
+      replacement_phase_coverage: r.replacement_phase_coverage,
+    });
+  } catch (e) { show(String(e)); }
+}
+
 async function runAutoAnnotate() {
   try {
     const r = await callApi('/api/annotate-auto', payload());

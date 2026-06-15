@@ -3,7 +3,7 @@
 <p align="center">
   <img alt="Release" src="https://img.shields.io/github/v/release/felizvida/genomeforge?display_name=tag">
   <img alt="License" src="https://img.shields.io/github/license/felizvida/genomeforge">
-  <img alt="Tutorial" src="https://img.shields.io/badge/tutorial-45%20real--world%20lessons-0ea5e9">
+  <img alt="Tutorial" src="https://img.shields.io/badge/tutorial-46%20real--world%20lessons-0ea5e9">
   <img alt="Web UI" src="https://img.shields.io/badge/interface-modern%20web%20UI-14b8a6">
 </p>
 
@@ -14,13 +14,14 @@ It combines:
 - interactive plasmid and sequence visualization
 - cloning and assembly planning
 - primer, PCR, trace, and verification workflows
+- FASTQ QC, trimming, lightweight read mapping, and NGS-lite variant evidence
 - CRISPR/design-assist tooling
 - project history, sharing, and lightweight review
-- a 45-lesson self-study tutorial built on real biological examples
+- a 46-lesson self-study tutorial built on real biological examples
 
 Latest release:
 
-- [Genome Forge v0.1.15](https://github.com/felizvida/genomeforge/releases/tag/v0.1.15)
+- [Genome Forge v0.1.16](https://github.com/felizvida/genomeforge/releases/tag/v0.1.16)
 
 ## Why Genome Forge
 
@@ -31,6 +32,7 @@ Genome Forge is built for practical sequence work across the full “design -> v
 - text-map inspection, diagnostic restriction comparison, custom ladders, and silent-site design
 - primer design, PCR, and mutagenesis workflows
 - alignment, trace review, and construct verification
+- FASTQ amplicon QC, adapter trimming, read mapping, coverage, and simple variant reports
 - external BLAST launch links for selected sequence against NCBI or WormBase
 - CRISPR helper workflows
 - reference libraries, auto-flagging, and siRNA design
@@ -114,10 +116,10 @@ genomeforge input.fasta info
 
 Current shipped baseline:
 
-- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `53/53` passed
-- `python3 smoke_test.py` -> `115/115` passed
-- `python3 real_world_functional_test.py` -> `106/106` passed
-- `npm run test:e2e` -> `15/15` passed
+- `python3 -m unittest discover -s tests -p 'test_*.py'` -> `57/57` passed
+- `python3 smoke_test.py` -> `119/119` passed
+- `python3 real_world_functional_test.py` -> `110/110` passed
+- `npm run test:e2e` -> `16/16` passed
 
 ## Documentation
 

@@ -252,6 +252,21 @@ GLOSSARY_TERMS = {
         'cs_analogy': 'A debugger trace behind a summarized test result.',
         'why_it_matters': 'Base calls are interpretations of peaks; weak or mixed peaks should change confidence.',
     },
+    'FASTQ': {
+        'definition': 'A sequencing-read text format that stores bases and a quality character for each base.',
+        'cs_analogy': 'A log file where every emitted token has an attached confidence score.',
+        'why_it_matters': 'FASTQ lets you separate the called read sequence from the evidence quality behind each base.',
+    },
+    'coverage': {
+        'definition': 'How many sequencing reads support each position in a reference sequence.',
+        'cs_analogy': 'How many independent observations exercise a given line or branch.',
+        'why_it_matters': 'A variant call at depth one is much weaker than the same call supported by multiple high-quality reads.',
+    },
+    'variant': {
+        'definition': 'A base or sequence difference from the chosen reference.',
+        'cs_analogy': 'A diff hunk relative to a known baseline.',
+        'why_it_matters': 'Expected variants can confirm an edit; unexpected variants can reveal mistakes, contamination, or biology worth investigating.',
+    },
     'silent mutation': {
         'definition': 'A DNA change that preserves the encoded amino acid.',
         'cs_analogy': 'A source-code rewrite that compiles to the same instruction.',
@@ -360,6 +375,15 @@ UI_GUIDES = [
         'panel': 'Results',
         'sample': 'Use multiple reads covering the expected edit and set expected bases only for positions with planned sequence changes.',
         'troubleshoot': 'If the verdict fails, inspect no-coverage genotype calls, unexpected variants, and mixed-position disagreements before changing the construct call.',
+    },
+    {
+        'match_api': '/api/ngs-workflow-report',
+        'tab': 'NGS Lite',
+        'fields': ['FASTQ Reads', 'Reference For Read Mapping', 'Expected Variants', 'Adapter Sequence', 'Depth and variant thresholds'],
+        'button': 'Workflow Report',
+        'panel': 'NGS Lite Evidence Report',
+        'sample': 'Use EGFP amplicon reads with one expected edit and one adapter-bearing read to inspect QC, trimming, coverage, and variants together.',
+        'troubleshoot': 'If the verdict is review, inspect low-quality tails, zero-coverage regions, unexpected variants, and whether expected edits have enough read support.',
     },
     {
         'match_api': '/api/trace-alignment-links',
@@ -952,6 +976,20 @@ CASES = [
              'Providers: <code>ncbi,wormbase,wormbase_parasite</code>',
              'Record name: <code>EGFP_CDS</code>',
          ]),
+    case('AT', 'NGS-Lite Amplicon Evidence Report', 'G', ['EGFP_CDS'], 'NGS Lite', 'Run a compact FASTQ QC, trimming, read-mapping, and variant-evidence workflow for an EGFP amplicon.', ['/api/fastq-qc', '/api/fastq-trim', '/api/ngs-map-reads', '/api/ngs-workflow-report'],
+         'Can a small amplicon read set confirm the expected reporter edit while also making quality, adapter trimming, and coverage gaps visible?',
+         'The example uses the familiar EGFP reporter so the biological object is easy to reason about. The sequencing evidence is intentionally small: a handful of overlapping amplicon reads, one planned variant, and one adapter-contaminated tail. That is enough to teach how FASTQ quality and coverage support or weaken a construct-verification call.',
+         'NGS-lite evidence is not about pretending a small local workflow replaces a production secondary-analysis stack. It is about making the core reasoning loop visible: inspect read quality, trim obvious technical artifacts, map reads to the intended reference, check coverage at decision-critical positions, and separate expected variants from surprises.',
+         'FASTQ looks like plain text, but every base carries a tiny confidence score; treating those scores as first-class evidence is what makes sequencing feel less magical.',
+         {'read_count': 4, 'adapter_hit_count_before_trim': 1, 'adapter_hit_count_after_trim': 0, 'expected_variant': 'EGFP position 67', 'workflow_verdict': 'PASS', 'phase_rows': ['construct verification', 'sequence analysis', 'NGS-lite pipeline', 'trust evidence']},
+         ['A FASTQ QC report that detects adapter contamination and summarizes read quality.', 'A trimming audit showing the adapter-bearing tail was removed without dropping useful reads.', 'A mapping and variant report that confirms the expected edit, reports coverage, and flags unexpected variants separately.'],
+         ['Coverage at the expected edit is more important than a pretty overall read count.', 'Adapter trimming changes what evidence is available, so the trim audit is part of the scientific record.', 'A PASS verdict is strongest when quality, coverage, expected-variant support, and absence of unexpected variants all point the same way.'],
+         'changing minimum depth, alternate fraction, or expected-variant JSON',
+         starter_values=[
+             'Use the NGS Lite panel default FASTQ reads, then replace the reference with the first <code>180</code> bp of <code>EGFP_CDS</code> for the full exercise.',
+             'Expected variants JSON: <code>{"67":"C"}</code> when using the generated EGFP amplicon example.',
+             'Adapter: <code>AGATCGGAAGAGC</code>; trim quality: <code>20</code>; minimum length: <code>60</code>.',
+         ]),
     case('AK', 'Reference Element Auto-Flagging and siRNA Design/Mapping', 'G', ['EGFP_CDS', 'mCherry_CDS'], 'Advanced', 'Reuse saved element libraries to auto-flag familiar sequence elements, then design and map siRNA candidates.', ['/api/reference-db-save', '/api/reference-scan', '/api/sirna-design', '/api/sirna-map'],
          'How do reusable sequence libraries turn repeated manual annotation into a faster and more consistent design workflow?',
          'Reporter CDS records are excellent for this because many labs annotate the same elements repeatedly. Saving reference libraries means the machine can recognize them quickly, and the same sequence can then be repurposed for knockdown-style thinking via siRNA design.',
@@ -1134,6 +1172,8 @@ def glossary_terms_for_case(case_info: dict) -> list[str]:
         selected.extend(['restriction site', 'methylation'])
     if any(api.startswith('/api/trace') or api in ['/api/import-ab1', '/api/sanger-consensus'] for api in case_info['apis']):
         selected.extend(['Sanger trace', 'consensus'])
+    if any(api in case_info['apis'] for api in ['/api/fastq-qc', '/api/fastq-trim', '/api/ngs-map-reads', '/api/ngs-workflow-report']):
+        selected.extend(['FASTQ', 'coverage', 'variant', 'consensus'])
     if any(api in case_info['apis'] for api in ['/api/pcr', '/api/pcr-gel-lanes', '/api/primers']):
         selected.append('amplicon')
     deduped = []
@@ -1181,6 +1221,12 @@ def decision_profile(case_info: dict) -> dict[str, str]:
             'decision': 'Accept the construct only where trace peaks support the called sequence at decision-critical bases.',
             'bench': 'Repeat sequencing or add an opposite-strand read if the chromatogram is weak, mixed, or edge-biased.',
             'caution': 'A clean-looking consensus is not stronger than the raw trace evidence behind it.',
+        }
+    if any(api in apis for api in {'/api/fastq-qc', '/api/fastq-trim', '/api/ngs-map-reads', '/api/ngs-workflow-report'}):
+        return {
+            'decision': 'Accept the construct only when expected edits have enough high-quality read support and coverage gaps do not touch decision-critical positions.',
+            'bench': 'Repeat or deepen the amplicon run if trimming removes too much evidence, coverage is sparse, or unexpected variants survive thresholding.',
+            'caution': 'A high-support local variant report is useful construct evidence, but it is not a substitute for production-grade NGS secondary analysis.',
         }
     if '/api/blast-launch' in apis or '/api/blast-search' in apis:
         return {
@@ -1258,6 +1304,11 @@ def common_mistakes(case_info: dict) -> list[tuple[str, str]]:
         return [
             ('Wrong interpretation', 'The exported base call is the raw experimental fact.'),
             ('Correction', 'The chromatogram is the rawer evidence; base calls and consensus are interpretations of that signal.'),
+        ]
+    if any(api in apis for api in {'/api/fastq-qc', '/api/fastq-trim', '/api/ngs-map-reads', '/api/ngs-workflow-report'}):
+        return [
+            ('Wrong interpretation', 'A variant in the table is automatically a biological truth.'),
+            ('Correction', 'Interpret the variant with depth, base quality, expected-edit status, zero-coverage regions, and sample provenance.'),
         ]
     if '/api/blast-launch' in apis or '/api/blast-search' in apis:
         return [

@@ -7,7 +7,7 @@ This folder contains the reproducible sample data used by the self-study tutoria
 - `training_real_world_sequences.fasta`: public-source base records bundled directly in FASTA.
 - `training_real_world_dataset.json`: metadata, sources, case-to-record mapping, and definitions for derived training records.
 - `case_playbook.md`: compact tutorial checklist.
-- `case_bundles/`: prebuilt ready-to-load bundles for all 45 cases.
+- `case_bundles/`: prebuilt ready-to-load bundles for all 46 cases.
 - `extract_case_bundle.py`: helper that writes a case-specific FASTA bundle plus a manifest JSON.
 
 ## Quick Use

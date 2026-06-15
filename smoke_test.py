@@ -130,6 +130,29 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
             {"key": "gene", "location": "5..25", "qualifiers": {"label": "g1"}},
         ],
     }
+    ngs_ref = seq[:64]
+    ngs_pos = 31
+    ngs_alt = "A" if ngs_ref[ngs_pos - 1] != "A" else "C"
+    ngs_variant = ngs_ref[: ngs_pos - 1] + ngs_alt + ngs_ref[ngs_pos:]
+    ngs_adapter = "AGATCGGAAGAGC"
+
+    def _fq(name: str, read_seq: str) -> str:
+        return f"@{name}\n{read_seq}\n+\n{'I' * len(read_seq)}\n"
+
+    ngs_fastq = "".join(
+        [
+            _fq("smoke_read_1", ngs_variant[:36]),
+            _fq("smoke_read_2", ngs_variant[12:48]),
+            _fq("smoke_read_3", ngs_variant[24:60] + ngs_adapter),
+        ]
+    )
+    ngs_clean_fastq = "".join(
+        [
+            _fq("smoke_read_1", ngs_variant[:36]),
+            _fq("smoke_read_2", ngs_variant[12:48]),
+            _fq("smoke_read_3", ngs_variant[24:60]),
+        ]
+    )
 
     # Core
     r.check("api_info", lambda: r.post("/api/info", base_payload)[1]["length"] > 0)
@@ -171,6 +194,51 @@ def run_suite(base_url: str, verbose: bool) -> dict[str, Any]:
             "/api/comparison-lens-svg",
             {"seq_a": seq, "seq_b": seq.replace("GAATTC", "GAGTTC"), "window": 30},
         )[1],
+    )
+    r.check(
+        "api_fastq_qc",
+        lambda: r.post("/api/fastq-qc", {"fastq": ngs_fastq, "adapter_sequence": ngs_adapter})[1]["adapter_hit_count"] == 1,
+    )
+    r.check(
+        "api_fastq_trim",
+        lambda: r.post(
+            "/api/fastq-trim",
+            {"fastq": ngs_fastq, "adapter_sequence": ngs_adapter, "trim_quality": 20, "min_length": 24},
+        )[1]["kept_read_count"]
+        == 3,
+    )
+    r.check(
+        "api_ngs_map_reads",
+        lambda: r.post(
+            "/api/ngs-map-reads",
+            {
+                "reference_sequence": ngs_ref,
+                "fastq": ngs_clean_fastq,
+                "min_depth": 2,
+                "min_alt_count": 2,
+                "min_alt_fraction": 0.6,
+            },
+        )[1]["variant_count"]
+        == 1,
+    )
+    r.check(
+        "api_ngs_workflow_report",
+        lambda: r.post(
+            "/api/ngs-workflow-report",
+            {
+                "reference_sequence": ngs_ref,
+                "fastq": ngs_fastq,
+                "adapter_sequence": ngs_adapter,
+                "trim_quality": 20,
+                "min_length": 24,
+                "expected_variants": {str(ngs_pos): ngs_alt},
+                "min_reference_coverage_pct": 90,
+                "min_depth": 2,
+                "min_alt_count": 2,
+                "min_alt_fraction": 0.6,
+            },
+        )[1]["verdict"]
+        == "PASS",
     )
     r.check(
         "api_canonicalize_record",
